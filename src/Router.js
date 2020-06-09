@@ -9,7 +9,7 @@ import { useStore } from './contexts'
 
 function NoMatch() {
   const store = useStore()
-  return store.app.isSignIn ? <Redirect to={'/home/dashboard'} /> : <Redirect to={'/auth/sign-in'} />
+  return store.user.isSignIn ? <Redirect to={'/home/dashboard'} /> : <Redirect to={'/auth/sign-in'} />
 }
 
 function Poster(props) {

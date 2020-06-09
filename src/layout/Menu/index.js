@@ -45,7 +45,6 @@ export default function Menu({ collapsed }) {
       defaultSelectedKeys={['dashboard']}
       defaultOpenKeys={[]}
       mode="inline"
-      theme="dark"
       inlineCollapsed={collapsed}
     >
       {

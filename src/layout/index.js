@@ -44,7 +44,7 @@ export default function Layout({ children, single }) {
                 overlay={
                   <AMenu onClick={e => {
                     if (e.key === "sign-out") {
-                      store.app.signOut()
+                      store.user.signOut()
                       router.goRoot()
                     }
                   }}>
@@ -53,7 +53,8 @@ export default function Layout({ children, single }) {
                 }
               >
                 <div style={{ margin: '0 20px' }}>
-                  <Avatar icon={<UserOutlined />} /><DownOutlined />
+                  {store.user.username}
+                  <Avatar style={{ margin: '0 5px' }} icon={<UserOutlined />} /><DownOutlined />
                 </div>
               </Dropdown>
             </Header>
