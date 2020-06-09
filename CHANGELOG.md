@@ -6,3 +6,4 @@
 - menu/layout
 - shttp
 - api mock
+- pace.js
