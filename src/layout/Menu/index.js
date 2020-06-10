@@ -1,8 +1,8 @@
 import React from 'react'
 import { Menu as Comp } from 'antd'
-import { DashboardOutlined, SettingOutlined } from '@ant-design/icons'
+import { DashboardOutlined, UnorderedListOutlined, PicLeftOutlined, HddOutlined, RadarChartOutlined, UsbOutlined, OrderedListOutlined, CloudSyncOutlined, CloudServerOutlined } from '@ant-design/icons'
 import { Observer } from 'mobx-react-lite'
-import { useRouter } from '../../contexts'
+import { useRouter, useStore } from '../../contexts'
 
 const data = [
   {
@@ -13,21 +13,80 @@ const data = [
     sub: [],
   },
   {
-    title: '设置',
-    name: 'setting',
-    icon: <SettingOutlined />,
-    path: '/home/setting',
+    title: '频道管理',
+    name: 'channel-manage',
+    icon: <UnorderedListOutlined />,
+    path: '/home/channel-manage',
+    sub: [],
+  },
+  {
+    title: '分组管理',
+    name: 'group-manage',
+    icon: <PicLeftOutlined />,
+    path: '/home/group-manage',
+    sub: [],
+  },
+  {
+    title: '资源管理',
+    name: 'resource-manage',
+    icon: <HddOutlined />,
+    path: '/home/resource-manage',
+    sub: [
+      // {
+      //   title: '资源列表',
+      //   name: 'resource-list',
+      //   icon: <OrderedListOutlined />,
+      //   path: '/home/resource-list',
+      //   sub: [],
+      // },
+      // {
+      //   title: '编辑资源',
+      //   name: 'resource-edit',
+      //   path: '/home/resource-edit',
+      //   sub: [],
+      // },
+    ],
+  },
+  {
+    title: '数据管理',
+    name: 'data-manage',
+    icon: <UsbOutlined />,
+    path: '/home/data-manage',
     sub: [
       {
-        title: 'item1',
-        name: 'item1',
-        path: '/auth/sign-in',
+        title: '数据备份',
+        name: 'data-backup',
+        icon: <CloudServerOutlined />,
+        path: '/home/data-backup',
         sub: [],
       },
       {
-        title: 'item2',
-        name: 'item2',
-        path: '/home/manage/2',
+        title: '数据同步',
+        name: 'data-sync',
+        icon: <CloudSyncOutlined />,
+        path: '/home/data-sync',
+        sub: [],
+      },
+    ],
+  },
+  {
+    title: '爬虫管理',
+    name: 'spider-manage',
+    icon: <RadarChartOutlined />,
+    path: '/home/spider-manage',
+    sub: [
+      {
+        title: '规则列表',
+        name: 'rule-list',
+        icon: <OrderedListOutlined />,
+        path: '/home/rule-list',
+        sub: [],
+      },
+      {
+        title: '任务列表',
+        name: 'task-list',
+        icon: <OrderedListOutlined />,
+        path: '/task-list',
         sub: [],
       },
     ],
@@ -36,13 +95,15 @@ const data = [
 
 export default function Menu({ collapsed }) {
   const router = useRouter()
-  function jump(path) {
+  const store = useStore()
+  function jump(path, key) {
+    store.app.set('menuKey', key)
     router.goPage(path, '', {})
   }
   return <Observer>{() => (
     <Comp
-      style={{ flex: 'auto' }}
-      defaultSelectedKeys={['dashboard']}
+      style={{ flex: 'auto', overflowY: 'auto', overflowX: 'hidden' }}
+      defaultSelectedKeys={[store.app.menuKey]}
       defaultOpenKeys={[]}
       mode="inline"
       inlineCollapsed={collapsed}
@@ -50,10 +111,10 @@ export default function Menu({ collapsed }) {
       {
         data.map(menu => {
           if (menu.sub.length === 0) {
-            return <Comp.Item key={menu.name} onClick={() => jump(menu.path)} icon={menu.icon}>{menu.title}</Comp.Item>
+            return <Comp.Item key={menu.name} onClick={() => jump(menu.path, menu.name)} icon={menu.icon}>{menu.title}</Comp.Item>
           } else {
             return <Comp.SubMenu title={menu.title} key={menu.name} icon={menu.icon}>
-              {menu.sub.map(item => <Comp.Item key={item.name} onClick={() => jump(item.path)} icon={item.icon}>{item.title}</Comp.Item>)}
+              {menu.sub.map(item => <Comp.Item key={item.name} onClick={() => jump(item.path, menu.name)} icon={item.icon}>{item.title}</Comp.Item>)}
             </Comp.SubMenu>
           }
         })

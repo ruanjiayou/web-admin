@@ -1,5 +1,9 @@
 import mock from 'mockjs'
 
+mock.setup({
+  timeout: '200-600'
+})
+
 function success(data) {
   return {
     code: 0,

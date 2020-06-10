@@ -1,16 +1,31 @@
 import shttp from '../utils/shttp'
+import * as backup from './backup'
+import * as channel from './channel'
+import * as group from './group'
+import * as resource from './resource'
+import * as rule from './rule'
+import * as sync from './sync'
+import * as task from './task'
+import * as user from './user'
 
-export function getMenu({ query, param, data }) {
+// resource types
+// image line
+// 
+function boot() {
   return shttp({
-    method: 'GET',
-    url: '/v1/public/menu'
+    url: '/v1/boot',
+    method: 'GET'
   })
 }
 
-export function signIn({ data }) {
-  return shttp({
-    method: 'POST',
-    url: '/v1/auth/user/sign-in',
-    data,
-  })
+export default {
+  boot,
+  ...backup,
+  ...channel,
+  ...group,
+  ...resource,
+  ...rule,
+  ...sync,
+  ...task,
+  ...user,
 }
