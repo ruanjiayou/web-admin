@@ -28,10 +28,10 @@ export default function SignInPage() {
         <Form.Item style={{ textAlign: 'center' }}>
           <Button type="primary" loading={local.isFetch} block onClick={async () => {
             local.isFetch = true
-            const res = await apis.signIn({ username: local.username, password: local.password })
+            const res = await apis.signIn({ data: { name: local.username, password: local.password } })
             local.isFetch = false
             if (res.code === 0) {
-              store.user.signIn(res.data)
+              store.user.signIn({ token: res.data.token, username: local.username })
               router.goPage('/')
             } else {
               message.error(res.message)

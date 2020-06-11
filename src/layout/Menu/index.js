@@ -57,14 +57,14 @@ const data = [
         title: '数据备份',
         name: 'data-backup',
         icon: <CloudServerOutlined />,
-        path: '/home/data-backup',
+        path: '/home/data-manage/backup',
         sub: [],
       },
       {
         title: '数据同步',
         name: 'data-sync',
         icon: <CloudSyncOutlined />,
-        path: '/home/data-sync',
+        path: '/home/data-manage/sync',
         sub: [],
       },
     ],
@@ -79,14 +79,14 @@ const data = [
         title: '规则列表',
         name: 'rule-list',
         icon: <OrderedListOutlined />,
-        path: '/home/rule-list',
+        path: '/home/spider-manage/rule',
         sub: [],
       },
       {
         title: '任务列表',
         name: 'task-list',
         icon: <OrderedListOutlined />,
-        path: '/task-list',
+        path: '/home/spider-manage/task',
         sub: [],
       },
     ],
@@ -97,6 +97,9 @@ export default function Menu({ collapsed }) {
   const router = useRouter()
   const store = useStore()
   function jump(path, key) {
+    if (store.app.menuKey === key) {
+      return;
+    }
     store.app.set('menuKey', key)
     router.goPage(path, '', {})
   }
@@ -104,7 +107,7 @@ export default function Menu({ collapsed }) {
     <Comp
       style={{ flex: 'auto', overflowY: 'auto', overflowX: 'hidden' }}
       defaultSelectedKeys={[store.app.menuKey]}
-      defaultOpenKeys={[]}
+      defaultOpenKeys={[store.app.menuKey]}
       mode="inline"
       inlineCollapsed={collapsed}
     >
@@ -114,7 +117,7 @@ export default function Menu({ collapsed }) {
             return <Comp.Item key={menu.name} onClick={() => jump(menu.path, menu.name)} icon={menu.icon}>{menu.title}</Comp.Item>
           } else {
             return <Comp.SubMenu title={menu.title} key={menu.name} icon={menu.icon}>
-              {menu.sub.map(item => <Comp.Item key={item.name} onClick={() => jump(item.path, menu.name)} icon={item.icon}>{item.title}</Comp.Item>)}
+              {menu.sub.map(item => <Comp.Item key={item.name} onClick={() => jump(item.path, item.name)} icon={item.icon}>{item.title}</Comp.Item>)}
             </Comp.SubMenu>
           }
         })

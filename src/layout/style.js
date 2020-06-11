@@ -15,9 +15,9 @@ export const LayoutH = styled.div`
 `;
 
 export const Sider = styled.div`
-  width: 200px;
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
 `;
 
 export const Header = styled.div`

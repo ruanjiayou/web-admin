@@ -30,3 +30,8 @@ mock.mock('/v1/auth/user/sign-in', success({
   token: 'xxxxx',
   username: 'admin',
 }))
+
+mock.mock('/v1/admin/backups', success([]))
+mock.mock('/v1/admin/syncs', success([]))
+mock.mock('/v1/admin/rules', success([]))
+mock.mock('/v1/admin/tasks', success([]))

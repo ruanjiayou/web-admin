@@ -21,6 +21,7 @@ export default function ResourceManagePage() {
     search_type: 'novel',
     search_page: 1,
     categories: [],
+    resources: [],
   }))
   let categories = []
   const search = useCallback(() => {
@@ -33,7 +34,7 @@ export default function ResourceManagePage() {
     getResources(query).then(res => {
       local.isLoading = false
       local.count = res.count
-      local.setResources(res.data)
+      local.resources = res.data
     }).catch(() => {
       local.isLoading = false
     })
@@ -46,12 +47,12 @@ export default function ResourceManagePage() {
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         <div style={{ padding: '10px 0' }}>
           名称<Divider type="vertical" />
-        <Input style={{ width: 250 }} value={local.search_name} onChange={e => {
+          <Input style={{ width: 250 }} value={local.search_name} onChange={e => {
             local.search_name = e.target.value
           }} />
           <Divider type="vertical" />
           资源类型<Divider type="vertical" />
-        <Select style={{ width: 150 }} value={local.search_type} onChange={value => {
+          <Select style={{ width: 150 }} value={local.search_type} onChange={value => {
             local.search_type = value
           }}>
             <Select.Option value="">全部</Select.Option>
@@ -73,7 +74,6 @@ export default function ResourceManagePage() {
         <div style={{ flex: '1 0 0%', overflow: 'auto' }}>
           <ResourceList
             items={local.resources}
-            isLoading={local.isLoading}
             openEdit={(data) => { local.temp = data; local.showEdit = true; }}
             destroy={destroy}
             search={search}

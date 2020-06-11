@@ -26,7 +26,7 @@ export default function Layout({ children, single }) {
   </Fragment> : (
       <Observer>{() => (
         <LayoutH>
-          <Sider style={{ width: local.collapsed ? 80 : store.config.siderWidth }}>
+          <Sider style={{ flexBasis: local.collapsed ? 80 : store.config.siderWidth }}>
             <Header style={hs}>
               <Avatar size={store.config.logoSize} src={logo} style={{ margin: '0 10px' }} alt="logo" />
               {!local.collapsed && store.config.name}
@@ -58,7 +58,7 @@ export default function Layout({ children, single }) {
                 </div>
               </Dropdown>
             </Header>
-            <Content>{children}</Content>
+            <Content style={{ padding: 15 }}>{children}</Content>
           </LayoutV>
         </LayoutH>
       )}</Observer>
