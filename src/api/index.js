@@ -7,6 +7,7 @@ import * as rule from './rule'
 import * as sync from './sync'
 import * as task from './task'
 import * as user from './user'
+import * as schedule from './schedule'
 
 // resource types
 // image line
@@ -28,4 +29,5 @@ export default {
   ...sync,
   ...task,
   ...user,
+  ...schedule,
 }

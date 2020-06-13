@@ -1,6 +1,6 @@
 import React from 'react'
 import { Menu as Comp } from 'antd'
-import { DashboardOutlined, UnorderedListOutlined, PicLeftOutlined, HddOutlined, RadarChartOutlined, UsbOutlined, OrderedListOutlined, CloudSyncOutlined, CloudServerOutlined } from '@ant-design/icons'
+import { DashboardOutlined, FieldTimeOutlined, UnorderedListOutlined, PicLeftOutlined, HddOutlined, RadarChartOutlined, UsbOutlined, OrderedListOutlined, CloudSyncOutlined, CloudServerOutlined } from '@ant-design/icons'
 import { Observer } from 'mobx-react-lite'
 import { useRouter, useStore } from '../../contexts'
 
@@ -24,6 +24,13 @@ const data = [
     name: 'group-manage',
     icon: <PicLeftOutlined />,
     path: '/home/group-manage',
+    sub: [],
+  },
+  {
+    title: '任务管理',
+    name: 'schedule-manage',
+    icon: <FieldTimeOutlined />,
+    path: '/home/schedule-manage',
     sub: [],
   },
   {
@@ -107,7 +114,8 @@ export default function Menu({ collapsed }) {
     <Comp
       style={{ flex: 'auto', overflowY: 'auto', overflowX: 'hidden' }}
       defaultSelectedKeys={[store.app.menuKey]}
-      defaultOpenKeys={[store.app.menuKey]}
+      // defaultOpenKeys={[store.app.menuKey]}
+      openKeys={['spider-manage', 'data-manage']}
       mode="inline"
       inlineCollapsed={collapsed}
     >

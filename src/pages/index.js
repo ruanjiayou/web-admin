@@ -5,6 +5,7 @@ import BackupPage from './home/DataManagePage/backup'
 import SyncPage from './home/DataManagePage/sync'
 import RulePage from './home/SpiderManagePage/rule'
 import TaskPage from './home/SpiderManagePage/task'
+import SchedulePage from './home/ScheduleManagePage'
 
 const pages = [
   {
@@ -16,6 +17,11 @@ const pages = [
     pathname: '/home/resource-manage',
     Page: ResourceManagePage,
     single: false,
+  },
+  {
+    pathname: '/home/schedule-manage',
+    Page: SchedulePage,
+    single: false
   },
   {
     pathname: '/home/data-manage/backup',

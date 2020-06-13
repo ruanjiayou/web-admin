@@ -7,9 +7,9 @@ import * as serviceWorker from './serviceWorker';
 import 'antd/dist/antd.css';
 
 if (process.env.NODE_ENV === 'development') {
-  import('./mock').then(() => {
-    console.log('mock started')
-  })
+  // import('./mock').then(() => {
+  //   console.log('mock started')
+  // })
 }
 
 // 错误边界处理
