@@ -34,7 +34,7 @@ export default function TaskList() {
     <FullHeight>
       <FullHeightFix style={{ padding: '20px 0' }}>
         <Right>
-          <Button type="primary" onClick={e => {
+          <Button type="primary" loading={local.isLoading} disabled={local.isLoading} onClick={e => {
             createBackup().then(res => {
               if (res.code === 0) {
                 notification.success({ message: '创建成功' });
@@ -44,6 +44,8 @@ export default function TaskList() {
               }
             })
           }}>创建备份</Button>
+          <Divider type="vertical" />
+          <Button onClick={search}>刷新</Button>
         </Right>
       </FullHeightFix>
       <FullHeightAuto>

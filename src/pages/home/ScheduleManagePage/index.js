@@ -3,6 +3,7 @@ import { Observer, useLocalStore } from 'mobx-react-lite'
 import apis from '../../../api';
 import { Button, Divider, Table, Popconfirm, Switch } from 'antd';
 import { RedoOutlined, WarningOutlined, PoweroffOutlined, PlayCircleOutlined } from '@ant-design/icons'
+import { FullHeight, FullHeightFix, FullHeightAuto, Right } from '../../../component/style'
 
 const { Column } = Table;
 const { getSchedules, tickSchedule, switchSchedule } = apis
@@ -31,36 +32,35 @@ export default function ResourceManagePage() {
   useEffect(() => {
     refresh()
   })
-  return (<Observer>{() => {
-    return <div className={'box'}>
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-        <div style={{ padding: '10px 0' }}>
+  return (<Observer>{() => (
+    <FullHeight>
+      <FullHeightFix>
+        <Right style={{ padding: '10px 0' }}>
           <Button type="primary" onClick={() => {
             refresh()
           }}>刷新</Button>
-          <Divider type="vertical" />
-        </div>
-        <div style={{ flex: '1 0 0%', overflow: 'auto' }}>
-          <Table dataSource={local.schedules} rowKey="id" scroll={{ y: 600 }} loading={local.isLoading}>
-            <Column title="名称" dataIndex="name" key="name" />
-            <Column title="活动状态" dataIndex="isActive" key="isActive" render={(text, record) => (
-              <span>{record.isActive ? '进行中' : '已停止'}</span>
-            )} />
-            <Column title="开启状态" dataIndex="isOpen" key="isOpen" render={(text, record) => (
-              <span>{record.isOpen ? '已开启' : '已关闭'}</span>
-            )} />
-            <Column title="cron" dataIndex="cron" key="cron" />
-            <Column title="操作" width={100} dataIndex="action" key="action" align="center" render={(text, record) => (
-              <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly' }}>
-                {record.isOpen ? <PoweroffOutlined onClick={() => toggle(record)} /> : <PlayCircleOutlined onClick={() => toggle(record)} />}
-                <Popconfirm title="确定?" icon={<WarningOutlined />} onConfirm={() => { tickSchedule(record) }}>
-                  <RedoOutlined />
-                </Popconfirm>
-              </div>
-            )} />
-          </Table>
-        </div>
-      </div>
-    </div>
-  }}</Observer>)
+        </Right>
+      </FullHeightFix>
+      <FullHeightAuto>
+        <Table dataSource={local.schedules} rowKey="name" scroll={{ y: 600 }} loading={local.isLoading}>
+          <Column title="名称" dataIndex="name" key="name" />
+          <Column title="活动状态" dataIndex="isActive" key="isActive" render={(text, record) => (
+            <span>{record.isActive ? '进行中' : '已停止'}</span>
+          )} />
+          <Column title="开启状态" dataIndex="isOpen" key="name" render={(text, record) => (
+            <span>{record.isOpen ? '已开启' : '已关闭'}</span>
+          )} />
+          <Column title="cron" dataIndex="cron" key="name" />
+          <Column title="操作" width={100} dataIndex="action" key="name" align="center" render={(text, record) => (
+            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly' }}>
+              {record.isOpen ? <PoweroffOutlined onClick={() => toggle(record)} /> : <PlayCircleOutlined onClick={() => toggle(record)} />}
+              <Popconfirm title="确定?" disabled={record.isActive} icon={<WarningOutlined />} onConfirm={() => { tickSchedule(record) }}>
+                <RedoOutlined />
+              </Popconfirm>
+            </div>
+          )} />
+        </Table>
+      </FullHeightAuto>
+    </FullHeight>
+  )}</Observer>)
 }

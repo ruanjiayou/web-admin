@@ -52,12 +52,12 @@ export default function SyncListPage() {
     <FullHeight>
       <FullHeightFix style={{ padding: '20px 0' }}>
         <Right>
-          <Button type="primary" onClick={() => search}>刷新数据</Button>
-          <Divider type="vertical" />
           <Button type="primary" onClick={e => {
             local.temp = {}
             local.showEditorPage = true
           }}>添加同步规则</Button>
+          <Divider type="vertical" />
+          <Button type="primary" onClick={() => search()}>刷新数据</Button>
         </Right>
       </FullHeightFix>
       <FullHeightAuto>

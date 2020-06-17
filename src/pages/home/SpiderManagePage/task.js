@@ -3,7 +3,7 @@ import { Observer, useLocalStore } from 'mobx-react-lite'
 import { Table, Popconfirm, Switch, notification, Button } from 'antd';
 import { DeleteOutlined, WarningOutlined, SyncOutlined, LoadingOutlined } from '@ant-design/icons'
 import apis from '../../../api'
-import { FullHeight, FullHeightFix, FullHeightAuto } from '../../../component/style'
+import { FullHeight, FullHeightFix, FullHeightAuto, Right } from '../../../component/style'
 
 const { Column } = Table;
 const { getTasks, updateTask, updateTaskResource, destroyTask } = apis
@@ -36,7 +36,9 @@ export default function TaskList() {
   return <Observer>{() => (
     <FullHeight>
       <FullHeightFix style={{ padding: '20px 0' }}>
-        <Button type="primary" onClick={e => { search() }}>刷新</Button>
+        <Right>
+          <Button type="primary" onClick={e => { search() }}>刷新</Button>
+        </Right>
       </FullHeightFix>
       <FullHeightAuto>
         <Table className="box" dataSource={local.tasks} rowKey="resource_id" scroll={{ y: 600 }} loading={local.isLoading} pagination={{
