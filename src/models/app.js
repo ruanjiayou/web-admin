@@ -1,6 +1,6 @@
 import { types } from "mobx-state-tree";
 
-export const app = types.model('app', {
+const app = types.model('app', {
   menuKey: types.optional(types.string, ''),
 }).actions(self => ({
   set(key, value) {
@@ -9,3 +9,5 @@ export const app = types.model('app', {
     self[key] = value
   }
 }))
+
+export default app;

@@ -9,10 +9,5 @@ export default {
     token: localStorage.getItem('user-token') || '',
     username: localStorage.getItem('user-username') || '',
   }),
-  config: models.config.create({
-    name: '后台管理',
-    logoSize: 50,
-    siderWidth: 200,
-    headerHeight: 60,
-  })
+  config: models.config.create()
 }

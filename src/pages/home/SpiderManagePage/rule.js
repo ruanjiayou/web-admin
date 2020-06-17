@@ -3,6 +3,7 @@ import { Observer, useLocalStore } from 'mobx-react-lite'
 import { Button, Modal, Form, Input, Card, Divider, notification, Table } from 'antd';
 import { DeleteOutlined, PlusCircleOutlined, CopyOutlined, FormOutlined } from '@ant-design/icons'
 import apis from '../../../api';
+import { FullHeight, FullHeightFix, FullHeightAuto } from '../../../component/style'
 
 const { Column } = Table;
 const { getRules, createRule, updateRule, addTask } = apis
@@ -47,69 +48,65 @@ export default function SpiderPage() {
     init()
   })
   return <Observer>{() => (
-    <Fragment>
-      <div className="box full-height" style={{ position: 'relative' }}>
-        <div className="full-height-fix">
-          <div style={{ padding: '20px 0', textAlign: 'right' }}>
-            <Button type="primary" onClick={e => { openEdit() }}>添加规则</Button>
-          </div>
-        </div>
-        <div className="full-height-auto">
-          <Table dataSource={local.rules} rowKey="id" scroll={{ y: 600 }} loading={local.isLoading} pagination={{
-            pageSize: 20,
-            current: local.search_page,
-            total: local.count,
-          }} onChange={(page) => {
-            local.search_page = page.current
-            init()
-          }}>
-            <Column title="规则id" dataIndex="id" key="id" />
-            <Column title="名称" dataIndex="name" key="name" />
-            <Column title="类型" dataIndex="type" key="type" />
-            <Column title="操作" width={200} dataIndex="action" key="action" align="center" render={(text, record) => (
-              <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly' }}>
-                <FormOutlined onClick={e => {
-                  openEdit(record.toJSON())
-                }} />
-                <Divider type="vertical" />
-                <PlusCircleOutlined onClick={() => {
-                  Modal.confirm({
-                    title: '添加任务',
-                    content: <Input ref={ref => urlRef.current = ref} />,
-                    onOk: () => {
-                      if (urlRef.current) {
-                        addTask(record, urlRef.current.state.value).then(res => {
-                          if (res.code === 0) {
-                            notification.success({ message: 'success' })
-                          } else {
-                            notification.error({ message: res.message })
-                          }
-                        })
-                      } else {
-                        notification.error({ message: 'ref fail' })
-                      }
-                    },
-                    onCancel: () => {
-                      urlRef.current = null
-                    }
-                  })
-                  setTimeout(() => {
+    <FullHeight>
+      <FullHeightFix style={{ padding: '20px 0', alignItems: 'flex-end' }}>
+        <Button type="primary" onClick={e => { openEdit() }}>添加规则</Button>
+      </FullHeightFix>
+      <FullHeightAuto>
+        <Table dataSource={local.rules} rowKey="id" scroll={{ y: 600 }} loading={local.isLoading} pagination={{
+          pageSize: 20,
+          current: local.search_page,
+          total: local.count,
+        }} onChange={(page) => {
+          local.search_page = page.current
+          init()
+        }}>
+          <Column title="规则id" dataIndex="id" key="id" />
+          <Column title="名称" dataIndex="name" key="name" />
+          <Column title="类型" dataIndex="type" key="type" />
+          <Column title="操作" width={200} dataIndex="action" key="action" align="center" render={(text, record) => (
+            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly' }}>
+              <FormOutlined onClick={e => {
+                openEdit(record.toJSON())
+              }} />
+              <Divider type="vertical" />
+              <PlusCircleOutlined onClick={() => {
+                Modal.confirm({
+                  title: '添加任务',
+                  content: <Input ref={ref => urlRef.current = ref} />,
+                  onOk: () => {
                     if (urlRef.current) {
-                      urlRef.current.focus()
+                      addTask(record, urlRef.current.state.value).then(res => {
+                        if (res.code === 0) {
+                          notification.success({ message: 'success' })
+                        } else {
+                          notification.error({ message: res.message })
+                        }
+                      })
+                    } else {
+                      notification.error({ message: 'ref fail' })
                     }
-                  }, 100)
-                }} />
-                <Divider type="vertical" />
-                <CopyOutlined />
-                <Divider type="vertical" />
-                <DeleteOutlined onClick={e => {
-                  alert('暂时不能删除')
-                }} />
-              </div>
-            )} />
-          </Table>
-        </div>
-      </div>
+                  },
+                  onCancel: () => {
+                    urlRef.current = null
+                  }
+                })
+                setTimeout(() => {
+                  if (urlRef.current) {
+                    urlRef.current.focus()
+                  }
+                }, 100)
+              }} />
+              <Divider type="vertical" />
+              <CopyOutlined />
+              <Divider type="vertical" />
+              <DeleteOutlined onClick={e => {
+                alert('暂时不能删除')
+              }} />
+            </div>
+          )} />
+        </Table>
+      </FullHeightAuto>
       {local.showEdit && (
         <Modal
           visible={true}
@@ -162,7 +159,6 @@ export default function SpiderPage() {
           </Form>
         </Modal>
       )}
-    </Fragment>
-
+    </FullHeight>
   )}</Observer>
 }

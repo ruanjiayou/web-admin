@@ -1,6 +1,6 @@
 import { types } from "mobx-state-tree";
 
-export const user = types.model('user', {
+const user = types.model('user', {
   isSignIn: types.optional(types.boolean, false),
   token: types.optional(types.string, ''),
   username: types.optional(types.string, ''),
@@ -20,3 +20,6 @@ export const user = types.model('user', {
     localStorage.setItem('user-username', username)
   }
 }))
+
+
+export default user;
