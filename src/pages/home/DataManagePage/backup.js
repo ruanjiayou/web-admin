@@ -67,7 +67,7 @@ export default function TaskList() {
               }} />
             } else {
               return <Fragment>
-                <Popconfirm title="确定同步这个备份到线上?" icon={<WarningOutlined />} onConfirm={() => {
+                <Popconfirm title="确定同步这个备份到线上?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={() => {
                   if (process.env.NODE_ENV !== 'development') {
                     return notification.error({ message: '线上环境这个命令无效' })
                   }
@@ -82,7 +82,7 @@ export default function TaskList() {
                   <UploadOutlined title="同步备份文件夹到线上" />
                 </Popconfirm>
                 <Divider type="vertical" />
-                <Popconfirm title="确定下载这个备份的zip?" icon={<WarningOutlined />} onConfirm={() => {
+                <Popconfirm title="确定下载这个备份的zip?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={() => {
                   downloadBackup2zip(record).then(res => {
                     if (res.code === 0) {
                       search();
@@ -96,7 +96,7 @@ export default function TaskList() {
                   <CloudDownloadOutlined title="下载备份文件夹的zip" />
                 </Popconfirm>
                 <Divider type="vertical" />
-                <Popconfirm title="确定恢复这个备份?" icon={<WarningOutlined />} onConfirm={() => {
+                <Popconfirm title="确定恢复这个备份?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={() => {
                   recoveryByBackup(record).then(res => {
                     if (res.code === 0) {
                       notification.success({ message: '操作成功' });
@@ -108,7 +108,7 @@ export default function TaskList() {
                   <HddOutlined title="按文件夹恢复数据库" />
                 </Popconfirm>
                 <Divider type="vertical" />
-                <Popconfirm title="确定?" icon={<WarningOutlined />} onConfirm={() => { destroyBackup({ dir: record.dir }).then(() => search()) }}>
+                <Popconfirm title="确定?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={() => { destroyBackup({ dir: record.dir }).then(() => search()) }}>
                   <DeleteOutlined />
                 </Popconfirm>
               </Fragment>

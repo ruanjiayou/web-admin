@@ -54,7 +54,7 @@ export default function ResourceList({ items, children, search, local, ...props 
 			<Column title="操作" width={100} dataIndex="action" key="action" align="center" render={(text, record) => (
 				<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly' }}>
 					{record.source_type === 'article' || record.source_type === 'news' ? <Link to={'/project/resource/edit?id=' + record.id} ><FormOutlined /></Link> : <FormOutlined onClick={() => { props.openEdit(record.toJSON()) }} />}
-					<Popconfirm title="确定?" icon={<WarningOutlined />} onConfirm={() => { props.destroy(record) }}>
+					<Popconfirm title="确定?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={() => { props.destroy(record) }}>
 						<DeleteOutlined />
 					</Popconfirm>
 				</div>

@@ -77,11 +77,11 @@ export default function SyncListPage() {
           <Column title="操作" width={150} dataIndex="action" key="action" align="center" render={(text, record) => (
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly' }}>
               <VisualBox visible={process.env.NODE_ENV === 'development'}>
-                <Popconfirm title="确定?" icon={<WarningOutlined />} onConfirm={() => { updateSyncProd(record) }}>
+                <Popconfirm title="确定?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={() => { updateSyncProd(record) }}>
                   <UploadOutlined />
                 </Popconfirm>
                 <Divider type="vertical" />
-                <Popconfirm title="确定?" icon={<WarningOutlined />} onConfirm={() => { updateSyncDev(record) }}>
+                <Popconfirm title="确定?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={() => { updateSyncDev(record) }}>
                   <CloudDownloadOutlined />
                 </Popconfirm>
                 <Divider type="vertical" />
@@ -91,7 +91,7 @@ export default function SyncListPage() {
                 local.showEditorPage = true
               }} />
               <Divider type="vertical" />
-              <Popconfirm title="确定?" icon={<WarningOutlined />} onConfirm={() => { destroySync(record) }}>
+              <Popconfirm title="确定?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={() => { destroySync(record) }}>
                 <DeleteOutlined />
               </Popconfirm>
             </div>

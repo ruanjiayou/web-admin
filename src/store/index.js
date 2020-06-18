@@ -1,4 +1,4 @@
-import models from '../models/index'
+import models from '../models'
 
 export default {
   app: models.app.create({
@@ -9,5 +9,7 @@ export default {
     token: localStorage.getItem('user-token') || '',
     username: localStorage.getItem('user-username') || '',
   }),
-  config: models.config.create()
+  config: models.config.create(),
+  channels: [],
+  groups: [],
 }

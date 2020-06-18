@@ -9,7 +9,7 @@ import { useStore } from './contexts'
 
 function NoMatch() {
   const store = useStore()
-  return store.user.isSignIn ? <Redirect to={'/home/dashboard'} /> : <Redirect to={'/auth/sign-in'} />
+  return store.user.isSignIn ? <Redirect to={store.app.menuKey || '/home/dashboard'} /> : <Redirect to={'/auth/sign-in'} />
 }
 
 function Poster(props) {
@@ -22,7 +22,7 @@ function Poster(props) {
     return <Fragment>
       <RouterContext.Provider value={router}>
         <Switch>
-          {pages.map(({ pathname, Page, single = false }) => (
+          {pages.filter(page=>!!page.Page).map(({ pathname, Page, single = false }) => (
             <Route key={pathname} path={pathname} render={props => (
               <Layout {...props} single={single}>
                 <Page />

@@ -58,7 +58,7 @@ export default function Layout({ children, single }) {
                 </div>
               </Dropdown>
             </Header>
-            <Content style={{ padding: 15 }}>{children}</Content>
+            <Content style={{ padding: 15, flex: 1, overflow: 'auto' }}>{children}</Content>
           </LayoutV>
         </LayoutH>
       )}</Observer>

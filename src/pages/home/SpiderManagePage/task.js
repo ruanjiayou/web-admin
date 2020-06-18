@@ -73,7 +73,7 @@ export default function TaskList() {
                   notification.info({ message: '操作成功' })
                 });
               }} />
-              <Popconfirm title="确定?" icon={<WarningOutlined />} onConfirm={async () => {
+              <Popconfirm title="确定?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={async () => {
                 await destroyTask(record)
                 search()
               }}>
