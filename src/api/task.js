@@ -1,5 +1,11 @@
 import shttp from '../utils/shttp'
 
+export function previewTask(query) {
+  return shttp({
+    url: `/v1/admin/novel-preview/?ruleId=${query.ruleId}&origin=${query.origin}`,
+    method: 'GET',
+  })
+}
 export function getTasks(query) {
   return shttp({
     url: `/v1/admin/tasks?resource_id=${query.resource_id}&page=${query.page}`,

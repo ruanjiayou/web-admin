@@ -30,9 +30,11 @@ export default function GroupManagePage() {
     let tree_id = window.localStorage.getItem('choose_group_id')
     if (tree_id) {
       local.tree = store.groups.find(group => group.id === tree_id)
+      local.config = local.tree
     }
     if (!local.tree && store.groups.length !== 0) {
       local.tree = store.groups[0]
+      local.config = local.tree
     }
     local.refreshing = false
   })
@@ -76,7 +78,7 @@ export default function GroupManagePage() {
         <FullHeight>
           xxx
         </FullHeight>
-        <FullWidthAuto>
+        <FullWidthAuto style={{ overflow: 'auto' }}>
           <CenterXY>
             <Mobile style={{ boxShadow: '#77b6e4 5px 5px 16px 7px', border: '1px solid #77b6e4' }}>
               {local.refreshing === false && local.tree && (
@@ -104,16 +106,16 @@ export default function GroupManagePage() {
             </Mobile>
           </CenterXY>
         </FullWidthAuto>
-        <FullHeight>
+        <FullHeight style={{ backgroundColor: 'wheat' }}>
           {local.config !== null && (
             <FullHeightAuto>
-              <Form>
+              <Form style={{ height: 700 }}>
                 <Form.Item label='组件名称' labelCol={lb} wrapperCol={rb}>
                   <Input value={local.config.title} autoFocus onChange={e => local.config.title = e.target.value} />
                 </Form.Item>
                 <Form.Item label='唯一标识' labelCol={lb} wrapperCol={rb}>
                   <Input value={local.config.name} onChange={e => local.config.name = e.target.value} />(name)
-            </Form.Item>
+                </Form.Item>
                 <Form.Item label='序号' labelCol={lb} wrapperCol={rb}>
                   <Input type="number" value={local.config.nth} onChange={e => local.config.nth = e.target.value} />
                 </Form.Item>
@@ -153,65 +155,62 @@ export default function GroupManagePage() {
                 </Form.Item>
                 <Divider />
                 <Row>
-                  <Col span={18} offset={6}>
-                    <Card title="attrs属性">
-                      <Form.Item label='隐藏标题' labelCol={lb} wrapperCol={rb}>
-                        <Radio.Group
-                          value={local.config.attrs.hide_title}
-                          options={[{ label: '显示', value: false }, { label: '隐藏', value: true }]}
-                          onChange={e => { local.config.attrs.hide_title = e.target.value }}
-                        />
-                      </Form.Item>
-                      <Form.Item label='默认选中' labelCol={lb} wrapperCol={rb}>
-                        <Radio.Group
-                          value={local.config.attrs.selected}
-                          options={[{ label: '选中', value: true }, { label: '不选中', value: false }]}
-                          onChange={e => { local.config.attrs.selected = e.target.value }}
-                        />
-                      </Form.Item>
-                      <Form.Item label='换一换' labelCol={lb} wrapperCol={rb}>
-                        <Radio.Group
-                          value={local.config.attrs.allowChange}
-                          options={[{ label: '显示', value: true }, { label: '隐藏', value: false }]}
-                          onChange={e => local.config.attrs.allowChange = e.target.value}
-                        />
-                      </Form.Item>
-                      <Form.Item label='轮播延时' labelCol={lb} wrapperCol={rb}>
-                        <Input type="number" value={local.config.attrs.timeout} onChange={e => local.config.attrs.timeout = e.target.value} />
-                      </Form.Item>
-                      <Form.Item label='分栏数' labelCol={lb} wrapperCol={rb}>
-                        <Input type="number" value={local.config.attrs.columns} onChange={e => local.config.attrs.columns = e.target.value} />
-                      </Form.Item>
-                      <Form.Item label='最多显示' labelCol={lb} wrapperCol={rb}>
-                        <Input type="number" value={local.config.attrs.showCount} onChange={e => local.config.attrs.showCount = e.target.value} />
-                      </Form.Item>
-                    </Card>
+                  <Col>
+                    <h2 style={{ textIndent: 20 }}>attr属性</h2>
+                    <Form.Item label='隐藏标题' labelCol={lb} wrapperCol={rb}>
+                      <Radio.Group
+                        value={local.config.attrs.hide_title}
+                        options={[{ label: '显示', value: false }, { label: '隐藏', value: true }]}
+                        onChange={e => { local.config.attrs.hide_title = e.target.value }}
+                      />
+                    </Form.Item>
+                    <Form.Item label='默认选中' labelCol={lb} wrapperCol={rb}>
+                      <Radio.Group
+                        value={local.config.attrs.selected}
+                        options={[{ label: '选中', value: true }, { label: '不选中', value: false }]}
+                        onChange={e => { local.config.attrs.selected = e.target.value }}
+                      />
+                    </Form.Item>
+                    <Form.Item label='换一换' labelCol={lb} wrapperCol={rb}>
+                      <Radio.Group
+                        value={local.config.attrs.allowChange}
+                        options={[{ label: '显示', value: true }, { label: '隐藏', value: false }]}
+                        onChange={e => local.config.attrs.allowChange = e.target.value}
+                      />
+                    </Form.Item>
+                    <Form.Item label='轮播延时' labelCol={lb} wrapperCol={rb}>
+                      <Input type="number" value={local.config.attrs.timeout} onChange={e => local.config.attrs.timeout = e.target.value} />
+                    </Form.Item>
+                    <Form.Item label='分栏数' labelCol={lb} wrapperCol={rb}>
+                      <Input type="number" value={local.config.attrs.columns} onChange={e => local.config.attrs.columns = e.target.value} />
+                    </Form.Item>
+                    <Form.Item label='最多显示' labelCol={lb} wrapperCol={rb}>
+                      <Input type="number" value={local.config.attrs.showCount} onChange={e => local.config.attrs.showCount = e.target.value} />
+                    </Form.Item>
                   </Col>
                 </Row>
                 <Divider />
                 <Row>
-                  <Col span={18} offset={6}>
-                    <Card title="更多跳转设置">
-                      <Form.Item label='频道' labelCol={lb} wrapperCol={rb}>
-                        <Input value={local.config.more.channel_id} onChange={e => local.config.more.channel_id = e.target.value} />
-                      </Form.Item>
-                      <Form.Item label='类型' labelCol={lb} wrapperCol={rb}>
-                        <Input value={local.config.more.type} onChange={e => local.config.more.type = e.target.value} />
-                      </Form.Item>
-                      <Form.Item label='关键字' labelCol={lb} wrapperCol={rb}>
-                        <Input value={local.config.more.keyword} onChange={e => local.config.more.keyword = e.target.value} />
-                      </Form.Item>
-                    </Card>
+                  <Col>
+                    <h2 style={{ textIndent: 20 }}>更多跳转设置</h2>
+                    <Form.Item label='频道' labelCol={lb} wrapperCol={rb}>
+                      <Input value={local.config.more.channel_id} onChange={e => local.config.more.channel_id = e.target.value} />
+                    </Form.Item>
+                    <Form.Item label='类型' labelCol={lb} wrapperCol={rb}>
+                      <Input value={local.config.more.type} onChange={e => local.config.more.type = e.target.value} />
+                    </Form.Item>
+                    <Form.Item label='关键字' labelCol={lb} wrapperCol={rb}>
+                      <Input value={local.config.more.keyword} onChange={e => local.config.more.keyword = e.target.value} />
+                    </Form.Item>
                   </Col>
                 </Row>
                 <Divider />
                 <Row>
-                  <Col span={18} offset={6}>
-                    <Card title="params与query">
-                      <Form.Item label='频道' labelCol={lb} wrapperCol={rb}>
-                        <Input.TextArea value={local.config.params} onChange={e => local.config.params = e.target.value}></Input.TextArea>
-                      </Form.Item>
-                    </Card>
+                  <Col>
+                    <h2 style={{ textIndent: 20 }}>params与query</h2>
+                    <Form.Item label='频道' labelCol={lb} wrapperCol={rb}>
+                      <Input.TextArea value={local.config.params} onChange={e => local.config.params = e.target.value}></Input.TextArea>
+                    </Form.Item>
                   </Col>
                 </Row>
               </Form>

@@ -4,7 +4,7 @@ import store from '../store'
 const shttp = axios.create({
   baseURL: 'http://localhost:8097',
   withCredentials: false,
-  timeout: 5000
+  // timeout: 5000
 })
 
 shttp.interceptors.request.use(config => {

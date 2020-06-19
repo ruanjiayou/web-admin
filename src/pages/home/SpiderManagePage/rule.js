@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback, Fragment, useRef } from 'react';
 import { Observer, useLocalStore } from 'mobx-react-lite'
 import { Button, Modal, Form, Input, Card, Divider, notification, Table } from 'antd';
-import { DeleteOutlined, PlusCircleOutlined, CopyOutlined, FormOutlined } from '@ant-design/icons'
+import { Icon } from '../../../component'
 import apis from '../../../api';
 import { FullHeight, FullHeightFix, FullHeightAuto } from '../../../component/style'
 
@@ -11,6 +11,7 @@ const { getRules, createRule, updateRule, addTask } = apis
 export default function SpiderPage() {
   const lb = { span: 6, offset: 3 }, rb = { span: 12 }
   const urlRef = useRef(null)
+  const originRef = useRef(null)
   const local = useLocalStore(() => ({
     isLoading: false,
     rule: {
@@ -66,11 +67,42 @@ export default function SpiderPage() {
           <Column title="类型" dataIndex="type" key="type" />
           <Column title="操作" width={200} dataIndex="action" key="action" align="center" render={(text, record) => (
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly' }}>
-              <FormOutlined onClick={e => {
-                openEdit(record.toJSON())
+              <Icon type="page-search" onClick={() => {
+                Modal.confirm({
+                  title: '预览效果',
+                  content: <Input ref={ref => originRef.current = ref} />,
+                  okText: '预览',
+                  cancelText: '取消',
+                  onOk: () => {
+                    if (originRef.current) {
+                      apis.previewTask({ origin: originRef.current.state.value, ruleId: record.id }).then(res => {
+                        if (res.code === 0) {
+                          notification.success({ message: 'success' })
+                          console.log(res);
+                        } else {
+                          notification.error({ message: res.message })
+                        }
+                      })
+                    } else {
+                      notification.error({ message: 'ref fail' })
+                    }
+                  },
+                  onCancel: () => {
+                    originRef.current = null
+                  }
+                });
+                setTimeout(() => {
+                  if (originRef.current) {
+                    originRef.current.focus()
+                  }
+                }, 100)
               }} />
               <Divider type="vertical" />
-              <PlusCircleOutlined onClick={() => {
+              <Icon type="edit" onClick={e => {
+                openEdit(record)
+              }} />
+              <Divider type="vertical" />
+              <Icon type="circle-plus" onClick={() => {
                 Modal.confirm({
                   title: '添加任务',
                   content: <Input ref={ref => urlRef.current = ref} />,
@@ -98,9 +130,9 @@ export default function SpiderPage() {
                 }, 100)
               }} />
               <Divider type="vertical" />
-              <CopyOutlined />
+              <Icon type="copy" />
               <Divider type="vertical" />
-              <DeleteOutlined onClick={e => {
+              <Icon type="delete" onClick={e => {
                 alert('暂时不能删除')
               }} />
             </div>
@@ -127,33 +159,36 @@ export default function SpiderPage() {
           }}
         >
           <Form>
-            <Form.Item label="规则id" labelCol={lb} wrapperCol={rb}>
-              <Input value={local.rule.id} autoFocus onChange={e => local.rule.id = e.target.value} />
+            <Form.Item label="域名-规则id" labelCol={lb} wrapperCol={rb}>
+              <Input placeholder="http://www.biquge.com" value={local.rule.id} autoFocus onChange={e => local.rule.id = e.target.value} />
             </Form.Item>
-            <Form.Item label="名称" labelCol={lb} wrapperCol={rb}>
-              <Input value={local.rule.name} autoFocus onChange={e => local.rule.name = e.target.value} />
+            <Form.Item label="网站名称" labelCol={lb} wrapperCol={rb}>
+              <Input placeholder="笔趣阁" value={local.rule.name} autoFocus onChange={e => local.rule.name = e.target.value} />
             </Form.Item>
-            <Form.Item label="类型" labelCol={lb} wrapperCol={rb}>
-              <Input value={local.rule.type} autoFocus onChange={e => local.rule.type = e.target.value} />
+            <Form.Item label="资源类型" labelCol={lb} wrapperCol={rb}>
+              <Input placeholder="novel" value={local.rule.type} autoFocus onChange={e => local.rule.type = e.target.value} />
             </Form.Item>
             <Card title="config">
-              <Form.Item label="titleSelector" labelCol={lb} wrapperCol={rb}>
-                <Input value={local.rule.config.titleSelector} autoFocus onChange={e => local.rule.config.titleSelector = e.target.value} />
+              <Form.Item label="章节标题$" labelCol={lb} wrapperCol={rb}>
+                <Input placeholder="h1" value={local.rule.config.titleSelector} autoFocus onChange={e => local.rule.config.titleSelector = e.target.value} />
               </Form.Item>
-              <Form.Item label="authorSelector" labelCol={lb} wrapperCol={rb}>
-                <Input value={local.rule.config.authorSelector} autoFocus onChange={e => local.rule.config.authorSelector = e.target.value} />
+              <Form.Item label="章节内容$" labelCol={lb} wrapperCol={rb}>
+                <Input placeholder="#content" value={local.rule.config.contentSelector} autoFocus onChange={e => local.rule.config.contentSelector = e.target.value} />
               </Form.Item>
-              <Form.Item label="posterSelector" labelCol={lb} wrapperCol={rb}>
-                <Input value={local.rule.config.posterSelector} autoFocus onChange={e => local.rule.config.posterSelector = e.target.value} />
+              <Form.Item label="书籍作者$" labelCol={lb} wrapperCol={rb}>
+                <Input placeholder=".boot-title p" value={local.rule.config.authorSelector} autoFocus onChange={e => local.rule.config.authorSelector = e.target.value} />
               </Form.Item>
-              <Form.Item label="introSelector" labelCol={lb} wrapperCol={rb}>
-                <Input value={local.rule.config.introSelector} autoFocus onChange={e => local.rule.config.introSelector = e.target.value} />
+              <Form.Item label="书籍封面$" labelCol={lb} wrapperCol={rb}>
+                <Input placeholder=".book-img img" value={local.rule.config.posterSelector} autoFocus onChange={e => local.rule.config.posterSelector = e.target.value} />
               </Form.Item>
-              <Form.Item label="listSelector" labelCol={lb} wrapperCol={rb}>
-                <Input value={local.rule.config.listSelector} autoFocus onChange={e => local.rule.config.listSelector = e.target.value} />
+              <Form.Item label="书籍简介$" labelCol={lb} wrapperCol={rb}>
+                <Input placeholder=".book-intro" value={local.rule.config.introSelector} autoFocus onChange={e => local.rule.config.introSelector = e.target.value} />
               </Form.Item>
-              <Form.Item label="contentSelector" labelCol={lb} wrapperCol={rb}>
-                <Input value={local.rule.config.contentSelector} autoFocus onChange={e => local.rule.config.contentSelector = e.target.value} />
+              <Form.Item label="简介标签过滤$" labelCol={lb} wrapperCol={rb}>
+                <Input placeholder="script span" value={local.rule.config.introFilterSelector} autoFocus onChange={e => local.rule.config.introFilterSelector = e.target.value} />
+              </Form.Item>
+              <Form.Item label="书籍列表$" labelCol={lb} wrapperCol={rb}>
+                <Input placeholder=".chapterlist a" value={local.rule.config.listSelector} autoFocus onChange={e => local.rule.config.listSelector = e.target.value} />
               </Form.Item>
             </Card>
           </Form>

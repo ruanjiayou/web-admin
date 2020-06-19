@@ -11,6 +11,8 @@ import {
   PlusOutlined,
   LoadingOutlined,
   InfoCircleOutlined,
+  FileSearchOutlined,
+  CopyOutlined,
 } from '@ant-design/icons'
 
 const IconMap = {
@@ -25,6 +27,8 @@ const IconMap = {
   'sync-horizon': SyncOutlined,
   'edit': FormOutlined,
   'delete': DeleteOutlined,
+  'copy': CopyOutlined,
+  'page-search': FileSearchOutlined,
 };
 
 export default function Icon({ type, ...props }) {
