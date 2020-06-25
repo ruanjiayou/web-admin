@@ -23,16 +23,20 @@ export default function SignInPage() {
           <Input name="username" onChange={e => local.username = e.target.value} placeholder="用户名" />
         </Form.Item>
         <Form.Item>
-          <Input name="password" onChange={e => local.password = e.target.value} type="password" placeholder="密码" />
+          <Input name="password" onChange={e => local.password = e.target.value} type="password" placeholder="密码" onKeyDown={e => {
+            if (e.keyCode === 13) {
+              document.getElementById('signin').click();
+            }
+          }} />
         </Form.Item>
         <Form.Item style={{ textAlign: 'center' }}>
-          <Button type="primary" loading={local.isFetch} block onClick={async () => {
+          <Button id="signin" type="primary" loading={local.isFetch} block onClick={async () => {
             local.isFetch = true
             const res = await apis.signIn({ data: { name: local.username, password: local.password } })
             local.isFetch = false
             if (res.code === 0) {
               store.user.signIn({ token: res.data.token, username: local.username })
-              router.goPage('/')
+              router.goPage('/home/dashboard')
             } else {
               message.error(res.message)
             }

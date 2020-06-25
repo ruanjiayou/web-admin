@@ -37,7 +37,7 @@ function Poster(props) {
 }
 
 export default function router() {
-  return <BrowserRouter basename="/">
+  return <BrowserRouter basename="/admin/">
     <Route path="/*" component={Poster} />
   </BrowserRouter>
 }
