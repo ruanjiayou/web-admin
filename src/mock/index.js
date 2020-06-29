@@ -22,7 +22,7 @@ mock.mock('/v1/public/menu', success({
   title: '总揽',
   name: 'dashboard',
   icon: '',
-  path: '/home/dashboard',
+  path: '/admin/home/dashboard',
   sub: [],
 }))
 

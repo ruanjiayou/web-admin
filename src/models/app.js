@@ -3,8 +3,8 @@ import { types } from "mobx-state-tree";
 const app = types.model('app', {
   menuKey: types.optional(types.string, ''),
   groupMode: types.optional(types.string, 'preview'),
-  imageLine: types.optional(types.string, 'http://localhost:8097')
-
+  imageLine: types.optional(types.string, ''),
+  baseUrl: types.optional(types.string, ''),
 }).actions(self => ({
   set(key, value) {
     if (key === 'menuKey')

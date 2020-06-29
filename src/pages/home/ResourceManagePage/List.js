@@ -2,8 +2,9 @@ import React from 'react'
 import { Observer } from 'mobx-react-lite'
 import { Link } from 'react-router-dom'
 // import LoadingView from '../HolderView/LoadingView'
+import apis from '../../../api';
 import { Table, Popconfirm, Switch, notification, Select, } from 'antd';
-import { FormOutlined, DeleteOutlined, WarningOutlined } from '@ant-design/icons'
+import { FormOutlined, DeleteOutlined, WarningOutlined, CloudServerOutlined } from '@ant-design/icons'
 
 const { Column } = Table;
 
@@ -29,7 +30,7 @@ export default function ResourceList({ items, children, search, local, ...props 
 			<Column title="连载" width={100} dataIndex="status" key="status" render={(text, record) => (
 				<Observer>{() => (
 					<Switch checked={record.status === 'loading'} onClick={e => {
-						record.toggleStatus().then(() => {
+						apis.updateResource({ id: record.id, status: record.status === 'loading' ? 'finished' : 'loading' }).then(() => {
 							record.setKV('status', record.status === 'loading' ? 'finished' : 'loading')
 							notification.info({ message: '修改成功' })
 						}).catch(e => {
@@ -42,7 +43,7 @@ export default function ResourceList({ items, children, search, local, ...props 
 			<Column title="公开" width={100} dataIndex="open" key="open" render={(text, record) => (
 				<Observer>{() => (
 					<Switch checked={record.open} onClick={e => {
-						record.toggleOpen().then(() => {
+						apis.updateResource({ id: record.id, open: !record.open }).then(() => {
 							record.setKV('open', !record.open)
 							notification.info({ message: '修改成功' })
 						}).catch(e => {
@@ -54,6 +55,7 @@ export default function ResourceList({ items, children, search, local, ...props 
 			<Column title="操作" width={100} dataIndex="action" key="action" align="center" render={(text, record) => (
 				<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly' }}>
 					{record.source_type === 'article' || record.source_type === 'news' ? <Link to={'/project/resource/edit?id=' + record.id} ><FormOutlined /></Link> : <FormOutlined onClick={() => { props.openEdit(record.toJSON()) }} />}
+					<CloudServerOutlined title="保存" onClick={() => props.store(record)} />
 					<Popconfirm title="确定?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={() => { props.destroy(record) }}>
 						<DeleteOutlined />
 					</Popconfirm>

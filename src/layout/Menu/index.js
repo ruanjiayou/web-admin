@@ -7,7 +7,7 @@ import pages from '../../pages'
 const data = []
 pages.forEach(page => {
   let curr = data;
-  if (!page.pathname.startsWith('/home')) {
+  if (!page.pathname.startsWith('/admin/home')) {
     return;
   }
   if (data.length === 0) {
@@ -48,7 +48,7 @@ export default function Menu({ collapsed }) {
       style={{ flex: 'auto', overflowY: 'auto', overflowX: 'hidden' }}
       defaultSelectedKeys={[store.app.menuKey]}
       // defaultOpenKeys={[store.app.menuKey]}
-      openKeys={collapsed ? [] : ['/home/data-manage', '/home/spider-manage']}
+      openKeys={collapsed ? [] : ['/admin/home/ui', '/admin/home/data-manage', '/admin/home/spider-manage']}
       mode="inline"
       inlineCollapsed={collapsed}
     >

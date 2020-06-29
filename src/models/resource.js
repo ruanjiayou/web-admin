@@ -1,5 +1,4 @@
 import { types } from 'mobx-state-tree'
-import apis from '../api'
 import store from '../store'
 
 export default types.model('Resource', {
@@ -26,15 +25,6 @@ export default types.model('Resource', {
   setKV(key, value) {
     self[key] = value
   },
-  toggleOpen() {
-    return apis.updateResource({ id: self.id, open: !self.open })
-  },
-  toggleStatus() {
-    return apis.updateResource({ id: self.id, status: self.status === 'loading' ? 'finished' : 'loading' })
-  },
-  toJSON() {
-    return apis.getSnapshot(self)
-  }
 })).views(self => ({
   get cover() {
     return store.app.imageLine + (self.poster || '/poster/nocover.jpg')

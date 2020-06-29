@@ -36,7 +36,7 @@ export default function SignInPage() {
             local.isFetch = false
             if (res.code === 0) {
               store.user.signIn({ token: res.data.token, username: local.username })
-              router.goPage('/home/dashboard')
+              router.goPage('/admin/home/dashboard')
             } else {
               message.error(res.message)
             }

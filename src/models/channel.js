@@ -1,5 +1,4 @@
 import { types, getSnapshot } from 'mobx-state-tree'
-import apis from '../api'
 
 export default types.model('Channel', {
   id: types.string,

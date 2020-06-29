@@ -1,5 +1,4 @@
 import { types, getSnapshot } from 'mobx-state-tree'
-import apis from '../api'
 
 const task = types.model('Task', {
   resource_id: types.string,
@@ -11,9 +10,6 @@ const task = types.model('Task', {
 }).actions(self => ({
   setKV(key, value) {
     self[key] = value
-  },
-  toggleStatus() {
-    return apis.updateTask({ rule_id: self.rule_id, resource_id: self.resource_id, status: self.status === 'loading' ? 'finished' : 'loading' })
   },
   toJSON() {
     return getSnapshot(self)

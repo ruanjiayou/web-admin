@@ -9,20 +9,20 @@ import { useStore } from './contexts'
 
 function NoMatch() {
   const store = useStore()
-  return store.user.isSignIn ? <Redirect to={store.app.menuKey || '/home/dashboard'} /> : <Redirect to={'/auth/sign-in'} />
+  return store.user.isSignIn ? <Redirect to={store.app.menuKey || '/admin/home/dashboard'} /> : <Redirect to={'/admin/auth/sign-in'} />
 }
 
 function Poster(props) {
   const store = useStore()
   const [router, RouterContext] = createRouter(props.history)
   return <Observer>{() => {
-    if (props.history.location.pathname.startsWith('/home') && store.user.isSignIn === false) {
-      return <Redirect to={'/auth/sign-in'} />
+    if (props.history.location.pathname.startsWith('/admin/home') && store.user.isSignIn === false) {
+      return <Redirect to={'/admin/auth/sign-in'} />
     }
     return <Fragment>
       <RouterContext.Provider value={router}>
         <Switch>
-          {pages.filter(page=>!!page.Page).map(({ pathname, Page, single = false }) => (
+          {pages.filter(page => !!page.Page).map(({ pathname, Page, single = false }) => (
             <Route key={pathname} path={pathname} render={props => (
               <Layout {...props} single={single}>
                 <Page />
@@ -37,7 +37,7 @@ function Poster(props) {
 }
 
 export default function router() {
-  return <BrowserRouter basename="/admin/">
+  return <BrowserRouter basename="/">
     <Route path="/*" component={Poster} />
   </BrowserRouter>
 }

@@ -1,5 +1,4 @@
 import { types } from 'mobx-state-tree'
-import apis from '../api'
 import resource from './resource'
 
 const GroupModel = types.model('Group', {
