@@ -3,6 +3,7 @@ import { Observer, useLocalStore } from 'mobx-react-lite'
 import { Button, Modal, Form, Input, Card, Divider, notification, Table } from 'antd';
 import { Icon } from '../../../component'
 import apis from '../../../api';
+import store from '../../../store'
 import { FullHeight, FullHeightFix, FullHeightAuto } from '../../../component/style'
 
 const { Column } = Table;
@@ -75,6 +76,9 @@ export default function SpiderPage() {
                   cancelText: '取消',
                   onOk: () => {
                     if (originRef.current) {
+                      if (record.type === 'pixiv') {
+                        return window.open(`${store.app.baseUrl}/v1/admin/pixiv-preview?id=${originRef.current.state.value}`)
+                      }
                       apis.previewTask({ origin: originRef.current.state.value, ruleId: record.id }).then(res => {
                         if (res.code === 0) {
                           notification.success({ message: 'success' })

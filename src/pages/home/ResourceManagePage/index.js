@@ -1,6 +1,7 @@
 import React, { useEffect, useCallback } from 'react';
 import { Observer, useLocalStore } from 'mobx-react-lite'
 import apis from '../../../api';
+import gstore from '../../../store/index'
 import ResourceList from './List'
 import ResourceEdit from './Edit'
 import { Button, Input, Select, Divider, Pagination } from 'antd';
@@ -9,6 +10,10 @@ const { getResources, createResource, updateResource, destroyResource } = apis
 
 async function destroy(data) {
   await destroyResource(data)
+}
+
+async function store(data) {
+  window.open(`${gstore.app.baseUrl}/v1/admin/book/${data.id}/store`, '_blank')
 }
 
 export default function ResourceManagePage() {
@@ -77,6 +82,7 @@ export default function ResourceManagePage() {
             openEdit={(data) => { local.temp = data; local.showEdit = true; }}
             destroy={destroy}
             search={search}
+            store={store}
             local={local}
           />
         </div>
