@@ -23,7 +23,7 @@ export function updateTask(data) {
 
 export function updateTaskResource(data) {
   return shttp({
-    url: 'v1/admin/task-resource',
+    url: '/v1/admin/task-resource',
     method: 'PUT',
     data,
   });
@@ -31,7 +31,7 @@ export function updateTaskResource(data) {
 
 export function destroyTask(data) {
   return shttp({
-    url: 'v1/admin/task',
+    url: '/v1/admin/task',
     method: 'DELETE',
     data,
   });
