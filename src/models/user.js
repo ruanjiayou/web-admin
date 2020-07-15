@@ -1,4 +1,5 @@
 import { types } from "mobx-state-tree";
+import storage from '../utils/storage'
 
 const user = types.model('user', {
   isSignIn: types.optional(types.boolean, false),
@@ -8,17 +9,28 @@ const user = types.model('user', {
   signOut() {
     self.token = ''
     self.username = ''
-    localStorage.removeItem('user-token')
-    localStorage.removeItem('user-username')
+    storage.removeKey('user-token')
+    storage.removeKey('user-username')
     self.isSignIn = false
   },
   signIn({ token, username }) {
     self.token = token
     self.username = username
     self.isSignIn = true
-    localStorage.setItem('user-token', token)
-    localStorage.setItem('user-username', username)
-  }
+    storage.setValue('user-token', token)
+    storage.setValue('user-username', username)
+  },
+  setToken(token) {
+    self.token = token
+    if(token) {
+      self.isSignIn = true
+    }
+    storage.setValue('user-token', token)
+  },
+  setUsername(name) {
+    self.username = name
+    storage.setValue('user-username', name)
+  },
 }))
 
 

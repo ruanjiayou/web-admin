@@ -1,6 +1,8 @@
 import { types } from "mobx-state-tree";
+import storage from '../utils/storage'
 
 const app = types.model('app', {
+  storagePrefix: types.optional(types.string, 'novel_admin_'),
   menuKey: types.optional(types.string, ''),
   groupMode: types.optional(types.string, 'preview'),
   imageLine: types.optional(types.string, ''),
@@ -8,7 +10,7 @@ const app = types.model('app', {
 }).actions(self => ({
   set(key, value) {
     if (key === 'menuKey')
-      window.localStorage.setItem('menu-key', value)
+      storage.setValue('menu-key', value)
     self[key] = value
   },
   toggleGroupMode() {

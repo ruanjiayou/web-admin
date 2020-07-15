@@ -9,6 +9,7 @@ import SyncPage from './home/DataManagePage/sync'
 import RulePage from './home/SpiderManagePage/rule'
 import TaskPage from './home/SpiderManagePage/task'
 import SchedulePage from './home/ScheduleManagePage'
+import ResourceEdit from './home/ResourceManagePage/article'
 
 import { DashboardOutlined, FieldTimeOutlined, UnorderedListOutlined, AppstoreAddOutlined, HddOutlined, RadarChartOutlined, UsbOutlined, OrderedListOutlined, CloudSyncOutlined, CloudServerOutlined } from '@ant-design/icons'
 
@@ -38,9 +39,20 @@ const pages = [
   },
   {
     pathname: '/admin/home/resource-manage',
-    Page: ResourceManagePage,
     title: '资源管理',
     icon: <HddOutlined />,
+  },
+  {
+    pathname: '/admin/home/resource-manage/list',
+    Page: ResourceManagePage,
+    title: '资源列表',
+    icon: <UnorderedListOutlined />,
+  },
+  {
+    pathname: '/admin/home/resource-manage/edit',
+    Page: ResourceEdit,
+    title: '资源编辑',
+    icon: <UnorderedListOutlined />,
   },
   {
     pathname: '/admin/home/schedule-manage',

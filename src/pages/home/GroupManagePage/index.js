@@ -8,6 +8,7 @@ import AutoView from '../../../Group/AutoView'
 import { Mobile, Icon, VisualBox } from '../../../component'
 import GroupEdit from './Edit'
 import models from '../../../models'
+import storage from '../../../utils/storage'
 
 export default function GroupManagePage() {
   const store = useStore()
@@ -27,7 +28,7 @@ export default function GroupManagePage() {
   const init = useCallback(async () => {
     local.refreshing = true
     await local.refreshData()
-    let tree_id = window.localStorage.getItem('choose_group_id')
+    let tree_id = storage.getValue('choose_group_id')
     if (tree_id) {
       local.tree = store.groups.find(group => group.id === tree_id)
       local.config = local.tree
@@ -45,7 +46,7 @@ export default function GroupManagePage() {
     <FullHeight>
       <AlignAside style={{ margin: '0 15%' }}>
         <Select disabled={local.refreshing} style={{ width: 200, marginRight: 20 }} value={local.tree ? local.tree.title : ''} onChange={async (value) => {
-          window.localStorage.setItem('choose_group_id', value)
+          storage.getValue('choose_group_id', value)
           init()
         }}>
           <Select.Option value="">请选择</Select.Option>
@@ -233,7 +234,7 @@ export default function GroupManagePage() {
             } else {
               await apis.createGroup(data)
             }
-            // window.localStorage.setItem('choose_group_id', null)
+            // storage.getValue('choose_group_id', null)
             // local.tree = null
             init()
             return true
