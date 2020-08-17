@@ -38,17 +38,12 @@ function each(group, data, del = false) {
   } else if (group.$delete || del) {
     data.delete.push({ id: group.id })
     del = true
-    group.children.forEach(child => {
-      each(child, data, del)
-    })
-  } else {
-    if (group.diff()) {
-      data.update.push(g);
-    }
-    group.children.forEach(child => {
-      each(child, data, del);
-    })
+  } else if (group.diff()) {
+    data.update.push(g);
   }
+  group.children.forEach(child => {
+    each(child, data, del);
+  })
 }
 export function updateGroupTree(tree) {
   const data = {

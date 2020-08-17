@@ -93,10 +93,10 @@ export default function AutoView({ self, children = [], ...props }) {
                   e.stopPropagation();
                   props.mountGroup && props.mountGroup(self)
                 }}>
-                  <Comp self={self} handle={handle} {...props}>
+                  <Comp self={self} {...props}>
                     {
                       self.children.map(child => {
-                        return <AutoView key={child.id} self={child} handle={'drag-' + child.id} {...props}></AutoView>
+                        return <AutoView key={child.id} self={child} {...props}></AutoView>
                       })
                     }
                   </Comp>

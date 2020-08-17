@@ -36,17 +36,17 @@ export default function GroupManagePage() {
     refreshing: false,
     submitting: false,
     tree_id: '',
-    ts: Date.now(),
     config: null,
     async refreshData() {
+      this.config = null;
       const res = await apis.getGroupTrees()
       store.groups = res.data.map(item => models.group.create(item))
     },
     get diff() {
-      if (!this.config) {
+      if (!this.tree) {
         return false;
       } else {
-        return diff(this.config);
+        return diff(this.tree);
       }
     },
     event: null,
@@ -61,6 +61,7 @@ export default function GroupManagePage() {
     local.refreshing = true
     await local.refreshData()
     local.tree_id = storage.getValue('choose_group_id')
+    local.tree = null
     if (local.tree_id) {
       local.tree = store.groups.find(group => group.id === local.tree_id)
       // local.config = local.tree
@@ -122,7 +123,7 @@ export default function GroupManagePage() {
       <FullWidth style={{ height: '100%', margin: '10px 0' }}>
         <FullWidthAuto style={{ overflow: 'auto' }}>
           <CenterXY style={{ flexDirection: 'column' }}>
-            <Mobile key={local.ts} style={{ boxShadow: '#77b6e4 5px 5px 16px 7px', border: '1px solid #77b6e4' }}>
+            <Mobile style={{ boxShadow: '#77b6e4 5px 5px 16px 7px', border: '1px solid #77b6e4' }}>
               {local.refreshing === false && local.tree && (
                 <AutoView
                   self={local.tree}
@@ -150,8 +151,9 @@ export default function GroupManagePage() {
                 />
               )}
             </Mobile>
-            <Button type="primary" disabled={!local.diff} loading={local.submitting} onClick={() => {
-              apis.updateGroupTree(local.config);
+            <Button type="primary" disabled={!local.diff} loading={local.submitting} onClick={async () => {
+              await apis.updateGroupTree(local.tree);
+              init()
             }}>提交</Button>
           </CenterXY>
         </FullWidthAuto>
