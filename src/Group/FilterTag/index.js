@@ -13,14 +13,14 @@ export default function Filter({ self, mode, ...props }) {
         props.destroyGroup({ id: self.id })
       }}>
       <span onClick={() => {
-        self.selectMe()
-        props.selectMe(self.id)
+        // self.selectMe()
+        // props.selectMe(self.id)
       }}>
         {self.title}
       </span>
-      <VisualBox visible={mode === 'edit'}>
+      {/* <VisualBox visible={mode === 'edit'}>
         <Icon type="edit" onClick={() => props.editGroup(self)} />
-      </VisualBox>
+      </VisualBox> */}
     </Tag >)
   }</Observer>
 }

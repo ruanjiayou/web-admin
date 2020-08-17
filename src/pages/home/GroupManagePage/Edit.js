@@ -4,7 +4,7 @@ import { Observer, useLocalStore } from 'mobx-react-lite';
 import * as _ from 'lodash';
 import { PlusCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
 
-export default function GroupEdit({ cancel, save, data }) {
+export default function GroupAdd({ cancel, save, data }) {
   const lb = { span: 6, offset: 3 }, rb = { span: 12 }
   const store = useLocalStore(() => ({
     data: data.id ? _.cloneDeep(data) : { refs: [], nth: 1, attrs: {}, params: {}, more: {}, ...data },

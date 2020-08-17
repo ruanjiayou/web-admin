@@ -30,3 +30,36 @@ export function getGroupTrees() {
     method: 'GET',
   })
 }
+
+function each(group, data, del = false) {
+  const g = group.toJSON()
+  if (group.$new) {
+    data.create.push(g)
+  } else if (group.$delete || del) {
+    data.delete.push({ id: group.id })
+    del = true
+    group.children.forEach(child => {
+      each(child, data, del)
+    })
+  } else {
+    if (group.diff()) {
+      data.update.push(g);
+    }
+    group.children.forEach(child => {
+      each(child, data, del);
+    })
+  }
+}
+export function updateGroupTree(tree) {
+  const data = {
+    delete: [],
+    create: [],
+    update: [],
+  }
+  each(tree, data, false);
+  return shttp({
+    url: `/v1/admin/group-tree`,
+    method: 'PUT',
+    data,
+  })
+}
