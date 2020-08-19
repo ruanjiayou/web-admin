@@ -6,6 +6,7 @@ import * as resource from './resource'
 import * as rule from './rule'
 import * as sync from './sync'
 import * as task from './task'
+import * as trade from './trade'
 import * as user from './user'
 import * as schedule from './schedule'
 
@@ -28,6 +29,7 @@ export default {
   ...rule,
   ...sync,
   ...task,
+  ...trade,
   ...user,
   ...schedule,
 }

@@ -4,11 +4,10 @@ import FilterTag from '../FilterTag'
 import { Icon, VisualBox, SortListView } from '../../component'
 import { ScrollWrap } from './style'
 
-export default function FilterRow({ self, children, ...props }) {
+export default function FilterRow({ self, ...props }) {
   return <Observer>{() => (
     <div key={self.id} style={{ display: 'flex', flexDirection: 'row', overflow: 'scroll' }}>
-      <ScrollWrap>{children}</ScrollWrap>
-      {/* <VisualBox visible={props.mode === 'edit'}>
+      <VisualBox visible={props.mode === 'edit'}>
         <div style={{ width: 20, height: 20 }} onClick={() => props.editGroup(self)}>
           <Icon type="edit" />
         </div>
@@ -17,7 +16,8 @@ export default function FilterRow({ self, children, ...props }) {
         {props.mode === 'edit' ? (
           <SortListView
             isLoading={false}
-            sort={() => { }}
+            direction="horizontal"
+            sort={(oldIndex, newIndex) => { self.sortByIndex(oldIndex, newIndex); }}
             items={self.children}
             droppableId={self.id}
             mode={props.mode}
@@ -32,9 +32,9 @@ export default function FilterRow({ self, children, ...props }) {
       <VisualBox visible={props.mode === 'edit'}>
         <div style={{ display: props.mode === 'edit' ? 'block' : 'none' }}>
           <Icon type="circle-plus" onClick={() => props.addGroup({ parent_id: self.id, tree_id: self.tree_id, view: 'filter-tag' })} />
-          <Icon type="plus" onClick={() => props.destroyGroup({ id: self.id })} />
+          <Icon type="delete" onClick={() => props.destroyGroup({ id: self.id })} />
         </div>
-      </VisualBox> */}
+      </VisualBox>
     </div>
   )}</Observer>
 }

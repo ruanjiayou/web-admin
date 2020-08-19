@@ -48,7 +48,7 @@ export default function Menu({ collapsed }) {
       style={{ flex: 'auto', overflowY: 'auto', overflowX: 'hidden' }}
       defaultSelectedKeys={[store.app.menuKey]}
       // defaultOpenKeys={[store.app.menuKey]}
-      openKeys={collapsed ? [] : ['/admin/home/ui', '/admin/home/resource-manage', '/admin/home/data-manage', '/admin/home/spider-manage']}
+      openKeys={collapsed ? [] : ['/admin/home/ui', '/admin/home/resource-manage', '/admin/home/data-manage', '/admin/home/spider-manage', '/admin/home/stock-manage']}
       mode="inline"
       inlineCollapsed={collapsed}
     >

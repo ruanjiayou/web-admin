@@ -87,6 +87,19 @@ const GroupModel = types.model('Group', {
   removeRef(i) {
     self.refs.splice(i, 1)
   },
+  sortByIndex(oldIndex, newIndex) {
+    const [child] = self.children.splice(oldIndex, 1)
+    const data = getSnapshot(child);
+    self.children.splice(newIndex, 0, data)
+  },
+  sortChildren(data) {
+    const mapping = {};
+    data.forEach((it, i) => {
+      mapping[data.id] = i
+    })
+    const children = self.children.map(child => { child.nth = mapping[child.id]; return child })
+    self.children = children
+  },
 }))
 
 export default GroupModel

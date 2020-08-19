@@ -10,7 +10,7 @@ import RulePage from './home/SpiderManagePage/rule'
 import TaskPage from './home/SpiderManagePage/task'
 import SchedulePage from './home/ScheduleManagePage'
 import ResourceEdit from './home/ResourceManagePage/article'
-
+import TradePage from './home/StockManagePage/trade'
 import { DashboardOutlined, FieldTimeOutlined, UnorderedListOutlined, AppstoreAddOutlined, HddOutlined, RadarChartOutlined, UsbOutlined, OrderedListOutlined, CloudSyncOutlined, CloudServerOutlined } from '@ant-design/icons'
 
 const pages = [
@@ -92,6 +92,17 @@ const pages = [
     pathname: '/admin/home/spider-manage/task',
     Page: TaskPage,
     title: '任务列表',
+    icon: <OrderedListOutlined />,
+  },
+  {
+    pathname: '/admin/home/stock-manage',
+    title: '股票管理',
+    icon: <RadarChartOutlined />,
+  },
+  {
+    pathname: '/admin/home/stock-manage/trade',
+    Page: TradePage,
+    title: '股票交易',
     icon: <OrderedListOutlined />,
   },
   {

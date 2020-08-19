@@ -22,7 +22,7 @@ const getItemStyle = (isDragging, draggableStyle) => ({
 
 const getListStyle = isDraggingOver => ({});
 
-export default function SortList({ isLoading, items, droppableId, mode, sort, listStyle = {}, itemStyle = {}, renderItem, ...restProps }) {
+export default function SortList({ isLoading, items, droppableId, mode, direction='vertical', sort, listStyle = {}, itemStyle = {}, renderItem, ...restProps }) {
   return <Observer>{() => {
     if (isLoading) {
       return <LoadingView />
@@ -42,7 +42,7 @@ export default function SortList({ isLoading, items, droppableId, mode, sort, li
         );
         await sort(result.source.index, result.destination.index)
       }}>
-        <Droppable droppableId={droppableId} isDropDisabled={mode === 'preview'}>
+        <Droppable droppableId={droppableId} direction={direction} isDropDisabled={mode === 'preview'}>
           {(provided, snapshot) => (
             <div
               ref={provided.innerRef}

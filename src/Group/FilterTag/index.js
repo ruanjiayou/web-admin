@@ -7,6 +7,7 @@ import Icon from '../../component/Icon'
 export default function Filter({ self, mode, ...props }) {
   return <Observer>{() => (
     <Tag
+      onClick={e=>{e.preventDefault();e.stopPropagation();}}
       style={self.attrs.selected === true ? { backgroundColor: 'pink', color: 'red' } : {}}
       closable={mode === 'edit'}
       onClose={() => {
