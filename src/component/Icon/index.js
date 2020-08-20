@@ -14,6 +14,7 @@ import {
   FileSearchOutlined,
   CopyOutlined,
   CloudServerOutlined,
+  DragOutlined,
 } from '@ant-design/icons'
 
 const IconMap = {
@@ -31,6 +32,7 @@ const IconMap = {
   'copy': CopyOutlined,
   'page-search': FileSearchOutlined,
   'store': CloudServerOutlined,
+  'drag': DragOutlined,
 };
 
 export default function Icon({ type, ...props }) {

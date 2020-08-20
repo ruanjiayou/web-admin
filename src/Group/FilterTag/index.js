@@ -7,8 +7,8 @@ import Icon from '../../component/Icon'
 export default function Filter({ self, mode, ...props }) {
   return <Observer>{() => (
     <Tag
-      onClick={e=>{e.preventDefault();e.stopPropagation();}}
-      style={self.attrs.selected === true ? { backgroundColor: 'pink', color: 'red' } : {}}
+      onClick={e => { e.preventDefault(); e.stopPropagation(); }}
+      style={{ backgroundColor: self.attrs.selected === true ? 'pink' : '', color: self.attrs.selected ? 'red' : '', marginRight: 0 }}
       closable={mode === 'edit'}
       onClose={() => {
         props.destroyGroup({ id: self.id })

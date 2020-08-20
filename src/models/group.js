@@ -65,6 +65,7 @@ const GroupModel = types.model('Group', {
   // hook
   afterCreate() {
     self.$origin = self.toJSON()
+    self.children.forEach((child, i) => child.nth = i)
   },
   selectMe(id = '') {
     const found = self.children.find(child => child.id === id)
@@ -91,6 +92,7 @@ const GroupModel = types.model('Group', {
     const [child] = self.children.splice(oldIndex, 1)
     const data = getSnapshot(child);
     self.children.splice(newIndex, 0, data)
+    self.children.forEach((child, i) => child.nth = i)
   },
   sortChildren(data) {
     const mapping = {};

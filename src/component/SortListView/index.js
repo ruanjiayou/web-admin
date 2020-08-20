@@ -22,7 +22,7 @@ const getItemStyle = (isDragging, draggableStyle) => ({
 
 const getListStyle = isDraggingOver => ({});
 
-export default function SortList({ isLoading, items, droppableId, mode, direction='vertical', sort, listStyle = {}, itemStyle = {}, renderItem, ...restProps }) {
+export default function SortList({ isLoading, handler, items, droppableId, mode, direction = 'vertical', sort, listStyle = {}, itemStyle = {}, renderItem, ...restProps }) {
   return <Observer>{() => {
     if (isLoading) {
       return <LoadingView />
@@ -50,12 +50,12 @@ export default function SortList({ isLoading, items, droppableId, mode, directio
               style={listStyle}
             >
               {items.map((item, index) => (
-                <Draggable key={item.id} draggableId={item.id} index={index}>
+                <Draggable key={item.id} draggableId={item.id} isDragDisabled={mode === 'preview'} index={index}>
                   {(provided, snapshot) => (
                     <div
                       ref={provided.innerRef}
                       {...provided.draggableProps}
-                      {...provided.dragHandleProps}
+                      {...(handler ? {} : provided.dragHandleProps)}
                       style={{
                         ...(getItemStyle(
                           snapshot.isDragging,
@@ -63,6 +63,7 @@ export default function SortList({ isLoading, items, droppableId, mode, directio
                         )),
                         ...itemStyle
                       }}>
+                      {handler && <div {...provided.dragHandleProps}>{handler}</div>}
                       {renderItem({ item, ...restProps })}
                     </div>
                   )}

@@ -100,9 +100,6 @@ export default function AutoView({ self, children = [], ...props }) {
                       })
                     }
                   </Comp>
-                  <VisualBox visible={props.mode === 'edit' && view.leaf !== true}>
-                    <CenterXY>+</CenterXY>
-                  </VisualBox>
                 </EditWrap>
               )}
             </Fragment>

@@ -31,14 +31,13 @@ export default function GroupManagePage() {
   const local = useLocalStore(() => ({
     createLoading: false,
     showGroupEdit: false,
+    showGroupAdd: false,
     tree: null,
     temp: null,
     refreshing: false,
     submitting: false,
     tree_id: '',
-    config: null,
     async refreshData() {
-      this.config = null;
       const res = await apis.getGroupTrees()
       store.groups = res.data.map(item => models.group.create(item))
     },
@@ -61,15 +60,12 @@ export default function GroupManagePage() {
     local.refreshing = true
     await local.refreshData()
     local.tree_id = storage.getValue('choose_group_id')
-    local.tree = null
     if (local.tree_id) {
       local.tree = store.groups.find(group => group.id === local.tree_id)
-      // local.config = local.tree
     }
     if (!local.tree && store.groups.length !== 0) {
       local.tree_id = store.groups[0].tree_id
       local.tree = store.groups[0]
-      // local.config = local.tree
     }
     local.refreshing = false
   })
@@ -85,8 +81,8 @@ export default function GroupManagePage() {
       <AlignAside style={{ margin: '0 15%' }}>
         <Select disabled={local.refreshing} style={{ width: 200, marginRight: 20 }} value={local.tree ? local.tree.title : ''} onChange={async (value) => {
           local.tree_id = value
+          storage.setValue('choose_group_id', local.tree_id)
           local.tree = store.groups.find(group => group.id === value)
-          local.config = local.tree
         }}>
           <Select.Option value={local.tree_id}>请选择</Select.Option>
           {store.groups.map((group, i) => (
@@ -114,7 +110,7 @@ export default function GroupManagePage() {
         <Divider type="verticle" />
         <Switch title="编辑" checked={store.app.groupMode === 'edit'} onChange={() => {
           if (store.app.groupMode === 'edit') {
-            local.config = null
+            local.showGroupEdit = false
           } else {
           }
           store.app.toggleGroupMode()
@@ -130,15 +126,16 @@ export default function GroupManagePage() {
                   mode={store.app.groupMode}
                   tabIndex={store.app.groupMode === 'edit' ? 0 : ''}
                   mountGroup={group => {
-                    local.config = group
+                    local.temp = group
+                    local.showGroupEdit = true
                   }}
                   addGroup={data => {
                     local.temp = data
-                    local.showGroupEdit = true
+                    local.showGroupAdd = true
                   }}
                   editGroup={data => {
                     local.temp = data
-                    local.showGroupEdit = true
+                    local.showGroupAdd = true
                   }}
                   destroyGroup={async data => {
                     await apis.destroyGroup(data)
@@ -157,11 +154,11 @@ export default function GroupManagePage() {
             }}>提交</Button>
           </CenterXY>
         </FullWidthAuto>
-        {local.config ? <GroupEdit group={local.config} /> : <div></div>}
+        {local.showGroupEdit ? <GroupEdit group={local.temp} /> : <div style={{ width: 300, height: '100%', backgroundColor: 'wheat' }}></div>}
       </FullWidth>
-      {local.showGroupEdit && <GroupAdd
+      {local.showGroupAdd && <GroupAdd
         data={local.temp}
-        cancel={() => { local.temp = null; local.showGroupEdit = false }}
+        cancel={() => { local.temp = null; local.showGroupAdd = false }}
         save={async (data) => {
           try {
             if (data.id) {
