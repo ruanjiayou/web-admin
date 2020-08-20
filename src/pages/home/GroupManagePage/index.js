@@ -117,42 +117,56 @@ export default function GroupManagePage() {
         }} />
       </AlignAside>
       <FullWidth style={{ height: '100%', margin: '10px 0' }}>
-        <FullWidthAuto style={{ overflow: 'auto' }}>
-          <CenterXY style={{ flexDirection: 'column' }}>
-            <Mobile style={{ boxShadow: '#77b6e4 5px 5px 16px 7px', border: '1px solid #77b6e4' }}>
-              {local.refreshing === false && local.tree && (
-                <AutoView
-                  self={local.tree}
-                  mode={store.app.groupMode}
-                  tabIndex={store.app.groupMode === 'edit' ? 0 : ''}
-                  mountGroup={group => {
-                    local.temp = group
-                    local.showGroupEdit = true
-                  }}
-                  addGroup={data => {
-                    local.temp = data
-                    local.showGroupAdd = true
-                  }}
-                  editGroup={data => {
-                    local.temp = data
-                    local.showGroupAdd = true
-                  }}
-                  destroyGroup={async data => {
-                    await apis.destroyGroup(data)
-                    init()
-                  }}
-                  renderItem={item => (
-                    // <BookItem item={item} />
-                    <div>fuck</div>
-                  )}
-                />
-              )}
-            </Mobile>
-            <Button type="primary" disabled={!local.diff} loading={local.submitting} onClick={async () => {
-              await apis.updateGroupTree(local.tree);
-              init()
-            }}>提交</Button>
-          </CenterXY>
+        <FullWidthAuto style={{ height: '100%' }}>
+          <FullHeight style={{ overflow: 'auto', alignItems: 'center' }}>
+            <FullHeightFix>
+              <div>
+                <span>filtr</span>
+                <span>pick</span>
+                <span>tab</span>
+                <span>menugrid</span>
+                <span>item-normal</span>
+                <span>item-small</span>
+              </div>
+            </FullHeightFix>
+            <FullHeightAuto style={{ display: 'flex', alignItems: 'center' }}>
+              <Mobile style={{ boxShadow: '#77b6e4 5px 5px 16px 7px', border: '1px solid #77b6e4' }}>
+                {local.refreshing === false && local.tree && (
+                  <AutoView
+                    self={local.tree}
+                    mode={store.app.groupMode}
+                    tabIndex={store.app.groupMode === 'edit' ? 0 : ''}
+                    mountGroup={group => {
+                      local.temp = group
+                      local.showGroupEdit = true
+                    }}
+                    addGroup={data => {
+                      local.temp = data
+                      local.showGroupAdd = true
+                    }}
+                    editGroup={data => {
+                      local.temp = data
+                      local.showGroupAdd = true
+                    }}
+                    destroyGroup={async data => {
+                      await apis.destroyGroup(data)
+                      init()
+                    }}
+                    renderItem={item => (
+                      // <BookItem item={item} />
+                      <div>fuck</div>
+                    )}
+                  />
+                )}
+              </Mobile>
+            </FullHeightAuto>
+            <FullHeightFix>
+              <Button type="primary" disabled={!local.diff} loading={local.submitting} onClick={async () => {
+                await apis.updateGroupTree(local.tree);
+                init()
+              }}>提交</Button>
+            </FullHeightFix>
+          </FullHeight>
         </FullWidthAuto>
         {local.showGroupEdit ? <GroupEdit group={local.temp} /> : <div style={{ width: 300, height: '100%', backgroundColor: 'wheat' }}></div>}
       </FullWidth>
