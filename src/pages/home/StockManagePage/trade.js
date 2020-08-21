@@ -22,6 +22,7 @@ export default function TaskList() {
     trades: [],
     showEdit: false,
     temp: null,
+    analyise: {},
   }))
   const search = useCallback(() => {
     local.isLoading = true
@@ -37,11 +38,31 @@ export default function TaskList() {
     })
   }, [])
   useEffect(() => {
+    init()
     search()
+  })
+  const init = useCallback(async () => {
+    local.isLoading = true;
+    try {
+      const res = await apis.analyise()
+      console.log(res);
+      local.analyise = res.data
+    } catch (e) {
+
+    } finally {
+      local.isLoading = false
+    }
   })
   return <Observer>{() => (
     <FullHeight>
       <FullHeightFix style={{ padding: '20px 0' }}>
+        <div style={{ flex: 1 }}>
+          <span style={{ color: 'green' }}>费用合计:-{local.analyise.fee}</span><Divider type="vertical" />
+          <span style={{ color: 'red' }}>分红合计:+{local.analyise.bonus}</span><Divider type="vertical" />
+          <span>买入次数:{local.analyise.buys}</span><Divider type="vertical" />
+          <span>卖出次数:{local.analyise.sells}</span><Divider type="vertical" />
+          <span>总收支:{local.analyise.total}</span>
+        </div>
         <Right>
           <Button type="primary" onClick={e => {
             local.temp = {
@@ -60,7 +81,7 @@ export default function TaskList() {
             }; local.showEdit = true
           }}>添加记录</Button>
           <Divider type="vertical" />
-          <Button type="primary" onClick={e => { search() }}>刷新</Button>
+          <Button type="primary" onClick={e => { search(); init() }}>刷新</Button>
         </Right>
       </FullHeightFix>
       <FullHeightAuto style={{ overflow: 'hidden' }}>

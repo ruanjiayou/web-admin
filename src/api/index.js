@@ -10,18 +10,23 @@ import * as trade from './trade'
 import * as user from './user'
 import * as schedule from './schedule'
 
-// resource types
-// image line
-// 
-function boot() {
+const boot = function () {
   return shttp({
     url: '/v1/boot',
     method: 'GET'
   })
-}
+};
+
+const analyise = function () {
+  return shttp({
+    url: '/v1/admin/analyise/trade',
+    method: 'GET'
+  })
+};
 
 export default {
   boot,
+  analyise,
   ...backup,
   ...channel,
   ...group,
