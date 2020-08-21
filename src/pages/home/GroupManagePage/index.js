@@ -10,6 +10,7 @@ import GroupAdd from './Edit'
 import GroupEdit from './GroupEdit'
 import models from '../../../models'
 import storage from '../../../utils/storage'
+import { Menu, Submenu, Item, Separator } from 'react-contexify';
 
 function diff(group) {
   let diffed = group.diff()
@@ -56,6 +57,14 @@ export default function GroupManagePage() {
       }
     },
   }))
+  const onGroupmenu = ({ props }) => { console.log(props.id) }
+  const GroupMenu = (props) => (
+    <Menu id='group_menu'>
+      <Item onClick={e => onGroupmenu(e, props)}>编辑</Item>
+      <Item onClick={e => onGroupmenu(e, props)}>删除</Item>
+      <Item disabled>添加子视图</Item>
+    </Menu>
+  );
   const init = useCallback(async () => {
     local.refreshing = true
     await local.refreshData()
@@ -78,6 +87,7 @@ export default function GroupManagePage() {
   })
   return <Observer>{() => (
     <FullHeight>
+      <GroupMenu />
       <AlignAside style={{ margin: '0 15%' }}>
         <Select disabled={local.refreshing} style={{ width: 200, marginRight: 20 }} value={local.tree ? local.tree.title : ''} onChange={async (value) => {
           local.tree_id = value

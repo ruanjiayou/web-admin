@@ -4,6 +4,7 @@ import FilterTag from '../FilterTag'
 import { Divider } from 'antd';
 import { Icon, VisualBox, SortListView } from '../../component'
 import { ScrollWrap } from './style'
+import { contextMenu } from 'react-contexify';
 
 export default function FilterRow({ self, ...props }) {
   return <Observer>{() => (
@@ -16,17 +17,24 @@ export default function FilterRow({ self, ...props }) {
           items={self.children}
           droppableId={self.id}
           mode={props.mode}
-          listStyle={{ flexWrap: 'nowrap', display: 'flex', overflowX: 'hidden', boxSizing: 'border-box' }}
+          listStyle={{ flexWrap: 'nowrap', display: 'flex', boxSizing: 'border-box' }}
           itemStyle={{ display: 'inline-block', lineHeight: 1, margin: '0 5px' }}
           renderItem={({ item }) => <FilterTag key={item.id} self={item} selectMe={(id) => self.selectMe(id)} {...props} />}
         />
       </ScrollWrap>
       <VisualBox visible={props.mode === 'edit'}>
-        <div style={{ display: props.mode === 'edit' ? 'flex' : 'none', paddingLeft: 6 }}>
-          <Icon type="circle-plus" onClick={() => props.addGroup({ parent_id: self.id, tree_id: self.tree_id, view: 'filter-tag' })} />
-          <Divider type="vertical" />
-          <Icon type="delete" onClick={() => props.destroyGroup({ id: self.id })} />
-        </div>
+        <Icon type="more" style={{ padding: '4px 8px' }} onContextMenu={e => {
+          if (props.mode === 'preview') return;
+          e.preventDefault();
+          contextMenu.show({
+            id: 'group_menu',
+            event: e,
+            props: {
+              id: self.id,
+              view: self.attrs.view
+            }
+          });
+        }} />
       </VisualBox>
     </div>
   )}</Observer>

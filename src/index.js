@@ -5,6 +5,7 @@ import { createStore } from './contexts'
 import { Observer } from 'mobx-react-lite';
 import * as serviceWorker from './serviceWorker';
 import 'antd/dist/antd.css';
+import 'react-contexify/dist/ReactContexify.min.css';
 
 if (process.env.NODE_ENV === 'development') {
   // import('./mock').then(() => {

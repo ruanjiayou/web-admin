@@ -15,11 +15,7 @@ export default function Filter({ self, ...props }) {
       itemStyle={{ display: 'flex', alignItems: 'center' }}
       mode={props.mode}
       handler={<VisualBox visible={props.mode === 'edit'}>
-        <div style={{ display: 'flex', paddingLeft: 8 }}>
-          <Icon type="drag" />
-          <Divider type="vertical"/>
-          <Icon type="edit" onClick={() => props.editGroup(self)} />
-        </div>
+        <Icon type="drag" style={{ padding: '4px 8px' }} />
       </VisualBox>}
       renderItem={({ item }) => <FilterRow self={item} {...props} />}
     />
