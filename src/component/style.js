@@ -2,6 +2,7 @@ import styled from 'styled-components'
 
 export const Right = styled.div`
   text-align: right;
+  flex: 1;
 `;
 export const CenterXY = styled.div`
 height: 100%;

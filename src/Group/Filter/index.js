@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Observer, useLocalStore } from 'mobx-react-lite'
 import { ReactSortable } from "react-sortablejs"
+import { Divider } from 'antd';
 import FilterRow from '../FilterRow'
 import { Icon, VisualBox, SortListView } from '../../component'
 
@@ -14,8 +15,9 @@ export default function Filter({ self, ...props }) {
       itemStyle={{ display: 'flex', alignItems: 'center' }}
       mode={props.mode}
       handler={<VisualBox visible={props.mode === 'edit'}>
-        <div style={{ display: 'flex' }}>
+        <div style={{ display: 'flex', paddingLeft: 8 }}>
           <Icon type="drag" />
+          <Divider type="vertical"/>
           <Icon type="edit" onClick={() => props.editGroup(self)} />
         </div>
       </VisualBox>}
