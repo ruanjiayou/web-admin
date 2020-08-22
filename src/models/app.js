@@ -6,9 +6,13 @@ const app = types.model('app', {
   groupMode: types.optional(types.string, 'edit'),
   imageLine: types.optional(types.string, ''),
   baseUrl: types.optional(types.string, ''),
+  currentEditGroupId: types.optional(types.string, ''),
 }).actions(self => ({
   set(key, value) {
     self[key] = value
+  },
+  setEditGroupId(id) {
+    self.currentEditGroupId = id
   },
   toggleGroupMode() {
     self.groupMode = self.groupMode === 'edit' ? 'preview' : 'edit'

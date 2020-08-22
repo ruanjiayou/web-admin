@@ -12,18 +12,21 @@ const tabs = [
   { tab: 'more', title: '更多' },
 ]
 
-function RenderHeader({ tab = 'base', setTab }) {
+function RenderHeader({ tab = 'base', setTab, onClose }) {
   return <TabHeader onClick={e => {
     const node = e.target;
     if (node.tagName === 'SPAN') {
       setTab && setTab(node.dataset.name)
     }
   }}>
-    {tabs.map(item => (<TabTag data-name={item.tab} className={tab === item.tab ? 'active' : ''} key={item.tab}>{item.title}</TabTag>))}
+    <div style={{ display: 'flex', flex: 1 }}>
+      {tabs.map(item => (<TabTag data-name={item.tab} className={tab === item.tab ? 'active' : ''} key={item.tab}>{item.title}</TabTag>))}
+    </div>
+    <div onClick={onClose}><Icon type="delete" /></div>
   </TabHeader>
 }
 
-export default function GroupEdit({ group }) {
+export default function GroupEdit({ group, onClose }) {
   const jsoneditor = useRef(null)
   const lb = { span: 6, offset: 3 }, rb = { span: 12 }
   const local = useLocalStore(() => ({
@@ -40,7 +43,7 @@ export default function GroupEdit({ group }) {
   return <Observer>{() => (
     <FullHeight style={{ width: 300, backgroundColor: 'wheat' }}>
       <FullWidth>
-        <RenderHeader tabs={tabs} tab={local.tab} setTab={local.setTab} />
+        <RenderHeader tabs={tabs} tab={local.tab} setTab={local.setTab} onClose={onClose} />
       </FullWidth>
       <FullHeightAuto>
         <Form style={{ height: 700, display: local.tab === 'base' ? 'block' : 'none' }}>

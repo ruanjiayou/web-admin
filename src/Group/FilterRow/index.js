@@ -5,10 +5,13 @@ import { Divider } from 'antd';
 import { Icon, VisualBox, SortListView } from '../../component'
 import { ScrollWrap } from './style'
 import { contextMenu } from 'react-contexify';
+import { useStore } from '../../contexts';
+import { EditWrap } from '../style'
 
 export default function FilterRow({ self, ...props }) {
+  const store = useStore()
   return <Observer>{() => (
-    <div key={self.id} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', overflowX: 'auto', padding: 5, flex: 1 }}>
+    <EditWrap className={store.app.currentEditGroupId === self.id ? 'focus' : ''} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', overflowX: 'auto', padding: 5, flex: 1 }}>
       <ScrollWrap>
         <SortListView
           isLoading={false}
@@ -36,6 +39,6 @@ export default function FilterRow({ self, ...props }) {
           });
         }} />
       </VisualBox>
-    </div>
+    </EditWrap>
   )}</Observer>
 }

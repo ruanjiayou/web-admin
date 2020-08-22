@@ -2,6 +2,9 @@ import styled from 'styled-components'
 
 export const TabHeader = styled.div`
   padding: 2px;
+  display: flex;
+  flex: 1;
+  align-items: center;
 `;
 
 export const TabTag = styled.span`

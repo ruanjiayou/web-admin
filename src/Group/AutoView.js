@@ -1,5 +1,7 @@
-import React, { Fragment } from 'react'
+import React, { Fragment, useEffect } from 'react'
 import { Divider } from 'antd';
+import { Observer, useLocalStore } from 'mobx-react-lite';
+import { useStore } from '../contexts';
 import Icon from '../component/Icon'
 import Picker from './Picker'
 import Filter from './Filter'
@@ -8,7 +10,6 @@ import FilterTag from './FilterTag'
 import Tree from './Tree'
 import Tab from './Tab'
 import TabPane from './TabPane'
-import { Observer, useLocalStore } from 'mobx-react-lite';
 import { CenterXY } from '../component/style'
 import { VisualBox } from '../component';
 import { EditWrap } from './style'
@@ -52,6 +53,7 @@ export const mapping = {
 }
 // self children mode 
 export default function AutoView({ self, children = [], ...props }) {
+  const store = useStore()
   const local = useLocalStore(() => ({
     isDragOver: false,
     onDrop: () => { local.isDragOver = false; console.log('drop' + self.id) },
@@ -94,7 +96,12 @@ export default function AutoView({ self, children = [], ...props }) {
                 </div>
               </div>} */}
               {(self.$delete === false || props.mode === 'edit') && (
-                <EditWrap onDragOver={local.onDragOver} onDragLeave={local.onDragLeave} onDrop={local.onDrop} className={`${props.mode} ${self.$delete ? 'delete' : ''} ${local.isDragOver ? 'dragover' : ''}`} tabIndex={props.mode === 'edit' ? 0 : ''}>
+                <EditWrap
+                  onDragOver={local.onDragOver}
+                  onDragLeave={local.onDragLeave}
+                  onDrop={local.onDrop}
+                  className={`${props.mode} ${self.$delete ? 'delete' : ''} ${local.isDragOver ? 'dragover' : ''} ${store.app.currentEditGroupId === self.id ? 'focus' : ''}`}
+                  tabIndex={props.mode === 'edit' ? 0 : ''}>
                   <Comp self={self} {...props}>
                     {
                       self.children.map(child => {

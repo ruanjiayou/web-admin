@@ -32,6 +32,19 @@ function diff(group) {
   }
   return false
 }
+function getById(tree, id) {
+  if (tree.id === id) {
+    return tree;
+  } else {
+    for (let i = 0; i < tree.children.length; i++) {
+      let n = getById(tree.children[i], id);
+      if (n) {
+        return n;
+      }
+    }
+    return null;
+  }
+}
 
 export default function GroupManagePage() {
   const store = useStore()
@@ -64,7 +77,11 @@ export default function GroupManagePage() {
       }
     },
   }))
-  const onGroupmenu = ({ props }) => { console.log(props.id) }
+  const onGroupmenu = ({ props }) => {
+    store.app.setEditGroupId(props.id)
+    local.temp = getById(local.tree, props.id);
+    if (local.temp) local.showGroupEdit = true
+  }
   const GroupMenu = (props) => (
     <Menu id='group_menu'>
       <Item onClick={e => onGroupmenu(e, props)}>编辑</Item>
@@ -94,9 +111,14 @@ export default function GroupManagePage() {
   })
   return <Observer>{() => (
     <FullHeight>
+      {/* 自定义右键菜单 */}
       <GroupMenu />
       <AlignAside style={{ margin: '0 15%' }}>
+        {/* 顶部操作栏 */}
         <Select disabled={local.refreshing} style={{ width: 200, marginRight: 20 }} value={local.tree ? local.tree.title : ''} onChange={async (value) => {
+          local.showGroupEdit = false;
+          local.temp = null
+          store.app.setEditGroupId('')
           local.tree_id = value
           storage.setValue('choose_group_id', local.tree_id)
           local.tree = store.groups.find(group => group.id === value)
@@ -165,6 +187,11 @@ export default function GroupManagePage() {
                       local.showGroupAdd = true
                     }}
                     destroyGroup={async data => {
+                      if (store.app.currentEditGroupId === data.id) {
+                        local.showGroupEdit = false;
+                        local.temp = null;
+                        store.app.setEditGroupId('')
+                      }
                       await apis.destroyGroup(data)
                       init()
                     }}
@@ -184,7 +211,7 @@ export default function GroupManagePage() {
             </FullHeightFix>
           </FullHeight>
         </FullWidthAuto>
-        {local.showGroupEdit ? <GroupEdit group={local.temp} /> : <div style={{ width: 300, height: '100%', backgroundColor: 'wheat' }}></div>}
+        {local.showGroupEdit ? <GroupEdit group={local.temp} onClose={() => { local.showGroupEdit = false; local.temp = null; store.app.setEditGroupId('') }} /> : <div style={{ width: 300, height: '100%', backgroundColor: 'wheat' }}></div>}
       </FullWidth>
       {local.showGroupAdd && <GroupAdd
         data={local.temp}
