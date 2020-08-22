@@ -45,8 +45,7 @@ export default function GroupManagePage() {
     submitting: false,
     tree_id: '',
     async refreshData() {
-      const query = { v: 0 }
-      const res = await apis.getGroupTrees({ query })
+      const res = await apis.getGroupTrees()
       store.groups = res.data.map(item => models.group.create(item))
     },
     get diff() {

@@ -3,6 +3,7 @@ import SignInPage from './auth/SignInPage'
 import DashboardPage from './home/DashboardPage'
 import ChannelManagePage from './home/ChannelManagePage'
 import GroupManagePage from './home/GroupManagePage'
+import NewGroupManagePage from './home/NewGroupManagePage'
 import ResourceManagePage from './home/ResourceManagePage'
 import BackupPage from './home/DataManagePage/backup'
 import SyncPage from './home/DataManagePage/sync'
@@ -35,6 +36,12 @@ const pages = [
     pathname: '/admin/home/ui/group-manage',
     Page: GroupManagePage,
     title: '分组管理',
+    icon: <UnorderedListOutlined />,
+  },
+  {
+    pathname: '/admin/home/ui/new-group-manage',
+    Page: NewGroupManagePage,
+    title: '新分组管理',
     icon: <UnorderedListOutlined />,
   },
   {

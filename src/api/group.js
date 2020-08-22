@@ -24,9 +24,9 @@ export function destroyGroup(params) {
 }
 
 
-export function getGroupTrees() {
+export function getGroupTrees({ query }) {
   return shttp({
-    url: `/v1/admin/group-trees`,
+    url: `/v1/admin/group-trees?v=${query.v}`,
     method: 'GET',
   })
 }
