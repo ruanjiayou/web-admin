@@ -23,7 +23,7 @@ export default function FilterRow({ self, ...props }) {
         />
       </ScrollWrap>
       <VisualBox visible={props.mode === 'edit'}>
-        <Icon type="more" style={{ padding: '4px 8px' }} onContextMenu={e => {
+        <Icon type="more" style={{ padding: '4px 8px' }} onClick={e => {
           if (props.mode === 'preview') return;
           e.preventDefault();
           contextMenu.show({

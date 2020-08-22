@@ -5,8 +5,10 @@ export const EditWrap = styled.div`
     background-color: #333;
   }
   border: 2px dashed transparent;
-  &:focus {
+  &.focus {
     border-color: #1890ff;
-    outline: none;
+  }
+  &.dragover {
+    background-color: yellow;
   }
 `; 

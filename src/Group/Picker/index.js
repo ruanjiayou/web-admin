@@ -4,8 +4,14 @@ import ItemView from '../BookItem/Normal'
 import Icon from '../../component/Icon'
 import { AlignAside, FullWidth } from '../../component/style'
 
-export default function Picker({ self }) {
+export default function Picker({ self, ...props }) {
   return <div>
+    <VisualBox visible={props.mode === 'edit'}>
+      <AlignAside style={{ border: '1px dashed grey', padding: '2px 5px' }}>
+        <Icon type="edit" />
+        <Icon type="delete" />
+      </AlignAside>
+    </VisualBox>
     <VisualBox visible={self.attrs.hide_title === false}>
       <AlignAside style={{ borderLeft: '5px solid #ff9999', padding: '5px 8px' }}>
         <span>{self.title}</span>

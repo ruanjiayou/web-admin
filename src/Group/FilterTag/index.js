@@ -20,6 +20,10 @@ export default function Filter({ self, mode, ...props }) {
           }
         });
       }}
+      closable={mode === 'edit'}
+      onClose={() => {
+        props.destroyGroup({ id: self.id })
+      }}
       onClick={e => { e.preventDefault(); e.stopPropagation(); }}
       style={{ backgroundColor: self.attrs.selected === true ? 'pink' : '', color: self.attrs.selected ? 'red' : '', marginRight: 0 }}>
       <span onClick={() => {

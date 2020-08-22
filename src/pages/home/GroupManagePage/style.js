@@ -15,3 +15,10 @@ export const TabTag = styled.span`
     color: white;
   }
 `;
+
+export const CompImg = styled.img`
+  display: inline-block;
+  height: 70px;
+  flex: 1;
+  margin: 0 5px;
+`;

@@ -11,6 +11,12 @@ import GroupEdit from './GroupEdit'
 import models from '../../../models'
 import storage from '../../../utils/storage'
 import { Menu, Submenu, Item, Separator } from 'react-contexify';
+import { CompImg } from './style'
+import ImgPicker from '../../../images/picker2.svg'
+import ImgFilter from '../../../images/filter2.svg'
+import ImgGrid from '../../../images/menu2.svg'
+import ImgTab from '../../../images/tab2.svg'
+import ImgTabbar from '../../../images/tabbar2.svg'
 
 function diff(group) {
   let diffed = group.diff()
@@ -130,13 +136,12 @@ export default function GroupManagePage() {
         <FullWidthAuto style={{ height: '100%' }}>
           <FullHeight style={{ overflow: 'auto', alignItems: 'center' }}>
             <FullHeightFix>
-              <div>
-                <span>filtr</span>
-                <span>pick</span>
-                <span>tab</span>
-                <span>menugrid</span>
-                <span>item-normal</span>
-                <span>item-small</span>
+              <div style={{ display: 'flex' }}>
+                <CompImg src={ImgFilter} title="过滤组件" />
+                <CompImg src={ImgPicker} title="卡片组件" />
+                <CompImg src={ImgTab} title="tab组件" />
+                <CompImg src={ImgTabbar} title="tabbar组件" />
+                <CompImg src={ImgGrid} title="grid组件" />
               </div>
             </FullHeightFix>
             <FullHeightAuto style={{ display: 'flex', alignItems: 'center' }}>
