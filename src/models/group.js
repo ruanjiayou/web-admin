@@ -20,7 +20,6 @@ function deepEqual(a, b) {
 const GroupModel = types.model('Group', {
   // 编辑用属性
   $origin: types.frozen({}),
-  $diff: types.frozen({}),
   $new: types.optional(types.boolean, false),
   $delete: types.optional(types.boolean, false),
   // data/children 临时属性
@@ -56,7 +55,7 @@ const GroupModel = types.model('Group', {
   // 编辑比较
   toJSON() {
     const data = getSnapshot(self);
-    return _.omit(data, ['data', 'children', '$new', '$delete', '$origin', '$diff'])
+    return _.omit(data, ['data', 'children', '$new', '$delete', '$origin'])
   },
   diff() {
     return !deepEqual(self.$origin, self.toJSON()) || self.$delete === true;
@@ -101,6 +100,22 @@ const GroupModel = types.model('Group', {
     })
     const children = self.children.map(child => { child.nth = mapping[child.id]; return child })
     self.children = children
+  },
+  addChild(child) {
+    self.children.push(child)
+  },
+  huifu() {
+    console.log(self.id, 'huifu')
+    self.$delete = false;
+    // Object.assign(self, self.$origin);
+    for (let i = self.children.length - 1; i > 0; i--) {
+      const child = self.children[i];
+      if (child.$new) {
+        self.children.splice(i, 1)
+      } else {
+        child.huifu()
+      }
+    }
   },
 }))
 

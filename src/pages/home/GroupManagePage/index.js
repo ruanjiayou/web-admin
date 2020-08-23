@@ -2,7 +2,7 @@ import React, { useEffect, useCallback, useRef } from 'react';
 import { Observer, useLocalStore, useComputed } from 'mobx-react-lite'
 import apis from '../../../api';
 import { useStore } from '../../../contexts'
-import { Button, Switch, Form, Input, notification, Radio, Select, Card, Row, Col, Divider } from 'antd';
+import { Button, Switch, Modal, Form, Input, notification, Radio, Select, Card, Row, Col, Divider } from 'antd';
 import { FullHeight, FullHeightFix, FullHeightAuto, CenterXY, AlignAside, Right, FullWidth, FullWidthFix, FullWidthAuto } from '../../../component/style'
 import AutoView from '../../../Group/AutoView'
 import { Mobile, Icon, VisualBox } from '../../../component'
@@ -17,34 +17,7 @@ import ImgFilter from '../../../images/filter2.svg'
 import ImgGrid from '../../../images/menu2.svg'
 import ImgTab from '../../../images/tab2.svg'
 import ImgTabbar from '../../../images/tabbar2.svg'
-
-function diff(group) {
-  let diffed = group.diff()
-  if (diffed) {
-    return true
-  } else {
-    for (let i = 0; i < group.children.length; i++) {
-      diffed = diff(group.children[i]);
-      if (diffed) {
-        return true;
-      }
-    }
-  }
-  return false
-}
-function getById(tree, id) {
-  if (tree.id === id) {
-    return tree;
-  } else {
-    for (let i = 0; i < tree.children.length; i++) {
-      let n = getById(tree.children[i], id);
-      if (n) {
-        return n;
-      }
-    }
-    return null;
-  }
-}
+import { GroupsDiff as diff, GroupsGetById as getById } from '../../../utils/helper'
 
 export default function GroupManagePage() {
   const store = useStore()
@@ -69,23 +42,23 @@ export default function GroupManagePage() {
         return diff(this.tree);
       }
     },
-    event: null,
-    edited(e) {
-      const tree_id = e.detail.tree_id;
-      if (local.tree && tree_id === local.tree.tree_id) {
-        local.ts = Date.now();
-      }
-    },
   }))
-  const onGroupmenu = ({ props }) => {
+  // 右键菜单事件
+  const onEditGroup = ({ props }) => {
     store.app.setEditGroupId(props.id)
     local.temp = getById(local.tree, props.id);
     if (local.temp) local.showGroupEdit = true
   }
+  const onDeleteGroup = ({ props }) => {
+    const temp = getById(local.tree, props.id);
+    if (temp) {
+      temp.setKey('$delete', true)
+    }
+  }
   const GroupMenu = (props) => (
     <Menu id='group_menu'>
-      <Item onClick={e => onGroupmenu(e, props)}>编辑</Item>
-      <Item onClick={e => onGroupmenu(e, props)}>删除</Item>
+      <Item onClick={e => onEditGroup(e, props)}>编辑</Item>
+      <Item onClick={e => onDeleteGroup(e, props)}>删除</Item>
       <Item disabled>添加子视图</Item>
     </Menu>
   );
@@ -103,10 +76,6 @@ export default function GroupManagePage() {
     local.refreshing = false
   })
   useEffect(() => {
-    if (!local.event) {
-      local.event = new Event('group')
-      document.addEventListener('group', local.edited)
-    }
     init()
   })
   return <Observer>{() => (
@@ -116,12 +85,31 @@ export default function GroupManagePage() {
       <AlignAside style={{ margin: '0 15%' }}>
         {/* 顶部操作栏 */}
         <Select disabled={local.refreshing} style={{ width: 200, marginRight: 20 }} value={local.tree ? local.tree.title : ''} onChange={async (value) => {
-          local.showGroupEdit = false;
-          local.temp = null
-          store.app.setEditGroupId('')
-          local.tree_id = value
-          storage.setValue('choose_group_id', local.tree_id)
-          local.tree = store.groups.find(group => group.id === value)
+          if (local.diff) {
+            Modal.confirm({
+              title: "confirm",
+              content: "数据发生变化,确定要离开吗?",
+              onOk() {
+                local.tree.huifu()
+                local.showGroupEdit = false;
+                local.temp = null
+                store.app.setEditGroupId('')
+                local.tree_id = value
+                storage.setValue('choose_group_id', local.tree_id)
+                local.tree = store.groups.find(group => group.id === value)
+              },
+              onCancel() {
+
+              },
+            })
+          } else {
+            local.showGroupEdit = false;
+            local.temp = null
+            store.app.setEditGroupId('')
+            local.tree_id = value
+            storage.setValue('choose_group_id', local.tree_id)
+            local.tree = store.groups.find(group => group.id === value)
+          }
         }}>
           <Select.Option value={local.tree_id}>请选择</Select.Option>
           {store.groups.map((group, i) => (
@@ -160,9 +148,9 @@ export default function GroupManagePage() {
           <FullHeight style={{ overflow: 'auto', alignItems: 'center' }}>
             <FullHeightFix>
               <div style={{ display: 'flex' }}>
-                <CompImg src={ImgFilter} title="过滤组件" />
-                <CompImg src={ImgPicker} title="卡片组件" />
-                <CompImg src={ImgTab} title="tab组件" />
+                <CompImg src={ImgFilter} title="过滤组件" onDragStart={() => { store.app.setCurrentDragType('filter') }} />
+                <CompImg src={ImgPicker} title="卡片组件" onDragStart={() => { store.app.setCurrentDragType('picker') }} />
+                <CompImg src={ImgTab} title="tab组件" onDragStart={() => { store.app.setCurrentDragType('tab') }} />
                 <CompImg src={ImgTabbar} title="tabbar组件" />
                 <CompImg src={ImgGrid} title="grid组件" />
               </div>
@@ -195,10 +183,10 @@ export default function GroupManagePage() {
                       await apis.destroyGroup(data)
                       init()
                     }}
-                    renderItem={item => (
-                      // <BookItem item={item} />
-                      <div>fuck</div>
-                    )}
+                  // renderItem={item => (
+                  //   // <BookItem item={item} />
+                  //   <div>fuck</div>
+                  // )}
                   />
                 )}
               </Mobile>

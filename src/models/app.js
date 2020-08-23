@@ -7,6 +7,7 @@ const app = types.model('app', {
   imageLine: types.optional(types.string, ''),
   baseUrl: types.optional(types.string, ''),
   currentEditGroupId: types.optional(types.string, ''),
+  currentDragType: types.optional(types.string, ''),
 }).actions(self => ({
   set(key, value) {
     self[key] = value
@@ -17,6 +18,29 @@ const app = types.model('app', {
   toggleGroupMode() {
     self.groupMode = self.groupMode === 'edit' ? 'preview' : 'edit'
   },
+  setCurrentDragType(type) {
+    self.currentDragType = type
+  },
+  canTypeDrop(dst) {
+    let can = false;
+    switch (dst) {
+      case "":
+        if (["picker", "tab", "filter", "tree-node", "menu-grid", "tabbar", "layout"].includes(self.currentDragType)) {
+          can = true;
+        }
+        break;
+      case "picker": break;
+      case "filter-tag": break;
+      case "tab-pane": can = true; break;
+      case "filter": can = self.currentDragType === 'filter-row'; break;
+      case "filter-row": can = self.currentDragType === 'filter-tag'; break;
+      case "tree-node": can = self.currentDragType === 'tree-node'; break;
+      case "tab": can = self.currentDragType === 'tab-pane'; break;
+      default: break;
+    }
+    console.log(`drag:${self.currentDragType} dst:${dst}`)
+    return can;
+  }
 }))
 
 export default app;
