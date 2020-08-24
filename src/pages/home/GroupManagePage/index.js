@@ -2,7 +2,7 @@ import React, { useEffect, useCallback, useRef } from 'react';
 import { Observer, useLocalStore, useComputed } from 'mobx-react-lite'
 import apis from '../../../api';
 import { useStore } from '../../../contexts'
-import { Button, Switch, Modal, Form, Input, notification, Radio, Select, Card, Row, Col, Divider } from 'antd';
+import { Button, Switch, Modal, Form, Input, notification, Radio, Select, Card, Row, Col, Divider, message } from 'antd';
 import { FullHeight, FullHeightFix, FullHeightAuto, CenterXY, AlignAside, Right, FullWidth, FullWidthFix, FullWidthAuto } from '../../../component/style'
 import AutoView from '../../../Group/AutoView'
 import { Mobile, Icon, VisualBox } from '../../../component'
@@ -17,7 +17,8 @@ import ImgFilter from '../../../images/filter2.svg'
 import ImgGrid from '../../../images/menu2.svg'
 import ImgTab from '../../../images/tab2.svg'
 import ImgTabbar from '../../../images/tabbar2.svg'
-import { GroupsDiff as diff, GroupsGetById as getById } from '../../../utils/helper'
+import { GroupsDiff as diff, GroupsGetById as getById, createGroupByType } from '../../../utils/helper'
+import { get } from 'lodash';
 
 export default function GroupManagePage() {
   const store = useStore()
@@ -55,13 +56,20 @@ export default function GroupManagePage() {
       temp.setKey('$delete', true)
     }
   }
-  const GroupMenu = (props) => (
-    <Menu id='group_menu'>
-      <Item onClick={e => onEditGroup(e, props)}>编辑</Item>
-      <Item onClick={e => onDeleteGroup(e, props)}>删除</Item>
-      <Item disabled>添加子视图</Item>
-    </Menu>
-  );
+  const onAddChild = ({ props }) => {
+    if (store.app.canAddChild(props.view)) {
+      const p = getById(local.tree, props.id)
+      local.temp = createGroupByType(p, '');
+      local.showGroupAdd = true
+    } else {
+      message.warn('can not add child')
+    }
+  }
+  const GroupMenu = (props) => (<Menu id='group_menu'>
+    <Item onClick={e => onEditGroup(e, props)}>编辑</Item>
+    <Item onClick={e => onDeleteGroup(e, props)}>删除</Item>
+    <Item onClick={e => onAddChild(e, props)}>添加子视图</Item>
+  </Menu>)
   const init = useCallback(async () => {
     local.refreshing = true
     await local.refreshData()
@@ -152,7 +160,7 @@ export default function GroupManagePage() {
                 <CompImg src={ImgPicker} title="卡片组件" onDragStart={() => { store.app.setCurrentDragType('picker') }} />
                 <CompImg src={ImgTab} title="tab组件" onDragStart={() => { store.app.setCurrentDragType('tab') }} />
                 <CompImg src={ImgTabbar} title="tabbar组件" />
-                <CompImg src={ImgGrid} title="grid组件" />
+                <CompImg src={ImgGrid} title="grid组件" onDragStart={() => { store.app.setCurrentDragType('menu-grid') }} />
               </div>
             </FullHeightFix>
             <FullHeightAuto style={{ display: 'flex', alignItems: 'center' }}>
@@ -199,25 +207,30 @@ export default function GroupManagePage() {
             </FullHeightFix>
           </FullHeight>
         </FullWidthAuto>
-        {local.showGroupEdit ? <GroupEdit group={local.temp} onClose={() => { local.showGroupEdit = false; local.temp = null; store.app.setEditGroupId('') }} /> : <div style={{ width: 300, height: '100%', backgroundColor: 'wheat' }}></div>}
+        {local.showGroupEdit && <GroupEdit group={local.temp} onClose={() => { local.showGroupEdit = false; local.temp = null; store.app.setEditGroupId('') }} />}
       </FullWidth>
       {local.showGroupAdd && <GroupAdd
         data={local.temp}
         cancel={() => { local.temp = null; local.showGroupAdd = false }}
         save={async (data) => {
-          try {
-            if (data.id) {
-              await apis.updateGroup(data)
-            } else {
-              await apis.createGroup(data)
-            }
-            // storage.getValue('choose_group_id', null)
-            // local.tree = null
-            init()
-            return true
-          } catch (err) {
-            return false
+          // try {
+          //   if (data.id) {
+          //     await apis.updateGroup(data)
+          //   } else {
+          //     await apis.createGroup(data)
+          //   }
+          //   // storage.getValue('choose_group_id', null)
+          //   // local.tree = null
+          //   init()
+          //   return true
+          // } catch (err) {
+          //   return false
+          // }
+          const curr = getById(local.tree, data.parent_id);
+          if (curr) {
+            curr.addChild(data)
           }
+          return true
         }}
       />}
       {/* <FullHeightFix>

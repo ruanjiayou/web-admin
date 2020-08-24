@@ -40,7 +40,11 @@ const app = types.model('app', {
     }
     console.log(`drag:${self.currentDragType} dst:${dst}`)
     return can;
-  }
+  },
+  canAddChild(view) {
+    console.log(view, 'can?')
+    return ['', 'filter', 'filter-row', 'tab', 'tab-pane', 'menu-grid', 'tree-node',].includes(view);
+  },
 }))
 
 export default app;

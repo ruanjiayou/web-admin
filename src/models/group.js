@@ -105,9 +105,12 @@ const GroupModel = types.model('Group', {
     self.children.push(child)
   },
   huifu() {
-    console.log(self.id, 'huifu')
     self.$delete = false;
-    // Object.assign(self, self.$origin);
+    if (self.diff()) {
+      for (let k in self.$origin) {
+        self[k] = self.$origin[k]
+      }
+    }
     for (let i = self.children.length - 1; i > 0; i--) {
       const child = self.children[i];
       if (child.$new) {
@@ -116,6 +119,7 @@ const GroupModel = types.model('Group', {
         child.huifu()
       }
     }
+    self.children.forEach((child, i) => child.nth = i)
   },
 }))
 

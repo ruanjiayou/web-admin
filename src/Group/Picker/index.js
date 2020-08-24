@@ -18,7 +18,7 @@ export default function Picker({ self, ...props }) {
               event: e,
               props: {
                 id: self.id,
-                view: self.attrs.view
+                view: self.view
               }
             });
           }} />
@@ -33,8 +33,13 @@ export default function Picker({ self, ...props }) {
           </VisualBox>
         </AlignAside>
       </VisualBox>
-      <FullWidth style={{ overflowX: 'auto' }}>
+      <FullWidth style={{ overflowX: 'auto', minHeight: 110 }}>
         {self.data.map((d, index) => (<ItemView style={{ width: '50%' }} key={index} item={d} />))}
+        <VisualBox visible={props.mode === 'edit'}>
+          <div style={{ width: '50%', textAlign: 'center' }}>
+            <Icon type="circle-plus" />
+          </div>
+        </VisualBox>
       </FullWidth>
       <VisualBox visible={self.attrs.allowChange === true}>
         <div style={{ textAlign: 'center' }}><Icon type="sync-horizon" /> 换一换</div>

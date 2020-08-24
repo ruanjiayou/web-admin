@@ -20,7 +20,7 @@ export default function Filter({ self, mode, ...props }) {
             event: e,
             props: {
               id: self.id,
-              view: self.attrs.view
+              view: self.view
             }
           });
         }}

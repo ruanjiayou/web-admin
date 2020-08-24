@@ -19,7 +19,7 @@ export default function Filter({ self, ...props }) {
             event: e,
             props: {
               id: self.id,
-              view: self.attrs.view
+              view: self.view
             }
           });
         }}>编辑过滤组<Icon type="edit" /></span>

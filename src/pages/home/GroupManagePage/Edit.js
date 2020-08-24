@@ -10,7 +10,17 @@ export default function GroupAdd({ cancel, save, data }) {
     data: data.id ? _.cloneDeep(data) : { refs: [], nth: 1, attrs: {}, params: {}, more: {}, ...data },
     loading: false,
     ref: '',
-    maps: [],
+    maps: [
+      { key: 'picker', value: 'picker' },
+      { key: 'filter', value: 'filter' },
+      { key: 'filter-row', value: 'filter-row' },
+      { key: 'filter-tag', value: 'filter-tag' },
+      { key: 'tab', value: 'tab' },
+      { key: 'tab-pane', value: 'tab-pane' },
+      { key: 'menu-grid', value: 'menu-grid' },
+      { key: 'menu', value: 'menu' },
+      { key: 'tree-node', value: 'tree-node' },
+    ],
   }))
   store.data.params = JSON.stringify(store.data.params)
   // for (let m in mapping) {
@@ -23,28 +33,30 @@ export default function GroupAdd({ cancel, save, data }) {
     <Modal
       style={{ overflow: 'auto', padding: 0 }}
       width={1000}
-      bodyStyle={{ height: 700, overflow: 'auto' }}
+      bodyStyle={{ height: 600, overflow: 'auto' }}
       title={data ? '编辑组件' : '添加组件'}
       visible={true}
       onCancel={cancel}
       onOk={async () => {
-        try {
-          store.data.params = JSON.parse(store.data.params)
-        } catch (err) {
-          notification.info({ message: 'params格式错误' })
-          return
-        }
-        if (store.loading) {
-          return;
-        }
-        store.loading = true;
-        const result = await save(store.data)
-        store.loading = false
-        if (result) {
-          cancel()
-        } else {
-          notification.info({ message: '操作失败' })
-        }
+        save(JSON.parse(JSON.stringify(store.data)));
+        cancel()
+        // try {
+        //   store.data.params = JSON.parse(store.data.params)
+        // } catch (err) {
+        //   notification.info({ message: 'params格式错误' })
+        //   return
+        // }
+        // if (store.loading) {
+        //   return;
+        // }
+        // store.loading = true;
+        // const result = await save(store.data)
+        // store.loading = false
+        // if (result) {
+        //   cancel()
+        // } else {
+        //   notification.info({ message: '操作失败' })
+        // }
       }}
     >
       <Form>

@@ -30,7 +30,25 @@ export function GroupsGetById(tree, id) {
 }
 
 export function createGroupByType(parent, view) {
+  if(view==='') {
+    if(parent.view === 'filter') {
+      view = 'filter-row'
+    }
+    if(parent.view === 'filter-row') {
+      view = 'filter-tag'
+    }
+    if(parent.view === 'tab') {
+      view = 'filter-pane'
+    }
+    if(parent.view === 'menu-grid') {
+      view = 'menu'
+    }
+    if(parent.view === 'tree-node') {
+      view = 'tree-node'
+    }
+  }
   const data = {
+    $new: true,
     tree_id: parent.tree_id,
     id: shortid.generate(),
     parent_id: parent.id,
@@ -47,5 +65,8 @@ export function createGroupByType(parent, view) {
     nth: parent.children.length,
     open: true,
   };
+  if(view === 'picker') {
+    data.attrs.hide_title = false;
+  }
   return data;
 }

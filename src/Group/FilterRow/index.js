@@ -34,7 +34,7 @@ export default function FilterRow({ self, ...props }) {
             event: e,
             props: {
               id: self.id,
-              view: self.attrs.view
+              view: self.view
             }
           });
         }} />

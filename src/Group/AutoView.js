@@ -10,6 +10,8 @@ import FilterTag from './FilterTag'
 import Tree from './Tree'
 import Tab from './Tab'
 import TabPane from './TabPane'
+import MenuGrid from './MenuGrid'
+import Menu from './Menu'
 import { CenterXY } from '../component/style'
 import { VisualBox } from '../component';
 import { EditWrap } from './style'
@@ -58,6 +60,15 @@ export const mapping = {
   'tab-pane': {
     name: 'tab-pane',
     component: TabPane,
+  },
+  'menu-grid': {
+    name: 'menu-grid',
+    subView: 'menu',
+    component: MenuGrid,
+  },
+  'menu': {
+    name: 'menu',
+    component: Menu,
   },
 }
 // self children mode 
