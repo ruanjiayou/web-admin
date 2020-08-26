@@ -18,7 +18,6 @@ import ImgGrid from '../../../images/menu2.svg'
 import ImgTab from '../../../images/tab2.svg'
 import ImgTabbar from '../../../images/tabbar2.svg'
 import { GroupsDiff as diff, GroupsGetById as getById, createGroupByType } from '../../../utils/helper'
-import { get } from 'lodash';
 
 export default function GroupManagePage() {
   const store = useStore()
@@ -53,7 +52,12 @@ export default function GroupManagePage() {
   const onDeleteGroup = ({ props }) => {
     const temp = getById(local.tree, props.id);
     if (temp) {
-      temp.setKey('$delete', true)
+      if (temp.$new) {
+        let tt = getById(local.tree, temp.parent_id);
+        tt && tt.removeChild(temp.id)
+      } else {
+        temp.setKey('$delete', true)
+      }
     }
   }
   const onAddChild = ({ props }) => {

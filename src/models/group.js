@@ -34,12 +34,10 @@ const GroupModel = types.model('Group', {
   refs: types.array(types.string),
   data: types.array(resource),
   attrs: types.optional(types.model({
-    hide_title: types.maybeNull(types.boolean),
-    allowChange: types.maybeNull(types.boolean),
+    random: types.maybeNull(types.boolean),
     selected: types.maybeNull(types.boolean),
     timeout: types.maybeNull(types.number),
     columns: types.maybeNull(types.number),
-    showCount: types.maybeNull(types.number),
   }), {}),
   // query/
   params: types.frozen(null, {}),
@@ -58,7 +56,7 @@ const GroupModel = types.model('Group', {
     return _.omit(data, ['data', 'children', '$new', '$delete', '$origin'])
   },
   diff() {
-    return !deepEqual(self.$origin, self.toJSON()) || self.$delete === true;
+    return !deepEqual(self.$origin, self.toJSON()) || self.$delete === true || self.$new === true;
   }
 })).actions(self => ({
   // hook
@@ -103,6 +101,11 @@ const GroupModel = types.model('Group', {
   },
   addChild(child) {
     self.children.push(child)
+  },
+  removeChild(id) {
+    const i = self.children.findIndex(item => item.id === id)
+    self.children.splice(i, 1);
+    self.children.forEach((child, i) => child.nth = i)
   },
   huifu() {
     self.$delete = false;

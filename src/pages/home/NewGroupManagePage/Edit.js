@@ -94,13 +94,6 @@ export default function GroupAdd({ cancel, save, data }) {
         <Row>
           <Col span={18} offset={6}>
             <Card title="attrs属性">
-              <Form.Item label='隐藏标题' labelCol={lb} wrapperCol={rb}>
-                <Radio.Group
-                  value={store.data.attrs.hide_title}
-                  options={[{ label: '显示', value: false }, { label: '隐藏', value: true }]}
-                  onChange={e => { store.data.attrs.hide_title = e.target.value }}
-                />
-              </Form.Item>
               <Form.Item label='默认选中' labelCol={lb} wrapperCol={rb}>
                 <Radio.Group
                   value={store.data.attrs.selected}
@@ -110,9 +103,9 @@ export default function GroupAdd({ cancel, save, data }) {
               </Form.Item>
               <Form.Item label='换一换' labelCol={lb} wrapperCol={rb}>
                 <Radio.Group
-                  value={store.data.attrs.allowChange}
+                  value={store.data.attrs.random}
                   options={[{ label: '显示', value: true }, { label: '隐藏', value: false }]}
-                  onChange={e => store.data.attrs.allowChange = e.target.value}
+                  onChange={e => store.data.attrs.random = e.target.value}
                 />
               </Form.Item>
               <Form.Item label='轮播延时' labelCol={lb} wrapperCol={rb}>
@@ -120,9 +113,6 @@ export default function GroupAdd({ cancel, save, data }) {
               </Form.Item>
               <Form.Item label='分栏数' labelCol={lb} wrapperCol={rb}>
                 <Input type="number" value={store.data.attrs.columns} onChange={e => store.data.attrs.columns = e.target.value} />
-              </Form.Item>
-              <Form.Item label='最多显示' labelCol={lb} wrapperCol={rb}>
-                <Input type="number" value={store.data.attrs.showCount} onChange={e => store.data.attrs.showCount = e.target.value} />
               </Form.Item>
             </Card>
           </Col>

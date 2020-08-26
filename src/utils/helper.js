@@ -65,8 +65,5 @@ export function createGroupByType(parent, view) {
     nth: parent.children.length,
     open: true,
   };
-  if(view === 'picker') {
-    data.attrs.hide_title = false;
-  }
   return data;
 }

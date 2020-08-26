@@ -25,14 +25,12 @@ export default function Picker({ self, ...props }) {
           <Icon type="delete" />
         </AlignAside>
       </VisualBox>
-      <VisualBox visible={self.attrs.hide_title === false}>
-        <AlignAside style={{ borderLeft: '5px solid #ff9999', padding: '5px 8px' }}>
-          <span>{self.title}</span>
-          <VisualBox visible={self.more.channel_id !== ''}>
-            <span style={{ fontSize: 13, color: '#888' }}>更多 <Icon type="arrow-right" /></span>
-          </VisualBox>
-        </AlignAside>
-      </VisualBox>
+      <AlignAside style={{ borderLeft: '5px solid #ff9999', padding: '5px 8px' }}>
+        <span>{self.title}</span>
+        <VisualBox visible={self.more.channel_id !== ''}>
+          <span style={{ fontSize: 13, color: '#888' }}>更多 <Icon type="arrow-right" /></span>
+        </VisualBox>
+      </AlignAside>
       <FullWidth style={{ overflowX: 'auto', minHeight: 110 }}>
         {self.data.map((d, index) => (<ItemView style={{ width: '50%' }} key={index} item={d} />))}
         <VisualBox visible={props.mode === 'edit'}>
@@ -41,7 +39,7 @@ export default function Picker({ self, ...props }) {
           </div>
         </VisualBox>
       </FullWidth>
-      <VisualBox visible={self.attrs.allowChange === true}>
+      <VisualBox visible={self.attrs.random === true}>
         <div style={{ textAlign: 'center' }}><Icon type="sync-horizon" /> 换一换</div>
       </VisualBox>
     </div>

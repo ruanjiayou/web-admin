@@ -96,11 +96,6 @@ export default function GroupEdit({ group }) {
           <Row>
             <Col>
               <h2 style={{ textIndent: 20 }}>attr属性</h2>
-              <Form.Item label='隐藏标题' labelCol={lb} wrapperCol={rb}>
-                <FullWidth>
-                  <Switch checked={group.attrs.hide_title} onChange={() => group.setKey('attrs.hide_title', !group.attrs.hide_title)} /><Divider type="vertical" />{group.open ? '显示' : '隐藏'}
-                </FullWidth>
-              </Form.Item>
               <Form.Item label='默认选中' labelCol={lb} wrapperCol={rb}>
                 <FullWidth>
                   <Switch checked={group.attrs.selected} onChange={() => group.setKey('attrs.selected', !group.attrs.selected)} /><Divider type="vertical" />{group.open ? '选中' : '不选中'}
@@ -108,7 +103,7 @@ export default function GroupEdit({ group }) {
               </Form.Item>
               <Form.Item label='换一换' labelCol={lb} wrapperCol={rb}>
                 <FullWidth>
-                  <Switch checked={group.attrs.allowChange} onChange={() => group.setKey('attrs.allowChange', !group.attrs.allowChange)} /><Divider type="vertical" />{group.open ? '显示' : '不显示'}
+                  <Switch checked={group.attrs.random} onChange={() => group.setKey('attrs.random', !group.attrs.random)} /><Divider type="vertical" />{group.open ? '显示' : '不显示'}
                 </FullWidth>
               </Form.Item>
               <Form.Item label='轮播延时' labelCol={lb} wrapperCol={rb}>
@@ -116,9 +111,6 @@ export default function GroupEdit({ group }) {
               </Form.Item>
               <Form.Item label='分栏数' labelCol={lb} wrapperCol={rb}>
                 <Input type="number" value={group.attrs.columns} onChange={e => group.setKey('attrs.columns', parseInt(e.target.value) || 0)} />
-              </Form.Item>
-              <Form.Item label='最多显示' labelCol={lb} wrapperCol={rb}>
-                <Input type="number" value={group.attrs.showCount} onChange={e => group.setKey('attrs.showCount', parseInt(e.target.value) || 0)} />
               </Form.Item>
             </Col>
           </Row>
