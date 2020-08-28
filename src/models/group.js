@@ -99,6 +99,19 @@ const GroupModel = types.model('Group', {
     const children = self.children.map(child => { child.nth = mapping[child.id]; return child })
     self.children = children
   },
+  appendData(data) {
+    self.data.push(data);
+    self.refs.push(data.id)
+  },
+  sortRefsByIndex(oldIndex, newIndex) {
+    const [child] = self.data.splice(oldIndex, 1)
+    const data = getSnapshot(child);
+    self.data.splice(newIndex, 0, data)
+
+    const ref = self.refs[oldIndex]
+    self.refs[oldIndex] = self.refs[newIndex]
+    self.refs[newIndex] = ref
+  },
   addChild(child) {
     self.children.push(child)
   },

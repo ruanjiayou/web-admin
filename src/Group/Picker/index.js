@@ -1,9 +1,10 @@
 import React from 'react'
 import { Observer } from 'mobx-react-lite'
-import { VisualBox, Icon } from '../../component'
+import { VisualBox, Icon, SortListView } from '../../component'
 import ItemView from '../BookItem/Normal'
 import { AlignAside, FullWidth } from '../../component/style'
 import { contextMenu } from 'react-contexify';
+import { ScrollWrap } from '../style'
 
 export default function Picker({ self, ...props }) {
   return <Observer>{() => (
@@ -31,11 +32,23 @@ export default function Picker({ self, ...props }) {
           <span style={{ fontSize: 13, color: '#888' }}>更多 <Icon type="arrow-right" /></span>
         </VisualBox>
       </AlignAside>
-      <FullWidth style={{ overflowX: 'auto', minHeight: 110 }}>
-        {self.data.map((d, index) => (<ItemView style={{ width: '50%' }} key={index} item={d} />))}
+      <FullWidth>
+        <ScrollWrap style={{ minHeight: 110, display: 'flex', flexDirection: 'row', alignItems: 'center', overflowX: 'auto', padding: 5, flex: 1 }}>
+          <SortListView
+            isLoading={false}
+            direction="horizontal"
+            sort={(oldIndex, newIndex) => { self.sortRefsByIndex(oldIndex, newIndex); }}
+            items={self.data}
+            droppableId={self.id}
+            mode={props.mode}
+            listStyle={{ flexWrap: 'nowrap', display: 'flex', boxSizing: 'border-box' }}
+            itemStyle={{ display: 'inline-block', lineHeight: 1, margin: '0 5px' }}
+            renderItem={({ item }) => <ItemView key={item.id} style={{ width: 250 }} item={item} />}
+          />
+        </ScrollWrap>
         <VisualBox visible={props.mode === 'edit'}>
-          <div style={{ width: '50%', textAlign: 'center' }}>
-            <Icon type="circle-plus" />
+          <div style={{ width: 30, textAlign: 'center' }}>
+            <Icon type="circle-plus" onClick={() => { props.addRef(self) }} />
           </div>
         </VisualBox>
       </FullWidth>

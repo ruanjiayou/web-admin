@@ -10,9 +10,10 @@ const { Column } = Table;
 const { getTrades, createTrade, updateTrade, destroyTrade } = apis
 const mapping = {
   '1': '证券买入',
-  '2': '券卖出',
+  '2': '证券卖出',
   '3': '红利入账',
   '4': '股息个税征收',
+  '5': '利息归本',
 }
 export default function TaskList() {
   const local = useLocalStore(() => ({

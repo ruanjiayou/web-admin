@@ -6,8 +6,7 @@ import { AlignAside, FullWidth } from '../../component/style'
 import { contextMenu } from 'react-contexify';
 import { useStore } from '../../contexts';
 import Menu from '../Menu'
-import { ScrollWrap } from './style'
-import { EditWrap } from '../style'
+import { EditWrap, ScrollWrap } from '../style'
 
 export default function Picker({ self, ...props }) {
   const store = useStore()

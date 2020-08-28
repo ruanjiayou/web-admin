@@ -8,6 +8,8 @@ import AutoView from '../../../Group/AutoView'
 import { Mobile, Icon, VisualBox } from '../../../component'
 import GroupAdd from './Edit'
 import GroupEdit from './GroupEdit'
+import ResourcesPick from './pickModal'
+
 import models from '../../../models'
 import storage from '../../../utils/storage'
 import { Menu, Submenu, Item, Separator } from 'react-contexify';
@@ -25,6 +27,7 @@ export default function GroupManagePage() {
     createLoading: false,
     showGroupEdit: false,
     showGroupAdd: false,
+    showPick: false,
     tree: null,
     temp: null,
     refreshing: false,
@@ -186,6 +189,10 @@ export default function GroupManagePage() {
                       local.temp = data
                       local.showGroupAdd = true
                     }}
+                    addRef={data => {
+                      local.temp = data
+                      local.showPick = true
+                    }}
                     destroyGroup={async data => {
                       if (store.app.currentEditGroupId === data.id) {
                         local.showGroupEdit = false;
@@ -211,7 +218,9 @@ export default function GroupManagePage() {
             </FullHeightFix>
           </FullHeight>
         </FullWidthAuto>
-        {local.showGroupEdit && <GroupEdit group={local.temp} onClose={() => { local.showGroupEdit = false; local.temp = null; store.app.setEditGroupId('') }} />}
+        {local.showGroupEdit && <GroupEdit group={local.temp} openPick={() => {
+          local.showPick = true
+        }} onClose={() => { local.showGroupEdit = false; local.temp = null; store.app.setEditGroupId('') }} />}
       </FullWidth>
       {local.showGroupAdd && <GroupAdd
         data={local.temp}
@@ -237,6 +246,9 @@ export default function GroupManagePage() {
           return true
         }}
       />}
+      {local.showPick && <ResourcesPick save={(data) => {
+        local.temp.appendData(data);
+      }} cancel={() => { local.showPick = false }} />}
       {/* <FullHeightFix>
         <Right style={{ margin: '0 15%' }}>
           <Button loading={local.addLoading} type="primary" disabled={local.refreshing || local.tree === null} onClick={async () => {

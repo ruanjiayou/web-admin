@@ -26,7 +26,7 @@ function RenderHeader({ tab = 'base', setTab, onClose }) {
   </TabHeader>
 }
 
-export default function GroupEdit({ group, onClose }) {
+export default function GroupEdit({ group, onClose, openPick }) {
   const jsoneditor = useRef(null)
   const lb = { span: 6, offset: 3 }, rb = { span: 12 }
   const local = useLocalStore(() => ({
@@ -77,12 +77,13 @@ export default function GroupEdit({ group, onClose }) {
             </FullWidth>
           </Form.Item>
           <Form.Item label='数据列表' labelCol={lb} wrapperCol={rb}>
-            {group.refs.map((ref, index) => <Input value={ref} key={index} onChange={e => {
+            {group.refs.map((ref, index) => <Input value={ref} disabled key={index} onChange={e => {
               group.refs[index] = e.target.value
             }} addonAfter={<Icon type="delete" onClick={e => {
               group.removeRef(index)
             }} />} />)}
-            <Input
+            <Button type="primary" onClick={() => openPick()}>添加数据</Button>
+            {/* <Input
               value={local.ref}
               onChange={e => local.ref = e.target.value}
               addonAfter={<Icon type="circle-plus" onClick={() => {
@@ -92,7 +93,7 @@ export default function GroupEdit({ group, onClose }) {
                   local.ref = ''
                 }
               }} />}
-            />
+            /> */}
           </Form.Item>
         </Form>
         <Form style={{ height: 700, display: local.tab === 'attrs' ? 'block' : 'none' }}>

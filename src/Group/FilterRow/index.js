@@ -3,10 +3,9 @@ import { Observer } from 'mobx-react-lite'
 import FilterTag from '../FilterTag'
 import { Divider } from 'antd';
 import { Icon, VisualBox, SortListView } from '../../component'
-import { ScrollWrap } from './style'
 import { contextMenu } from 'react-contexify';
 import { useStore } from '../../contexts';
-import { EditWrap } from '../style'
+import { EditWrap, ScrollWrap } from '../style'
 
 export default function FilterRow({ self, ...props }) {
   const store = useStore()
