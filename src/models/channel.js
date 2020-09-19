@@ -7,5 +7,7 @@ export default types.model('Channel', {
   enable: types.boolean,
   editable: types.boolean,
   order_index: types.number,
+  isChannel: types.boolean,
+  isRecommand: types.string,
   group_id: types.string,
 })

@@ -85,8 +85,8 @@ export default function TaskList() {
           <Button type="primary" onClick={e => { search(); init() }}>刷新</Button>
         </Right>
       </FullHeightFix>
-      <FullHeightAuto style={{ overflow: 'hidden' }}>
-        <Table className="box" dataSource={local.trades} rowKey="id" scroll={{ y: 600 }} loading={local.isLoading} pagination={{
+      <FullHeightAuto>
+        <Table className="box" dataSource={local.trades} rowKey="id" scroll={{ y: 400 }} loading={local.isLoading} pagination={{
           pageSize: 20,
           current: local.search_page,
           total: local.count,

@@ -51,6 +51,20 @@ export default function ChannelEditor({ data, cancel, save, groups }) {
             onChange={e => store.data.enable = e.target.value}
           />
         </Form.Item>
+        <Form.Item label='是否首页' labelCol={lb} wrapperCol={rb}>
+          <Radio.Group
+            value={store.data.isRecommand}
+            options={[{ label: '是', value: true }, { label: '否', value: false }]}
+            onChange={e => store.data.isRecommand = e.target.value}
+          />
+        </Form.Item>
+        <Form.Item label='是否频道' labelCol={lb} wrapperCol={rb}>
+          <Radio.Group
+            value={store.data.isChannel}
+            options={[{ label: '是', value: true }, { label: '否', value: false }]}
+            onChange={e => store.data.isChannel = e.target.value}
+          />
+        </Form.Item>
         <Form.Item label='group_id' labelCol={lb} wrapperCol={rb}>
           <Select value={store.data.group_id} onChange={value => store.data.group_id = value}>
             <Select.Option value="">无</Select.Option>
