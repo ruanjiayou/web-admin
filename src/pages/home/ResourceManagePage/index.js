@@ -9,11 +9,11 @@ import { Button, Input, Select, Divider, Pagination } from 'antd';
 const { getResources, createResource, updateResource, destroyResource } = apis
 
 async function destroy(data) {
-  await destroyResource(data)
+  return await destroyResource(data)
 }
 
 async function store(data) {
-  window.open(`${gstore.app.baseUrl}/v1/admin/book/${data.id}/store`, '_blank')
+  window.open(`${gstore.app.baseUrl}/v1/admin/book/${data.id}/store?token=${gstore.user.token}`, '_blank')
 }
 
 export default function ResourceManagePage() {
@@ -80,7 +80,10 @@ export default function ResourceManagePage() {
           <ResourceList
             items={local.resources}
             openEdit={(data) => { local.temp = data; local.showEdit = true; }}
-            destroy={destroy}
+            destroy={async function(data) {
+              await destroy(data)
+              search()
+            }}
             search={search}
             store={store}
             local={local}

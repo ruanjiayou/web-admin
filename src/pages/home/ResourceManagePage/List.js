@@ -44,7 +44,8 @@ export default function ResourceList({ items, children, search, local, ...props 
 				<Observer>{() => (
 					<Switch checked={record.open} onClick={e => {
 						apis.updateResource({ id: record.id, open: !record.open }).then(() => {
-							record.setKV('open', !record.open)
+							// record.setKV('open', !record.open)
+							record.open = !record.open
 							notification.info({ message: '修改成功' })
 						}).catch(e => {
 							notification.info({ message: '修改失败' })
@@ -54,9 +55,11 @@ export default function ResourceList({ items, children, search, local, ...props 
 			)} />
 			<Column title="操作" width={100} dataIndex="action" key="action" align="center" render={(text, record) => (
 				<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly' }}>
-					{record.source_type === 'article' || record.source_type === 'news' ? <Link to={'/admin/home/resource-manage/edit?id=' + record.id} ><FormOutlined /></Link> : <FormOutlined onClick={() => { props.openEdit(record.toJSON()) }} />}
+					{record.source_type === 'article' || record.source_type === 'news' ? <Link to={'/admin/home/resource-manage/edit?id=' + record.id} ><FormOutlined /></Link> : <FormOutlined onClick={() => { props.openEdit(record) }} />}
 					<CloudServerOutlined title="保存" onClick={() => props.store(record)} />
-					<Popconfirm title="确定?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={() => { props.destroy(record) }}>
+					<Popconfirm title="确定?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={() => {
+						props.destroy(record)
+					}}>
 						<DeleteOutlined />
 					</Popconfirm>
 				</div>

@@ -63,7 +63,9 @@ export default function SpiderPage() {
           local.search_page = page.current
           init()
         }}>
-          <Column title="规则id" dataIndex="id" key="id" />
+          <Column title="规则id" dataIndex="id" key="id" render={(text) => (
+            <a href={text} target="_blank">{text}</a>
+          )} />
           <Column title="名称" dataIndex="name" key="name" />
           <Column title="类型" dataIndex="type" key="type" />
           <Column title="操作" width={200} dataIndex="action" key="action" align="center" render={(text, record) => (

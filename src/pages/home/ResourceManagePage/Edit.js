@@ -3,6 +3,7 @@ import React, { Fragment, useRef } from 'react'
 import { Modal, Form, Input, notification, Select, Upload, Button, Switch, Tag } from 'antd'
 import { Observer, useLocalStore } from 'mobx-react-lite';
 import { UploadOutlined, PlusCircleOutlined } from '@ant-design/icons'
+import store from '../../../store'
 
 export default function ResourceEdit({ data, cancel, save, }) {
   const lb = { span: 3 }, rb = { span: 18 }
@@ -10,7 +11,7 @@ export default function ResourceEdit({ data, cancel, save, }) {
     data: data.id ? _.cloneDeep(data) : { tags: [] },
     loading: false,
     ref: '',
-    poster: data.poster || 'http://localhost:8097/poster/nocover.jpg',
+    poster: data.poster || store.app.imageLine + '/poster/nocover.jpg',
     maps: [],
     tagAddVisible: false,
     tempTag: '',
@@ -22,8 +23,8 @@ export default function ResourceEdit({ data, cancel, save, }) {
     <Fragment>
       <Modal
         style={{ overflow: 'auto', padding: 0 }}
-        width={1000}
-        bodyStyle={{ height: 700, overflow: 'auto' }}
+        width={700}
+        bodyStyle={{ height: 500, overflow: 'auto' }}
         title={local.data.id ? '编辑组件' : '添加组件'}
         visible={true}
         onCancel={cancel}
@@ -141,7 +142,7 @@ export default function ResourceEdit({ data, cancel, save, }) {
               }} beforeUpload={(f) => {
                 return false
               }}>
-              <img width="100%" src={local.poster} alt=""/>
+              <img width="100%" src={store.app.imageLine + local.poster} alt="" />
               <Button style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)' }}>
                 <UploadOutlined /> 上传
               </Button>

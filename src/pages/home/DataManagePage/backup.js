@@ -12,6 +12,7 @@ const { Column } = Table;
 export default function TaskList() {
   const local = useLocalStore(() => ({
     isLoading: false,
+    isStoring: false,
     backups: [],
   }))
   const search = useCallback(() => {
@@ -34,15 +35,21 @@ export default function TaskList() {
     <FullHeight>
       <FullHeightFix style={{ padding: '20px 0' }}>
         <Right>
-          <Button type="primary" loading={local.isLoading} disabled={local.isLoading} onClick={e => {
-            createBackup().then(res => {
-              if (res.code === 0) {
+          <Button type="primary" loading={local.isStoring} disabled={local.isLoading || local.isStoring} onClick={async (e) => {
+            try {
+              local.isStoring = true
+              const res = await createBackup()
+              if (res && res.code === 0) {
+                search()
                 notification.success({ message: '创建成功' });
-                search();
               } else {
                 notification.error({ message: '创建失败' });
               }
-            })
+            } catch (e) {
+              notification.error({ message: '请求失败' });
+            } finally {
+              local.isStoring = false
+            }
           }}>创建备份</Button>
           <Divider type="vertical" />
           <Button onClick={search}>刷新</Button>
