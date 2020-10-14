@@ -5,6 +5,7 @@ export const LayoutV = styled.div`
   height: 100%;
   flex: auto;
   flex-direction: column;
+  overflow: hidden;
 `;
 
 export const LayoutH = styled.div`

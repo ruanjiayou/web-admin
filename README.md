@@ -14,3 +14,6 @@
 - 拖拽组件 filter和频道的排序用了
 - showCount x allowChange -> random hide_title picker必须显示
 - row/tag 是 filter的子组件 应该是查询类型分组而不是ui类型
+- type/status等额外字段 允许手动添加
+- serie/series
+- text-audio

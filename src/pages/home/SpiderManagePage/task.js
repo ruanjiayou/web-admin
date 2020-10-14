@@ -1,9 +1,11 @@
 import React, { useEffect, useCallback, Fragment } from 'react';
 import { Observer, useLocalStore } from 'mobx-react-lite'
-import { Table, Popconfirm, Switch, notification, Button } from 'antd';
+import { Table, Popconfirm, Switch, notification, Button, Divider } from 'antd';
 import { DeleteOutlined, WarningOutlined, SyncOutlined, LoadingOutlined } from '@ant-design/icons'
 import apis from '../../../api'
 import { FullHeight, FullHeightFix, FullHeightAuto, Right } from '../../../component/style'
+import { Icon } from '../../../component';
+import Clipboard from 'react-clipboard.js';
 
 const { Column } = Table;
 const { getTasks, updateTask, updateTaskResource, destroyTask } = apis
@@ -41,7 +43,7 @@ export default function TaskList() {
         </Right>
       </FullHeightFix>
       <FullHeightAuto>
-        <Table className="box" dataSource={local.tasks} rowKey="resource_id" scroll={{ y: 600 }} loading={local.isLoading} pagination={{
+        <Table className="box" dataSource={local.tasks} rowKey="resource_id" loading={local.isLoading} pagination={{
           pageSize: 20,
           current: local.search_page,
           total: local.count,
@@ -49,9 +51,10 @@ export default function TaskList() {
           local.search_page = page.current
           search()
         }}>
-          <Column title="id" width={100} dataIndex="id" key="id" />
           <Column title="名称" width={100} dataIndex="name" key="name" />
-          <Column title="origin" dataIndex="origin" key="origin" />
+          <Column title="origin" dataIndex="origin" key="origin" render={text => {
+            return <a href={text} target="_blank">{text}</a>
+          }} />
           <Column title="连载" width={100} dataIndex="status" key="status" render={(text, record) => (
             <Observer>{() => (
               <Switch checked={record.status === 'loading'} onClick={e => {
@@ -68,11 +71,14 @@ export default function TaskList() {
           )} />
           <Column title="操作" width={100} dataIndex="action" key="action" align="center" render={(text, record) => (
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly' }}>
+              <Icon type="copy" title={record.id} />
+              <Divider type="vertical" />
               <SyncOutlined title="更新资源" onClick={() => {
                 updateTaskResource({ rule_id: record.rule_id, origin: record.origin }).then(() => {
                   notification.info({ message: '操作成功' })
                 });
               }} />
+              <Divider type="vertical" />
               <Popconfirm title="确定?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={async () => {
                 await destroyTask(record)
                 search()
