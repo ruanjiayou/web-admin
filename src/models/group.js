@@ -34,6 +34,8 @@ const GroupModel = types.model('Group', {
   refs: types.array(types.string),
   data: types.array(resource),
   attrs: types.optional(types.model({
+    allowChange: types.optional(types.boolean, false),
+    hide_title: types.optional(types.boolean, true),
     random: types.maybeNull(types.boolean),
     selected: types.maybeNull(types.boolean),
     timeout: types.maybeNull(types.number),

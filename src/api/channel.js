@@ -10,6 +10,7 @@ export function getChannels() {
 export function createChannel(data) {
   return shttp({
     url: '/v1/admin/channel',
+    method: 'POST',
     data
   })
 }

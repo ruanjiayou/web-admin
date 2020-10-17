@@ -58,3 +58,10 @@ export function updateGroupTree(tree) {
     data,
   })
 }
+
+export function getGroupTypes() {
+  return shttp({
+    url: `/v1/admin/group-types`,
+    method: 'GET',
+  })
+}

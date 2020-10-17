@@ -7,3 +7,6 @@
 - shttp
 - api mock
 - pace.js
+
+# dev 2020-10-18 02：27
+- 优化操作

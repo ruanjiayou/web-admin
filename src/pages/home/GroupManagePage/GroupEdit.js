@@ -77,7 +77,7 @@ export default function GroupEdit({ group, onClose, openPick }) {
             </FullWidth>
           </Form.Item>
           <Form.Item label='数据列表' labelCol={lb} wrapperCol={rb}>
-            {group.refs.map((ref, index) => <Input value={ref} disabled key={index} onChange={e => {
+            {(group.refs || []).map((ref, index) => <Input value={ref} disabled key={index} onChange={e => {
               group.refs[index] = e.target.value
             }} addonAfter={<Icon type="delete" onClick={e => {
               group.removeRef(index)
@@ -144,19 +144,17 @@ export default function GroupEdit({ group, onClose, openPick }) {
                   style={{ borderColor: local.paramsError ? 'red' : '' }}
                   ref={ref => jsoneditor.current = ref}
                   defaultValue={JSON.stringify(group.params)}
-                  onChange={() => {
-                    setTimeout(() => {
-                      let params = {}
-                      if (jsoneditor.current) {
-                        try {
-                          params = JSON.parse(jsoneditor.current.state.value)
-                          local.paramsError = false
-                          group.setKey('params', params)
-                        } catch (err) {
-                          local.paramsError = true
-                        }
+                  onBlur={(e) => {
+                    let params = {}
+                    if (jsoneditor.current) {
+                      try {
+                        params = JSON.parse(jsoneditor.current.state.value)
+                        local.paramsError = false
+                        group.setKey('params', params)
+                      } catch (err) {
+                        local.paramsError = true
                       }
-                    }, 100)
+                    }
                   }}
                 ></Input.TextArea>
               </Form.Item>

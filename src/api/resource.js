@@ -59,3 +59,10 @@ export function destroyResource(params) {
     method: 'DELETE',
   })
 }
+
+export function grabImages(params) {
+  return shttp({
+    url: `/v1/admin/resource-grab-images/${params.id}`,
+    method: 'GET',
+  })
+}

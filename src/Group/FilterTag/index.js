@@ -7,7 +7,7 @@ import { contextMenu } from 'react-contexify';
 import { useStore } from '../../contexts';
 import { EditWrap } from '../style'
 
-export default function Filter({ self, mode, ...props }) {
+export default function Filter({ self, remove, mode, ...props }) {
   const store = useStore()
   return <Observer>{() => (
     <EditWrap className={store.app.currentEditGroupId === self.id ? 'focus' : ''}>
@@ -26,7 +26,11 @@ export default function Filter({ self, mode, ...props }) {
         }}
         closable={mode === 'edit'}
         onClose={() => {
-          props.destroyGroup({ id: self.id })
+          if(self.$new) {
+            remove()
+          } else {
+            props.destroyGroup({ id: self.id })
+          }
         }}
         onClick={e => { e.preventDefault(); e.stopPropagation(); }}
         style={{ backgroundColor: self.attrs.selected === true ? 'pink' : '', color: self.attrs.selected ? 'red' : '', marginRight: 0 }}>

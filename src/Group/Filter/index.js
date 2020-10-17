@@ -12,6 +12,7 @@ export default function Filter({ self, ...props }) {
   return <Observer>{() => <div>
     <VisualBox visible={props.mode === 'edit'}>
       <AlignAside style={{ border: '1px dashed grey', padding: '2px 5px' }}>
+        <span>编辑过滤组</span>
         <span onClick={(e) => {
           e.preventDefault();
           contextMenu.show({
@@ -22,8 +23,7 @@ export default function Filter({ self, ...props }) {
               view: self.view
             }
           });
-        }}>编辑过滤组<Icon type="edit" /></span>
-        <span>添加过滤类型<Icon type="circle-plus" /></span>
+        }}><Icon type="more" /></span>
       </AlignAside>
     </VisualBox>
     <SortListView

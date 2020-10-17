@@ -1,10 +1,12 @@
 import React, { useEffect, useCallback } from 'react';
 import { Observer, useLocalStore } from 'mobx-react-lite'
+import { useEffectOnce } from 'react-use';
 import apis from '../../../api';
 import ChannelList from './List'
 import ChannelEdit from './Edit'
 import { Button, Divider } from 'antd';
 import { FullHeight, FullHeightFix, FullHeightAuto, Right } from '../../../component/style'
+import { useStore } from '../../../contexts'
 
 const { createChannel, getChannels, updateChannel, updateChannels, destroyChannel } = apis
 
@@ -13,6 +15,7 @@ async function destroy(data) {
 }
 
 export default function ChannelManagePage() {
+  const store = useStore()
   const local = useLocalStore(() => ({
     isLoading: false,
     showEdit: false,
@@ -40,14 +43,20 @@ export default function ChannelManagePage() {
       local.isLoading = false
     })
   }, [])
-  useEffect(() => {
+
+  useEffectOnce(() => {
     search()
+    if (store.groups.length === 0) {
+      apis.getGroupTrees({ query: { v: 0 } }).then(res => {
+        store.groups = res.data
+      })
+    }
   })
   return <Observer>{() => <FullHeight>
     <FullHeightFix>
       <Right style={{ padding: '10px 15%' }}>
         <Button type="primary" onClick={() => { local.temp = {}; local.showEdit = true }}>添加栏目</Button>
-        <Divider type="vertical"/>
+        <Divider type="vertical" />
         <Button type="primary" onClick={() => { search() }}>刷新</Button>
       </Right>
     </FullHeightFix>
@@ -60,7 +69,7 @@ export default function ChannelManagePage() {
         sort={sort}
       />
     </FullHeightAuto>
-    {local.showEdit && <ChannelEdit groups={[]} data={local.temp} cancel={() => { local.showEdit = false }} save={async (data) => {
+    {local.showEdit && <ChannelEdit groups={store.groups} data={local.temp} cancel={() => { local.showEdit = false }} save={async (data) => {
       let res = null
       if (data.id) {
         res = await updateChannel(data)

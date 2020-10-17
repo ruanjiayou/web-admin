@@ -21,7 +21,7 @@ export default function FilterRow({ self, ...props }) {
           mode={props.mode}
           listStyle={{ flexWrap: 'nowrap', display: 'flex', boxSizing: 'border-box' }}
           itemStyle={{ display: 'inline-block', lineHeight: 1, margin: '0 5px' }}
-          renderItem={({ item }) => <FilterTag key={item.id} self={item} selectMe={(id) => self.selectMe(id)} {...props} />}
+          renderItem={({ item, index }) => <FilterTag key={item.id} self={item} remove={()=>self.removeChild(item.id)} selectMe={(id) => self.selectMe(id)} {...props} />}
         />
       </ScrollWrap>
       <VisualBox visible={props.mode === 'edit'}>

@@ -137,8 +137,8 @@ export default function GroupManagePage() {
             local.showGroupEdit = true
           }}>编辑root</Button>
           <Button type="primary" onClick={() => {
-            local.temp = {}
-            local.showGroupEdit = true
+            local.temp = { attrs: {}, more: {}, view: '' }
+            local.showGroupAdd = true
           }}>添加root</Button>
           <Button type="primary" onClick={async () => {
             await apis.destroyGroup(local.tree)
@@ -226,24 +226,14 @@ export default function GroupManagePage() {
         data={local.temp}
         cancel={() => { local.temp = null; local.showGroupAdd = false }}
         save={async (data) => {
-          // try {
-          //   if (data.id) {
-          //     await apis.updateGroup(data)
-          //   } else {
-          //     await apis.createGroup(data)
-          //   }
-          //   // storage.getValue('choose_group_id', null)
-          //   // local.tree = null
-          //   init()
-          //   return true
-          // } catch (err) {
-          //   return false
-          // }
+          data.params = JSON.parse(data.params)
           const curr = getById(local.tree, data.parent_id);
           if (curr) {
             curr.addChild(data)
+          } else {
+            await apis.createGroup(data)
+            init()
           }
-          return true
         }}
       />}
       {local.showPick && <ResourcesPick save={(data) => {

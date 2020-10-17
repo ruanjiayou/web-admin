@@ -17,3 +17,5 @@
 - type/status等额外字段 允许手动添加
 - serie/series
 - text-audio
+- 正文识别
+- 默认group数据归一化问题

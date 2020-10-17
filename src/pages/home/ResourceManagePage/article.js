@@ -1,4 +1,5 @@
 import React, { useEffect, useCallback, Fragment, useRef } from 'react';
+import { useEffectOnce } from 'react-use'
 import { Observer, useLocalStore } from 'mobx-react-lite'
 import Ueditor from '../../../component/Ueditor'
 import apis from '../../../api'
@@ -20,7 +21,7 @@ export default function ResourceEdit() {
     content: '',
     createdAt: new Date().toISOString(),
     source_type: 'article',
-    type: 'article',
+    type: '',
     origin: '',
     // words: 0,
     open: true,
@@ -30,10 +31,11 @@ export default function ResourceEdit() {
     tempTag: '',
     tagAddVisible: false,
     loading: false,
+    categories: {},
   }))
   const edit = useCallback(() => {
     if (ueditor.current) {
-      const content = decodeURIComponent(ueditor.current.getUEContent())
+      const content = decodeURIComponent(ueditor.current.getUEContent().replace(/%[^2]/g, '%25'))
       const data = _.pick(store, ['id', 'title', 'poster', 'source_type', 'type', 'origin', 'open', 'tags'])
       data.content = content
       data.createdAt = new Date(store.createdAt)
@@ -75,6 +77,12 @@ export default function ResourceEdit() {
       })
     }
   })
+
+  useEffectOnce(() => {
+    apis.getGroupTypes().then(result => {
+      store.categories = result.data
+    })
+  }, [])
   return <Observer>{() => (<Fragment>
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', }}>
       <div style={{ flex: 1, overflowY: 'auto' }}>
@@ -93,6 +101,13 @@ export default function ResourceEdit() {
           }}>
             <Select.Option value="article">文章</Select.Option>
             <Select.Option value="news">资讯</Select.Option>
+          </Select>
+        </Form.Item>
+        <Form.Item label="type" labelCol={lb} wrapperCol={rb}>
+          <Select value={store.type} onChange={v => {
+            store.type = v
+          }}>
+            {(store.categories[store.source_type] || []).map(it => <Select.Option key={it.id} value={it.name === '全部' ? '' : it.name}>{it.name}</Select.Option>)}
           </Select>
         </Form.Item>
         <Form.Item label='开放' labelCol={lb} wrapperCol={rb}>

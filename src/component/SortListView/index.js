@@ -64,7 +64,7 @@ export default function SortList({ isLoading, handler, items, droppableId, mode,
                         ...itemStyle
                       }}>
                       {handler && <div {...provided.dragHandleProps}>{handler}</div>}
-                      {renderItem({ item, ...restProps })}
+                      {renderItem({ item, index, ...restProps })}
                     </div>
                   )}
                 </Draggable>

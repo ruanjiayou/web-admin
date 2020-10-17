@@ -50,6 +50,14 @@ export default function ResourceEdit({ data, cancel, save, }) {
           <Form.Item label="描述" labelCol={lb} wrapperCol={rb}>
             <Input.TextArea rows={4} value={local.data.desc} onChange={e => local.data.desc = e.target.value} />
           </Form.Item>
+          <Form.Item label="资源类型" labelCol={lb} wrapperCol={rb}>
+            <Select value={local.data.source_type || ''} onChange={value => {
+              local.data.source_type = value
+              local.data.type = ""
+            }}>
+              {store.types.map(type => <Select.Option value={type.name} key={type.name}>{type.title}</Select.Option>)}
+            </Select>
+          </Form.Item>
           <Form.Item label="类别" labelCol={lb} wrapperCol={rb}>
             {/* <Select value={local.data.type} onChange={e => local.data.type = e.target.value}>
               <Select.Option value="">请选择</Select.Option>
@@ -57,29 +65,9 @@ export default function ResourceEdit({ data, cancel, save, }) {
             </Select> */}
             <Input value={local.data.type} autoFocus onChange={e => local.data.type = e.target.value} />
           </Form.Item>
-          <Form.Item label="资源类型" labelCol={lb} wrapperCol={rb}>
-            <Select value={local.data.source_type} onChange={value => {
-              local.data.source_type = value
-              local.data.type = ""
-              // TODO: 需要model才能 getSnapShot
-            }}>
-              <Select.Option value="">请选择</Select.Option>
-              <Select.Option value="image">图片</Select.Option>
-              <Select.Option value="animation">动漫</Select.Option>
-              <Select.Option value="music">音频</Select.Option>
-              <Select.Option value="video">视频</Select.Option>
-              <Select.Option value="novel">小说</Select.Option>
-              <Select.Option value="article">文章</Select.Option>
-              <Select.Option value="news">资讯</Select.Option>
-            </Select>
-          </Form.Item>
           <Form.Item label="country" labelCol={lb} wrapperCol={rb}>
-            <Select value={local.data.country} onChange={value => local.data.country = value}>
-              <Select.Option value="">请选择</Select.Option>
-              <Select.Option value="China">中国</Select.Option>
-              <Select.Option value="English">英国</Select.Option>
-              <Select.Option value="Japan">日本</Select.Option>
-              <Select.Option value="Korea">韩国</Select.Option>
+            <Select value={local.data.country || ''} onChange={value => local.data.country = value}>
+              {store.city.map(city => <Select.Option value={city.name} key={city.name}>{city.title}</Select.Option>)}
             </Select>
           </Form.Item>
           <Form.Item label="tags" labelCol={lb} wrapperCol={rb}>

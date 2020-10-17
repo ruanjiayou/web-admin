@@ -1,4 +1,5 @@
 import React, { useEffect, useCallback } from 'react';
+import { useEffectOnce } from 'react-use'
 import { Observer, useLocalStore } from 'mobx-react-lite'
 import apis from '../../../api';
 import gstore from '../../../store/index'
@@ -6,7 +7,7 @@ import ResourceList from './List'
 import ResourceEdit from './Edit'
 import { Button, Input, Select, Divider, Pagination } from 'antd';
 
-const { getResources, createResource, updateResource, destroyResource } = apis
+const { getResources, createResource, updateResource, destroyResource, getGroupTypes } = apis
 
 async function destroy(data) {
   return await destroyResource(data)
@@ -25,10 +26,9 @@ export default function ResourceManagePage() {
     search_name: '',
     search_type: 'novel',
     search_page: 1,
-    categories: [],
+    categories: {},
     resources: [],
   }))
-  let categories = []
   const search = useCallback(() => {
     local.isLoading = true
     const query = {
@@ -46,7 +46,12 @@ export default function ResourceManagePage() {
   }, [])
   useEffect(() => {
     search()
-  })
+  }, [])
+  useEffectOnce(() => {
+    getGroupTypes().then(result => {
+      local.categories = result.data
+    })
+  }, [])
   return (<Observer>{() => {
     return <div className={'box'}>
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -59,6 +64,7 @@ export default function ResourceManagePage() {
           资源类型<Divider type="vertical" />
           <Select style={{ width: 150 }} value={local.search_type} onChange={value => {
             local.search_type = value
+            search()
           }}>
             <Select.Option value="">全部</Select.Option>
             <Select.Option value="image">图片</Select.Option>
@@ -68,6 +74,7 @@ export default function ResourceManagePage() {
             <Select.Option value="novel">小说</Select.Option>
             <Select.Option value="article">文章</Select.Option>
             <Select.Option value="news">资讯</Select.Option>
+            <Select.Option value="private">私人</Select.Option>
           </Select>
           <Divider type="vertical" />
           <Button type="primary" onClick={() => {
@@ -80,17 +87,18 @@ export default function ResourceManagePage() {
           <ResourceList
             items={local.resources}
             openEdit={(data) => { local.temp = data; local.showEdit = true; }}
-            destroy={async function(data) {
+            destroy={async function (data) {
               await destroy(data)
               search()
             }}
+            categories={local.categories}
             search={search}
             store={store}
             local={local}
           />
         </div>
       </div>
-      {local.showEdit && <ResourceEdit data={local.temp} categories={categories} cancel={() => { local.showEdit = false }} save={data => {
+      {local.showEdit && <ResourceEdit data={local.temp} categories={local.categories[local.search_type] || []} cancel={() => { local.showEdit = false }} save={data => {
         if (data.id) {
           return updateResource(data)
         } else {

@@ -150,7 +150,7 @@ export default function GroupAdd({ cancel, save, data }) {
           <Col span={18} offset={6}>
             <Card title="params与query">
               <Form.Item label='频道' labelCol={lb} wrapperCol={rb}>
-                <Input.TextArea value={store.data.params} onChange={e => store.data.params = e.target.value}></Input.TextArea>
+                <Input.TextArea minLength={6} value={store.data.params} onBlur={e => store.data.params = e.target.value}></Input.TextArea>
               </Form.Item>
             </Card>
           </Col>
