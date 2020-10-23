@@ -19,7 +19,7 @@ import ImgFilter from '../../../images/filter2.svg'
 import ImgGrid from '../../../images/menu2.svg'
 import ImgTab from '../../../images/tab2.svg'
 import ImgTabbar from '../../../images/tabbar2.svg'
-import { GroupsDiff as diff, GroupsGetById as getById, createGroupByType } from '../../../utils/helper'
+import { GroupsDiff as diff, GroupsGetById as getById, createEmptyGroup } from '../../../utils/helper'
 
 export default function GroupManagePage() {
   const store = useStore()
@@ -66,7 +66,7 @@ export default function GroupManagePage() {
   const onAddChild = ({ props }) => {
     if (store.app.canAddChild(props.view)) {
       const p = getById(local.tree, props.id)
-      local.temp = createGroupByType(p, '');
+      local.temp = createEmptyGroup(p);
       local.showGroupAdd = true
     } else {
       message.warn('can not add child')
@@ -137,7 +137,7 @@ export default function GroupManagePage() {
             local.showGroupEdit = true
           }}>编辑root</Button>
           <Button type="primary" onClick={() => {
-            local.temp = { attrs: {}, more: {}, view: '' }
+            local.temp = createEmptyGroup()
             local.showGroupAdd = true
           }}>添加root</Button>
           <Button type="primary" onClick={async () => {

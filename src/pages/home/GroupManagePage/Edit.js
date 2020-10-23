@@ -3,6 +3,7 @@ import { Modal, Form, Input, notification, Radio, Select, Card, Row, Col, Divide
 import { Observer, useLocalStore } from 'mobx-react-lite';
 import * as _ from 'lodash';
 import { PlusCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
+import {VisualBox} from '../../../component'
 
 export default function GroupAdd({ cancel, save, data }) {
   const lb = { span: 6, offset: 3 }, rb = { span: 12 }
@@ -32,7 +33,7 @@ export default function GroupAdd({ cancel, save, data }) {
   return <Observer>{() => (
     <Modal
       style={{ overflow: 'auto', padding: 0 }}
-      width={1000}
+      width={722}
       bodyStyle={{ height: 600, overflow: 'auto' }}
       title={data ? '编辑组件' : '添加组件'}
       visible={true}
@@ -40,23 +41,6 @@ export default function GroupAdd({ cancel, save, data }) {
       onOk={async () => {
         save(JSON.parse(JSON.stringify(store.data)));
         cancel()
-        // try {
-        //   store.data.params = JSON.parse(store.data.params)
-        // } catch (err) {
-        //   notification.info({ message: 'params格式错误' })
-        //   return
-        // }
-        // if (store.loading) {
-        //   return;
-        // }
-        // store.loading = true;
-        // const result = await save(store.data)
-        // store.loading = false
-        // if (result) {
-        //   cancel()
-        // } else {
-        //   notification.info({ message: '操作失败' })
-        // }
       }}
     >
       <Form>
@@ -150,7 +134,7 @@ export default function GroupAdd({ cancel, save, data }) {
           <Col span={18} offset={6}>
             <Card title="params与query">
               <Form.Item label='频道' labelCol={lb} wrapperCol={rb}>
-                <Input.TextArea minLength={6} value={store.data.params} onBlur={e => store.data.params = e.target.value}></Input.TextArea>
+                <Input.TextArea minLength={6} defaultValue={store.data.params} onBlur={e => store.data.params = e.target.value}></Input.TextArea>
               </Form.Item>
             </Card>
           </Col>

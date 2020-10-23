@@ -23,7 +23,6 @@ const GroupModel = types.model('Group', {
   $new: types.optional(types.boolean, false),
   $delete: types.optional(types.boolean, false),
   // data/children 临时属性
-
   tree_id: types.string,
   id: types.string,
   parent_id: types.optional(types.string, ''),
@@ -33,21 +32,19 @@ const GroupModel = types.model('Group', {
   view: types.optional(types.string, ''),
   refs: types.array(types.string),
   data: types.array(resource),
-  attrs: types.optional(types.model({
-    allowChange: types.optional(types.boolean, false),
-    hide_title: types.optional(types.boolean, true),
-    random: types.maybeNull(types.boolean),
-    selected: types.maybeNull(types.boolean),
-    timeout: types.maybeNull(types.number),
-    columns: types.maybeNull(types.number),
+  attrs: types.frozen(types.model({
+    random: types.union(types.boolean, types.null, types.undefined),
+    selected: types.union(types.boolean, types.null, types.undefined),
+    timeout: types.union(types.number, types.null, types.undefined),
+    columns: types.union(types.number, types.null, types.undefined),
   }), {}),
   // query/
   params: types.frozen(null, {}),
   more: types.optional(types.model({
-    channel_id: types.maybeNull(types.string),
-    keyword: types.maybeNull(types.string),
-    type: types.maybeNull(types.string),
-  }), {}),
+    channel_id: types.union(types.string, types.null, ),
+    keyword: types.union(types.string, types.null, types.undefined),
+    type: types.union(types.string, types.null, types.undefined),
+  }), {channel_id:''}),
   nth: types.optional(types.number, 0),
   open: types.optional(types.boolean, true),
   children: types.optional(types.array(types.late(() => GroupModel)), []),
@@ -59,7 +56,16 @@ const GroupModel = types.model('Group', {
   },
   diff() {
     return !deepEqual(self.$origin, self.toJSON()) || self.$delete === true || self.$new === true;
-  }
+  },
+  omitable(key) {
+    const mapper = {
+      'picker': ['params', 'attrs.selected', 'attrs.random'],
+      'filter': ['more', 'attrs', 'refs', 'title'],
+      'filter-tag': ['attrs', 'refs', 'more'],
+    }
+    const b = mapper[self.view] && mapper[self.view].includes(key)
+    return b
+  },
 })).actions(self => ({
   // hook
   afterCreate() {

@@ -15,7 +15,7 @@ import Menu from './Menu'
 import { CenterXY } from '../component/style'
 import { VisualBox } from '../component';
 import { EditWrap } from './style'
-import { createGroupByType } from '../utils/helper'
+import { createEmptyGroup } from '../utils/helper'
 
 function Root({ children }) {
   return children
@@ -80,7 +80,7 @@ export default function AutoView({ self, children = [], ...props }) {
       e.preventDefault();
       e.stopPropagation();
       if (store.app.canTypeDrop(self.view)) {
-        self.addChild(createGroupByType(self, store.app.currentDragType))
+        self.addChild(createEmptyGroup(self, store.app.currentDragType))
       }
       local.isDragOver = false;
       store.app.setCurrentDragType('');

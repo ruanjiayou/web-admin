@@ -29,41 +29,48 @@ export function GroupsGetById(tree, id) {
   }
 }
 
-export function createGroupByType(parent, view) {
-  if(view==='') {
-    if(parent.view === 'filter') {
-      view = 'filter-row'
-    }
-    if(parent.view === 'filter-row') {
-      view = 'filter-tag'
-    }
-    if(parent.view === 'tab') {
-      view = 'filter-pane'
-    }
-    if(parent.view === 'menu-grid') {
-      view = 'menu'
-    }
-    if(parent.view === 'tree-node') {
-      view = 'tree-node'
-    }
-  }
+export function createEmptyGroup(parent = {}, view = '') {
+  const uuid = shortid.generate()
   const data = {
     $new: true,
-    tree_id: parent.tree_id,
-    id: shortid.generate(),
-    parent_id: parent.id,
+    tree_id: parent.tree_id || uuid,
+    id: uuid,
+    parent_id: parent.id || uuid,
     title: 'new',
     name: '',
     desc: '',
-    view,
+    view: '',
     refs: [],
     attrs: {
-
+      random: false,
+      selected: false,
+      timeout: 0,
+      columns: 1,
     },
     params: {},
-    more: {},
-    nth: parent.children.length,
+    more: {
+      channel_id: '',
+      keyword: '',
+      type: '',
+    },
+    nth: parent.children ? parent.children.length : 0,
     open: true,
   };
+  if (parent.view === 'filter') {
+    view = 'filter-row'
+  }
+  if (parent.view === 'filter-row') {
+    view = 'filter-tag'
+  }
+  if (parent.view === 'tab') {
+    view = 'filter-pane'
+  }
+  if (parent.view === 'menu-grid') {
+    view = 'menu'
+  }
+  if (parent.view === 'tree-node') {
+    view = 'tree-node'
+  }
+  data.view = view
   return data;
 }

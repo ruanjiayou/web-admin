@@ -3,7 +3,7 @@ import { useLocalStore, Observer } from 'mobx-react-lite'
 import { Tabs } from 'antd';
 import TabPane from '../TabPane'
 import { Icon, VisualBox } from '../../component'
-import { createGroupByType } from '../../utils/helper'
+import { createEmptyGroup } from '../../utils/helper'
 
 export default function Tab({ self, children, ...props }) {
   const local = useLocalStore(() => ({
@@ -17,7 +17,7 @@ export default function Tab({ self, children, ...props }) {
             <TabPane self={child} {...props} />
           </Tabs.TabPane>)
         )}
-        {props.mode === 'edit' && <Tabs.TabPane key={-1} tab={<span onClick={e => { e.preventDefault(); e.stopPropagation(); props.addGroup(createGroupByType(self, '')) }}><Icon type="circle-plus" /></span>}></Tabs.TabPane>}
+        {props.mode === 'edit' && <Tabs.TabPane key={-1} tab={<span onClick={e => { e.preventDefault(); e.stopPropagation(); props.addGroup(createEmptyGroup(self)) }}><Icon type="circle-plus" /></span>}></Tabs.TabPane>}
       </Tabs>
     )}</Observer>)
 }

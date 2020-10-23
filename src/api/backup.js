@@ -1,53 +1,38 @@
 import shttp from '../utils/shttp'
 
-export function getBackups() {
+export function getCollections() {
   return shttp({
-    url: '/v1/admin/backups',
+    url: '/v1/admin/backups-db/collections',
     method: 'GET',
   })
 }
 
-export function createBackup() {
+export function getBackups() {
   return shttp({
-    url: `/v1/admin/backup`,
+    url: '/v1/admin/backups-db',
+    method: 'GET',
+  })
+}
+
+export function createBackup(data) {
+  return shttp({
+    url: `/v1/admin/backups-db`,
     method: 'POST',
+    data,
   })
 }
 
 export function destroyBackup(params) {
   return shttp({
-    url: `/v1/admin/backup/${params.dir}`,
+    url: `/v1/admin/backups-db/${params.dir}`,
     method: 'DELETE',
-  })
-}
-
-// 同步本地备份到线上
-export function syncBackup2prod(params) {
-  return shttp({
-    url: `/v1/admin/backup-upload/${params.dir}`,
-    method: 'POST'
-  })
-}
-
-// 下载备份zip 返回url title
-export function downloadBackup2zip(params) {
-  return shttp({
-    url: `/v1/admin/backup-download/${params.dir}`,
-    method: 'GET'
   })
 }
 
 // 按文件夹回复数据库
 export function recoveryByBackup(params) {
   return shttp({
-    url: `/v1/admin/backup-recovery/${params.dir}`,
-    method: 'POST'
-  })
-}
-
-export function zip2backup(params) {
-  return shttp({
-    url: `/v1/admin/backup-unzip/${params.dir}`,
+    url: `/v1/admin/backups-db/${params.dir}`,
     method: 'POST'
   })
 }

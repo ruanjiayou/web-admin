@@ -1,12 +1,13 @@
 import React, { useEffect, useCallback, Fragment } from 'react';
 import { Observer, useLocalStore } from 'mobx-react-lite'
-import { Table, Popconfirm, notification, Button, Divider } from 'antd';
-import { DeleteOutlined, WarningOutlined, UploadOutlined, CloudDownloadOutlined, HddOutlined, FileZipOutlined } from '@ant-design/icons'
+import { Table, Popconfirm, notification, Button, Divider, Input } from 'antd';
+import { DeleteOutlined, WarningOutlined, HddOutlined } from '@ant-design/icons'
 import apis from '../../../api'
-import { FullHeight, FullHeightFix, FullHeightAuto, Right, FullWidthAuto } from '../../../component/style'
+import { FullHeight, FullHeightFix, FullHeightAuto, Right } from '../../../component/style'
+import { VisualBox } from '../../../component'
+import Modal from 'antd/lib/modal/Modal';
 
-
-const { getBackups, createBackup, destroyBackup, syncBackup2prod, downloadBackup2zip, recoveryByBackup, zip2backup } = apis
+const { getBackups, createBackup, destroyBackup, recoveryByBackup } = apis
 const { Column } = Table;
 
 export default function TaskList() {
@@ -14,6 +15,8 @@ export default function TaskList() {
     isLoading: false,
     isStoring: false,
     backups: [],
+    showModal: false,
+    backupName: `${new Date().getFullYear()}-${new Date().getMonth()}-${new Date().getDate()}-automation`,
   }))
   const search = useCallback(() => {
     local.isLoading = true
@@ -36,73 +39,47 @@ export default function TaskList() {
       <FullHeightFix style={{ padding: '20px 0' }}>
         <Right>
           <Button type="primary" loading={local.isStoring} disabled={local.isLoading || local.isStoring} onClick={async (e) => {
-            try {
-              local.isStoring = true
-              const res = await createBackup()
-              if (res && res.code === 0) {
-                search()
-                notification.success({ message: '创建成功' });
-              } else {
-                notification.error({ message: '创建失败' });
-              }
-            } catch (e) {
-              notification.error({ message: '请求失败' });
-            } finally {
-              local.isStoring = false
-            }
+            local.showModal = true
           }}>创建备份</Button>
           <Divider type="vertical" />
           <Button onClick={search}>刷新</Button>
         </Right>
       </FullHeightFix>
+      <Modal
+        visible={local.showModal}
+        okText="创建"
+        cancelText="取消"
+        onCancel={() => local.showModal = false}
+        onOk={async () => {
+          local.showModal = false
+          try {
+            local.isStoring = true
+            const res = await createBackup({ name: local.backupName })
+            if (res && res.code === 0) {
+              search()
+              notification.success({ message: '创建成功' });
+            } else {
+              notification.error({ message: '创建失败' });
+            }
+          } catch (e) {
+            notification.error({ message: '请求失败' });
+          } finally {
+            local.isStoring = false
+          }
+        }}
+      >
+        <Input defaultValue={local.backupName} onChange={e => {
+          local.backupName = e.target.value
+        }} />
+      </Modal>
       <FullHeightAuto>
         <Table dataSource={local.backups} rowKey="dir" pagination={false} loading={local.isLoading}>
           <Column title="备份" dataIndex="dir" key="dir" render={(text, record) => {
             return record.type === 'zip' ? text + '.zip' : text
           }} />
           <Column title="操作" width={200} dataIndex="action" key="action" align="center" render={(text, record) => {
-            if (record.type === 'zip') {
-              return <FileZipOutlined title="解压zip" onClick={() => {
-                zip2backup(record).then(res => {
-                  if (res.code === 0) {
-                    notification.success({ message: '操作成功' });
-                    search();
-                  } else {
-                    notification.error({ message: '操作失败' });
-                  }
-                })
-              }} />
-            } else {
-              return <Fragment>
-                <Popconfirm title="确定同步这个备份到线上?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={() => {
-                  if (process.env.NODE_ENV !== 'development') {
-                    return notification.error({ message: '线上环境这个命令无效' })
-                  }
-                  syncBackup2prod(record).then(res => {
-                    if (res.code === 0) {
-                      notification.success({ message: '操作成功' });
-                    } else {
-                      notification.error({ message: '操作失败' });
-                    }
-                  })
-                }}>
-                  <UploadOutlined title="同步备份文件夹到线上" />
-                </Popconfirm>
-                <Divider type="vertical" />
-                <Popconfirm title="确定下载这个备份的zip?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={() => {
-                  downloadBackup2zip(record).then(res => {
-                    if (res.code === 0) {
-                      search();
-                      // TODO: download
-                      window.open(res.data.url, '_blank')
-                    } else {
-                      notification.error({ message: '操作失败' });
-                    }
-                  })
-                }}>
-                  <CloudDownloadOutlined title="下载备份文件夹的zip" />
-                </Popconfirm>
-                <Divider type="vertical" />
+            return <Fragment>
+              <VisualBox visible={record.type === 'dir'}>
                 <Popconfirm title="确定恢复这个备份?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={() => {
                   recoveryByBackup(record).then(res => {
                     if (res.code === 0) {
@@ -115,15 +92,14 @@ export default function TaskList() {
                   <HddOutlined title="按文件夹恢复数据库" />
                 </Popconfirm>
                 <Divider type="vertical" />
-                <Popconfirm title="确定?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={() => { destroyBackup({ dir: record.dir }).then(() => search()) }}>
-                  <DeleteOutlined />
-                </Popconfirm>
-              </Fragment>
-            }
+              </VisualBox>
+              <Popconfirm title="确定?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={() => { destroyBackup({ dir: record.type === 'zip' ? record.dir + '.zip' : record.dir }).then(() => search()) }}>
+                <DeleteOutlined />
+              </Popconfirm>
+            </Fragment>
           }} />
         </Table>
       </FullHeightAuto>
     </FullHeight>
-
   )}</Observer>
 }
