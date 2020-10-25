@@ -44,17 +44,17 @@ export default function ResourceManagePage() {
       <FullHeightAuto>
         <Table dataSource={local.schedules} rowKey="name" scroll={{ y: 600 }} loading={local.isLoading}>
           <Column title="名称" dataIndex="name" key="name" />
-          <Column title="活动状态" dataIndex="isActive" key="isActive" render={(text, record) => (
-            <span>{record.isActive ? '进行中' : '已停止'}</span>
+          <Column title="活动状态" dataIndex="isRuning" key="isRuning" render={(text, record) => (
+            <span>{record.isRuning ? '进行中' : '已停止'}</span>
           )} />
-          <Column title="开启状态" dataIndex="isOpen" key="name" render={(text, record) => (
-            <span>{record.isOpen ? '已开启' : '已关闭'}</span>
+          <Column title="开启状态" dataIndex="isActive" key="name" render={(text, record) => (
+            <span>{record.isActive ? '已开启' : '已关闭'}</span>
           )} />
           <Column title="cron" dataIndex="cron" key="name" />
           <Column title="操作" width={100} dataIndex="action" key="name" align="center" render={(text, record) => (
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly' }}>
-              {record.isOpen ? <PoweroffOutlined onClick={() => toggle(record)} /> : <PlayCircleOutlined onClick={() => toggle(record)} />}
-              <Popconfirm title="确定?" disabled={record.isActive} icon={<WarningOutlined />} onConfirm={() => { tickSchedule(record) }}>
+              {record.isActive ? <PoweroffOutlined onClick={() => toggle(record)} /> : <PlayCircleOutlined onClick={() => toggle(record)} />}
+              <Popconfirm title="确定?" disabled={record.isRuning} icon={<WarningOutlined />} onConfirm={() => { tickSchedule(record) }}>
                 <RedoOutlined />
               </Popconfirm>
             </div>

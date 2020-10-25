@@ -70,6 +70,7 @@ export default function ResourceEdit() {
           store.origin = data.origin
           //
           store.tempImg = data.poster
+          window.editor && window.editor.ready(() => window.editor.setContent(store.content))
         } else {
           notification.error({ message: '请求失败' })
         }
@@ -99,8 +100,15 @@ export default function ResourceEdit() {
           <Select value={store.source_type} onChange={value => {
             store.source_type = value
           }}>
+            <Select.Option value="">全部</Select.Option>
+            <Select.Option value="image">图片</Select.Option>
+            <Select.Option value="animation">动漫</Select.Option>
+            <Select.Option value="music">音频</Select.Option>
+            <Select.Option value="video">视频</Select.Option>
+            <Select.Option value="novel">小说</Select.Option>
             <Select.Option value="article">文章</Select.Option>
             <Select.Option value="news">资讯</Select.Option>
+            <Select.Option value="private">私人</Select.Option>
           </Select>
         </Form.Item>
         <Form.Item label="type" labelCol={lb} wrapperCol={rb}>

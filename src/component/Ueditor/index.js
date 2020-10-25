@@ -3,7 +3,7 @@
  * 自定义菜单配置
  */
 import React, { Component } from 'react'
-let editor = null
+window.editor = null
 
 class UEditor extends Component {
 
@@ -12,12 +12,12 @@ class UEditor extends Component {
   }
 
   componentWillUnmount() {
-    editor && editor.destroy()
+    window.editor && window.editor.destroy()
   }
 
   // 初始化编辑器
   setConfig() {
-    editor = window.UE.getEditor('editor', {
+    window.editor = window.UE.getEditor('editor', {
       toolbars: [
         [
           'source', // 源代码
@@ -118,14 +118,14 @@ class UEditor extends Component {
       initialFrameWidth: '100%',
       zIndex: 1200
     })
-    editor.ready(() => {
-      editor.setContent(this.props.initData)
+    window.editor.ready(() => {
+      window.editor.setContent(this.props.initData)
     })
   }
 
   // 获取编辑器内容
   getUEContent() {
-    return editor.getContent()
+    return window.editor.getContent()
   }
 
   render() {

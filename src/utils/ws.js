@@ -2,7 +2,7 @@ import io from 'socket.io-client';
 import store from '../store'
 import Message from '../models/message'
 
-export const ws = io('http://localhost:8097', {
+export const ws = io('/', {
   path: '/ws'
 });
 
