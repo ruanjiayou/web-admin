@@ -24,6 +24,20 @@ export default function TaskList() {
     showEdit: false,
     temp: null,
     analyise: {},
+    // 总操作盈亏
+    get total() {
+      if (this.trades.length) {
+        let sum = 0;
+        this.trades.forEach(trade => {
+          if (trade.type === 1 || trade.type === 2) {
+            sum += trade.total
+          }
+        })
+        return sum
+      } else {
+        return 0
+      }
+    }
   }))
   const search = useCallback(() => {
     local.isLoading = true
@@ -58,13 +72,14 @@ export default function TaskList() {
     <FullHeight>
       <FullHeightFix style={{ padding: '20px 0' }}>
         <div style={{ flex: 1 }}>
-          <span style={{ color: 'green' }}>费用合计:-{local.analyise.fee}</span><Divider type="vertical" />
-          <span style={{ color: 'red' }}>分红合计:+{local.analyise.bonus}</span><Divider type="vertical" />
+          <span style={{ color: 'red' }}>持有市值:+{local.analyise.owner}</span><Divider type="vertical" />
+          <span style={{ color: 'green' }}>总盈亏:{(local.analyise.owner + local.analyise.total).toFixed(2)}</span><Divider type="vertical" />
+          <span style={{ color: 'green' }}>费用:-{local.analyise.fee}</span><Divider type="vertical" />
+          <span style={{ color: 'red' }}>分红:+{local.analyise.bonus}</span><Divider type="vertical" />
           <span>买入次数:{local.analyise.buys}</span><Divider type="vertical" />
           <span>卖出次数:{local.analyise.sells}</span><Divider type="vertical" />
-          <span>总收支:{local.analyise.total}</span>
         </div>
-        <Right>
+        <Right style={{ flex: 0, whiteSpace: 'nowrap' }}>
           <Button type="primary" onClick={e => {
             local.temp = {
               type: '1', amount: 0, price: 0, trade: 0, total: 0, currency: '人民币', fee: 0, fees: [
@@ -85,16 +100,16 @@ export default function TaskList() {
           <Button type="primary" onClick={e => { search(); init() }}>刷新</Button>
         </Right>
       </FullHeightFix>
-      <FullHeightAuto>
+      <FullHeightAuto style={{ overflowY: 'hidden' }}>
         <Table className="box" dataSource={local.trades} rowKey="id" scroll={{ y: 400 }} loading={local.isLoading} pagination={{
-          pageSize: 20,
+          pageSize: 200,
           current: local.search_page,
           total: local.count,
         }} onChange={(page) => {
           local.search_page = page.current
           search()
         }}>
-          <Column title="id" width={100} dataIndex="id" key="id" render={text => <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block', width: '100%' }}>{text}</span>} />
+          {/* <Column title="id" width={100} dataIndex="id" key="id" render={text => <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block', width: '100%' }}>{text}</span>} /> */}
           <Column title="名称" width={100} dataIndex="name" key="name" />
           <Column title="交收日期" width={100} dataIndex="settlement" key="settlement" />
           <Column title="交易类别" width={120} dataIndex="type" key="type" render={text => <span>
@@ -103,8 +118,8 @@ export default function TaskList() {
             }
           </span>
           } />
-          <Column title="成交数量" width={100} dataIndex="amount" key="amount" />
-          <Column title="成交价格" width={100} dataIndex="price" key="price" />
+          <Column title="成交数量" width={80} dataIndex="amount" key="amount" />
+          <Column title="成交价格" width={80} dataIndex="price" key="price" />
           <Column title="成交金额" width={100} dataIndex="trade" key="trade" />
           <Column title="费用合计" width={100} dataIndex="fee" key="fee" />
           <Column title="发生金额" width={100} dataIndex="total" key="total" />
