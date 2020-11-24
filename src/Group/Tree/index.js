@@ -3,11 +3,12 @@ import { Observer, useLocalStore } from 'mobx-react-lite'
 import { Button, Divider } from 'antd'
 import VisualBox from '../../component/VisualBox';
 import Icon from '../../component/Icon'
+import { createEmptyGroup } from '../../utils/helper'
 
 function Node({ self, isChild = false, ...props }) {
   const store = useLocalStore(() => ({
     showMenu: false,
-    showChildren: true,
+    showChildren: false,
   }))
   return <Observer>{() => (
     <div className="full-width" style={{ padding: '5px 0', }}>
@@ -18,7 +19,7 @@ function Node({ self, isChild = false, ...props }) {
         <span style={{ marginLeft: 5, backgroundColor: '#eaeaea', border: '1px solid #666', padding: 3, borderRadius: 5, zIndex: store.showMenu ? 100 : 98, position: 'relative', }}>
           {self.title}
           <VisualBox visible={self.children.length !== 0}>
-            {store.showChildren ? <Icon type="circle-plus" onClick={() => store.showChildren = !store.showChildren} /> : <Icon type="circle-minus" onClick={() => store.showChildren = !store.showChildren} />}
+            {store.showChildren ? <Icon type="circle-minus" onClick={() => store.showChildren = !store.showChildren} /> : <Icon type="circle-plus" onClick={() => store.showChildren = !store.showChildren} />}
           </VisualBox>
         </span>
         <div onClick={() => store.showMenu = false} style={{ display: store.showMenu && props.mode === 'edit' ? 'block' : 'none', position: 'fixed', left: 0, top: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 99 }}></div>
@@ -26,7 +27,7 @@ function Node({ self, isChild = false, ...props }) {
           <div style={{ textAlign: 'right' }}>
             <Button type="primary" onClick={() => {
               store.showMenu = false
-              props.editGroup({ parent_id: self.id, tree_id: self.tree_id, view: 'tree-node' })
+              props.addGroup(createEmptyGroup(self))
             }}>添加</Button>
             <Divider type="vertical" />
             <Button onClick={() => { store.showMenu = false; props.editGroup(self) }}>修改</Button>

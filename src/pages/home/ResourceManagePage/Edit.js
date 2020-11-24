@@ -63,7 +63,10 @@ export default function ResourceEdit({ data, cancel, save, }) {
               <Select.Option value="">请选择</Select.Option>
               {catas.map(cata => (<Select.Option value={cata.name}>{cata.title}</Select.Option>))}
             </Select> */}
-            <Input value={local.data.type} autoFocus onChange={e => local.data.type = e.target.value} />
+            <Input value={local.data.type} onChange={e => local.data.type = e.target.value} />
+          </Form.Item>
+          <Form.Item label="系列" labelCol={lb} wrapperCol={rb}>
+            <Input.TextArea rows={4} value={local.data.series} onChange={e => local.data.series = e.target.value} />
           </Form.Item>
           <Form.Item label="country" labelCol={lb} wrapperCol={rb}>
             <Select value={local.data.country || ''} onChange={value => local.data.country = value}>

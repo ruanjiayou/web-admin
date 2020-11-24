@@ -22,6 +22,7 @@ export default function ResourceEdit() {
     createdAt: new Date().toISOString(),
     source_type: 'article',
     type: '',
+    series: '',
     origin: '',
     // words: 0,
     open: true,
@@ -91,10 +92,13 @@ export default function ResourceEdit() {
           <Input style={{ width: '50%' }} value={store.title} autoFocus onChange={e => store.title = e.target.value} />
         </Form.Item>
         <Form.Item label="来源" labelCol={lb} wrapperCol={rb}>
-          <Input style={{ width: '50%' }} value={store.origin} autoFocus onChange={e => store.origin = e.target.value} />
+          <Input style={{ width: '50%' }} value={store.origin} onChange={e => store.origin = e.target.value} />
         </Form.Item>
         <Form.Item label="时间" labelCol={lb} wrapperCol={rb}>
-          <Input style={{ width: '50%' }} value={store.createdAt} autoFocus onChange={e => store.createdAt = e.target.value} />
+          <Input style={{ width: '50%' }} value={store.createdAt} onChange={e => store.createdAt = e.target.value} />
+        </Form.Item>
+        <Form.Item label="系列" labelCol={lb} wrapperCol={rb}>
+          <Input style={{ width: '50%' }} value={store.series} onChange={e => store.series = e.target.value} />
         </Form.Item>
         <Form.Item label="资源类型" labelCol={lb} wrapperCol={rb}>
           <Select value={store.source_type} onChange={value => {

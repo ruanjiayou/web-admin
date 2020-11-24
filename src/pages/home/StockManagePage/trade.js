@@ -5,6 +5,7 @@ import { DeleteOutlined, WarningOutlined, SyncOutlined, LoadingOutlined, FormOut
 import apis from '../../../api'
 import { FullHeight, FullHeightFix, FullHeightAuto, Right } from '../../../component/style'
 import Edit from './editTrade'
+import { useEffectOnce } from 'react-use';
 
 const { Column } = Table;
 const { getTrades, createTrade, updateTrade, destroyTrade } = apis
@@ -52,7 +53,7 @@ export default function TaskList() {
       local.isLoading = false
     })
   }, [])
-  useEffect(() => {
+  useEffectOnce(() => {
     init()
     search()
   })

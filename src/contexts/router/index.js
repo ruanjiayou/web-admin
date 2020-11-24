@@ -1,4 +1,5 @@
 import React, { useContext } from 'react'
+import qs from 'qs'
 
 const context = React.createContext(null)
 
@@ -7,6 +8,14 @@ export function createRouter(history) {
     history,
     state(key) {
       return history.location.state && history.location.state[key]
+    },
+    get pathname() {
+      return history.location.pathname
+    },
+    getQuery(uri) {
+      const url = history.location.pathname + history.location.search;
+      const [pathname, querystring = ''] = (uri || url).split('?')
+      return qs.parse(querystring, { allowDots: true })
     },
     goBack() {
 

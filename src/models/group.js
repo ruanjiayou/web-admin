@@ -6,6 +6,9 @@ function deepEqual(a, b) {
   for (let k in a) {
     let equal = true;
     if (_.isPlainObject(a[k])) {
+      if (_.isEmpty(a[k]) && !_.isEmpty(b[k])) {
+        return false
+      }
       equal = deepEqual(a[k], b[k]);
     } else {
       equal = _.isEqual(a[k], b[k]);
@@ -41,10 +44,10 @@ const GroupModel = types.model('Group', {
   // query/
   params: types.frozen(null, {}),
   more: types.optional(types.model({
-    channel_id: types.union(types.string, types.null, ),
+    channel_id: types.union(types.string, types.null,),
     keyword: types.union(types.string, types.null, types.undefined),
     type: types.union(types.string, types.null, types.undefined),
-  }), {channel_id:''}),
+  }), { channel_id: '' }),
   nth: types.optional(types.number, 0),
   open: types.optional(types.boolean, true),
   children: types.optional(types.array(types.late(() => GroupModel)), []),

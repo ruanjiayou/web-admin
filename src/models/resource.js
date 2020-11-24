@@ -15,6 +15,7 @@ export default types.model('Resource', {
   images: types.optional(types.array(types.string), []),
   status: types.optional(types.enumeration(['loading', 'finished']), 'finished'),
   type: types.optional(types.string, ''),
+  series: types.optional(types.string, ''),
   createdAt: types.optional(types.string, ''),
   words: types.optional(types.number, 0),
   comments: types.optional(types.number, 0),

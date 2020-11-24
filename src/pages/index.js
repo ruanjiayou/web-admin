@@ -11,7 +11,10 @@ import TaskPage from './home/SpiderManagePage/task'
 import SchedulePage from './home/ScheduleManagePage'
 import ResourceEdit from './home/ResourceManagePage/article'
 import TradePage from './home/StockManagePage/trade'
-import { DashboardOutlined, FieldTimeOutlined, UnorderedListOutlined, AppstoreAddOutlined, HddOutlined, RadarChartOutlined, UsbOutlined, OrderedListOutlined, CloudSyncOutlined, CloudServerOutlined, StockOutlined, TransactionOutlined } from '@ant-design/icons'
+import ExamineListPage from './home/ExamineManagePage/List'
+import ExamineDetailPage from './home/ExamineManagePage/Detail'
+import LinkManagePage from './home/LinkManagePage'
+import { LinkOutlined, DashboardOutlined, FieldTimeOutlined, UnorderedListOutlined, AppstoreAddOutlined, HddOutlined, RadarChartOutlined, UsbOutlined, OrderedListOutlined, CloudSyncOutlined, CloudServerOutlined, StockOutlined, TransactionOutlined } from '@ant-design/icons'
 
 const pages = [
   {
@@ -95,6 +98,23 @@ const pages = [
     icon: <OrderedListOutlined />,
   },
   {
+    pathname: '/admin/home/examine-manage',
+    title: '问答管理',
+    icon: <RadarChartOutlined />,
+  },
+  {
+    pathname: '/admin/home/examine-manage/list',
+    Page: ExamineListPage,
+    title: '试卷列表',
+    icon: <OrderedListOutlined />,
+  },
+  {
+    pathname: '/admin/home/examine-manage/detail',
+    Page: ExamineDetailPage,
+    title: '试卷详情',
+    icon: <OrderedListOutlined />,
+  },
+  {
     pathname: '/admin/home/stock-manage',
     title: '股票管理',
     icon: <StockOutlined />,
@@ -104,6 +124,12 @@ const pages = [
     Page: TradePage,
     title: '股票交易',
     icon: <TransactionOutlined />,
+  },
+  {
+    pathname: '/admin/home/links',
+    Page: LinkManagePage,
+    title: '链接管理',
+    icon: <LinkOutlined />,
   },
   {
     pathname: '/admin/auth/sign-in',

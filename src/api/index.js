@@ -9,6 +9,8 @@ import * as task from './task'
 import * as trade from './trade'
 import * as user from './user'
 import * as schedule from './schedule'
+import * as examine from './examine'
+import * as link from './link'
 
 const boot = function () {
   return shttp({
@@ -37,4 +39,6 @@ export default {
   ...trade,
   ...user,
   ...schedule,
+  ...examine,
+  ...link,
 }

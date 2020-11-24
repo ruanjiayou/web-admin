@@ -45,7 +45,8 @@ export default function Menu({ collapsed }) {
     if (menuKey) {
       local.openKeys = [menuKey]
     }
-  })
+    store.app.set('menuKey', router.history.location.pathname)
+  }, [router.history.location])
 
   function onToggle(key) {
     const i = local.openKeys.indexOf(key)
@@ -63,13 +64,12 @@ export default function Menu({ collapsed }) {
       return;
     }
     store.app.set('menuKey', key)
-    storage.setValue('menu-key', key)
     router.goPage(path, '', {})
   }
   return <Observer>{() => (
     <Comp
       style={{ flex: 'auto', overflowY: 'auto', overflowX: 'hidden' }}
-      defaultSelectedKeys={[store.app.menuKey]}
+      selectedKeys={[store.app.menuKey]}
       openKeys={collapsed ? [] : local.openKeys}
       mode="inline"
       inlineCollapsed={collapsed}

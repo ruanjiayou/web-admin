@@ -42,7 +42,6 @@ const app = types.model('app', {
     return can;
   },
   canAddChild(view) {
-    console.log(view, 'can?')
     return ['', 'filter', 'filter-row', 'tab', 'tab-pane', 'menu-grid', 'tree-node',].includes(view);
   },
 }))

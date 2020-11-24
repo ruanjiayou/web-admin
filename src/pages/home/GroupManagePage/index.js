@@ -168,6 +168,7 @@ export default function GroupManagePage() {
                 <CompImg src={ImgTab} title="tab组件" onDragStart={() => { store.app.setCurrentDragType('tab') }} />
                 <CompImg src={ImgTabbar} title="tabbar组件" />
                 <CompImg src={ImgGrid} title="grid组件" onDragStart={() => { store.app.setCurrentDragType('menu-grid') }} />
+                <CompImg src={ImgGrid} alt="NodeTree" title="NodeTree组件" onDragStart={() => { store.app.setCurrentDragType('tree-node') }} />
               </div>
             </FullHeightFix>
             <FullHeightAuto style={{ display: 'flex', alignItems: 'center' }}>
@@ -187,7 +188,7 @@ export default function GroupManagePage() {
                     }}
                     editGroup={data => {
                       local.temp = data
-                      local.showGroupAdd = true
+                      local.showGroupEdit = true
                     }}
                     addRef={data => {
                       local.temp = data
