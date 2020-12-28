@@ -3,7 +3,7 @@ import { useEffectOnce } from 'react-use'
 import { Observer, useLocalStore } from 'mobx-react-lite'
 import Ueditor from '../../../component/Ueditor'
 import apis from '../../../api'
-import { Button, notification, Input, Form, Radio, Tag, Upload, Select } from 'antd';
+import { Button, notification, Input, Form, Radio, Tag, Upload, Select, Divider } from 'antd';
 import Icon from '../../../component/Icon'
 import qs from 'qs'
 import * as _ from 'lodash'
@@ -33,6 +33,8 @@ export default function ResourceEdit() {
     tagAddVisible: false,
     loading: false,
     categories: {},
+    // 
+    fetching: false,
   }))
   const edit = useCallback(() => {
     if (ueditor.current) {
@@ -45,6 +47,11 @@ export default function ResourceEdit() {
       api(data).then(res => {
         if (res.code === 0) {
           notification.info({ message: '操作成功' })
+          store.title = ''
+          store.author = ''
+          store.content = ''
+          store.createdAt = ''
+          window.editor.setContent('')
         } else {
           notification.error({ message: '操作失败' })
         }
@@ -53,7 +60,23 @@ export default function ResourceEdit() {
     } else {
       notification.error({ message: '获取ueditor失败' })
     }
-  })
+  }, [])
+  const crawler = useCallback(async () => {
+    store.fetching = true
+    try {
+      const result = await apis.fetchCrawler({ data: { origin: store.origin } });
+      if (result.code === 0) {
+        store.title = result.data.title
+        store.author = result.data.author
+        store.createdAt = result.data.time
+        store.content = result.data.content
+        window.editor.setContent(store.content)
+      }
+    } finally {
+      store.fetching = false
+    }
+
+  }, [])
   useEffect(() => {
     if (store.id) {
       store.loading = true
@@ -93,6 +116,8 @@ export default function ResourceEdit() {
         </Form.Item>
         <Form.Item label="来源" labelCol={lb} wrapperCol={rb}>
           <Input style={{ width: '50%' }} value={store.origin} onChange={e => store.origin = e.target.value} />
+          <Divider type="vertical" />
+          <Button type="primary" loading={store.fetching} onClick={crawler}>抓取</Button>
         </Form.Item>
         <Form.Item label="时间" labelCol={lb} wrapperCol={rb}>
           <Input style={{ width: '50%' }} value={store.createdAt} onChange={e => store.createdAt = e.target.value} />
@@ -181,7 +206,7 @@ export default function ResourceEdit() {
             }} beforeUpload={(f) => {
               return false
             }}>
-            <img width="100%" src={store.tempImg} />
+            <img width="100%" src={store.tempImg} alt="" />
             {store.poster === '' && (
               <Button style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)' }}>
                 <Icon type="arrow-up-line" /> 编辑
@@ -195,10 +220,8 @@ export default function ResourceEdit() {
           </div>
         </Form.Item>
       </div>
-      <Form.Item label="" style={{ marginLeft: '12.5%' }} labelCol={lb} wrapperCol={rb}>
-        <Button loading={store.loading} disabled={store.loading} type="primary" onClick={() => {
-          edit()
-        }}>保存</Button>
+      <Form.Item label="" style={{ textAlign: 'center', backgroundColor: '#b5cbde', height: 50, lineHeight: '50px', margin: 0, }}>
+        <Button loading={store.loading} disabled={store.loading} type="primary" onClick={edit}>保存</Button>
       </Form.Item>
     </div>
   </Fragment>)}</Observer>

@@ -11,6 +11,8 @@ import * as user from './user'
 import * as schedule from './schedule'
 import * as examine from './examine'
 import * as link from './link'
+import * as pub from './public'
+import * as config from './config'
 
 const boot = function () {
   return shttp({
@@ -41,4 +43,6 @@ export default {
   ...schedule,
   ...examine,
   ...link,
+  ...pub,
+  ...config,
 }

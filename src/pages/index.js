@@ -14,7 +14,8 @@ import TradePage from './home/StockManagePage/trade'
 import ExamineListPage from './home/ExamineManagePage/List'
 import ExamineDetailPage from './home/ExamineManagePage/Detail'
 import LinkManagePage from './home/LinkManagePage'
-import { LinkOutlined, DashboardOutlined, FieldTimeOutlined, UnorderedListOutlined, AppstoreAddOutlined, HddOutlined, RadarChartOutlined, UsbOutlined, OrderedListOutlined, CloudSyncOutlined, CloudServerOutlined, StockOutlined, TransactionOutlined } from '@ant-design/icons'
+import ConfigPage from './home/ConfigPage'
+import { LinkOutlined, DashboardOutlined, SettingOutlined, FieldTimeOutlined, UnorderedListOutlined, AppstoreAddOutlined, HddOutlined, RadarChartOutlined, UsbOutlined, OrderedListOutlined, CloudSyncOutlined, CloudServerOutlined, StockOutlined, TransactionOutlined } from '@ant-design/icons'
 
 const pages = [
   {
@@ -22,6 +23,12 @@ const pages = [
     Page: DashboardPage,
     title: '总揽',
     icon: <DashboardOutlined />,
+  },
+  {
+    pathname: '/admin/home/config',
+    title: '项目配置',
+    icon: <SettingOutlined />,
+    Page: ConfigPage,
   },
   {
     pathname: '/admin/home/ui',

@@ -16,7 +16,7 @@ export default function TaskList() {
     isStoring: false,
     backups: [],
     showModal: false,
-    backupName: `${new Date().getFullYear()}-${new Date().getMonth()}-${new Date().getDate()}-automation`,
+    backupName: `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()}-automation`,
   }))
   const search = useCallback(() => {
     local.isLoading = true
@@ -49,6 +49,7 @@ export default function TaskList() {
         visible={local.showModal}
         okText="创建"
         cancelText="取消"
+        style={{ top: window.screen.height / 2 + 'px', transform: 'translate(0, -50%)' }}
         onCancel={() => local.showModal = false}
         onOk={async () => {
           local.showModal = false
@@ -68,7 +69,7 @@ export default function TaskList() {
           }
         }}
       >
-        <Input defaultValue={local.backupName} onChange={e => {
+        <Input defaultValue={local.backupName} autoFocus onChange={e => {
           local.backupName = e.target.value
         }} />
       </Modal>

@@ -15,7 +15,7 @@ export function getTasks(query) {
 
 export function updateTask(data) {
   return shttp({
-    url: 'v1/admin/task',
+    url: '/v1/admin/task',
     method: 'PUT',
     data,
   });

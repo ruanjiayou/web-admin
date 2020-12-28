@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import apis from '../../../api';
 import { Table, Popconfirm, Switch, notification, Select, } from 'antd';
 import { FormOutlined, DeleteOutlined, WarningOutlined, CloudServerOutlined, SyncOutlined } from '@ant-design/icons'
+import { Icon } from '../../../component'
 
 const { Column } = Table;
 
@@ -69,6 +70,18 @@ export default function ResourceList({ items, children, categories, search, loca
 					}}>
 						<DeleteOutlined />
 					</Popconfirm>
+					<Icon type="page-search" onClick={() => {
+						console.log(window.origin + '/root/home/BookInfo?home.tab=&BookInfo.id=' + record.id)
+						if (record.source_type === 'novel') {
+							window.open(window.origin + '/root/home/BookInfo?home.tab=&BookInfo.id=' + record.id)
+						} else if (['news', 'article', 'private'].includes(record.source_type)) {
+							window.open(window.origin + '/root/home/Article?home.tab=QD7vNfJCU&Article.id=' + record.id)
+						} else if (['image'].includes(record.source_type)) {
+							window.open(window.origin + '/root/groups/GroupTree/Image?GroupTree.name=image&Image.id=' + record.id)
+						} else {
+							notification.info({ message: '类型不可预览' })
+						}
+					}} />
 					<SyncOutlined title="抓取image" onClick={() => {
 						apis.grabImages({ id: record.id }).then(res => {
 							notification.info({ message: `success:${res.data.success} fail:${res.data.fail}` })

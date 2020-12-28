@@ -50,3 +50,12 @@ flex-direction: row;
 export const FullWidthAuto = styled.div`
 flex: 1;
 `;
+
+export const Padding = styled.div`
+  padding: 15px;
+`
+
+export const PaddingSide = styled.div`
+  padding: 0 15px;
+`
+

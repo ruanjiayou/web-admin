@@ -13,3 +13,11 @@ export function getCatagories() {
     method: 'GET',
   })
 }
+
+export function fetchCrawler({ data }) {
+  return shttp({
+    url: '/v1/public/crawler',
+    method: 'POST',
+    data
+  })
+}
