@@ -16,3 +16,9 @@
 - 友情链接
 - NodeTree编辑
 - series字段
+
+# 2021-01-28
+- types和group数据修改
+- updateResource的array数据bug
+- stock数据编辑计算
+- resource快速编辑

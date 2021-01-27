@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback, Fragment } from 'react';
 import { Observer, useLocalStore } from 'mobx-react-lite'
 import { Table, Popconfirm, Switch, notification, Button, Divider } from 'antd';
-import { DeleteOutlined, WarningOutlined, SyncOutlined, LoadingOutlined, FormOutlined } from '@ant-design/icons'
+import { DeleteOutlined, WarningOutlined, SyncOutlined, LoadingOutlined, FormOutlined, CheckCircleOutlined } from '@ant-design/icons'
 import apis from '../../../api'
 import { FullHeight, FullHeightFix, FullHeightAuto, Right } from '../../../component/style'
 import Edit from './editTrade'
@@ -15,6 +15,8 @@ const mapping = {
   '3': '红利入账',
   '4': '股息个税征收',
   '5': '利息归本',
+  '6': '银行转证券',
+  '7': '证券转银行',
 }
 export default function TaskList() {
   const local = useLocalStore(() => ({
@@ -30,9 +32,7 @@ export default function TaskList() {
       if (this.trades.length) {
         let sum = 0;
         this.trades.forEach(trade => {
-          if (trade.type === 1 || trade.type === 2) {
-            sum += trade.total
-          }
+          sum += trade.total
         })
         return sum
       } else {
@@ -73,8 +73,8 @@ export default function TaskList() {
     <FullHeight>
       <FullHeightFix style={{ padding: '20px 0' }}>
         <div style={{ flex: 1 }}>
-          <span style={{ color: 'red' }}>持有市值:+{local.analyise.owner}</span><Divider type="vertical" />
-          <span style={{ color: 'green' }}>总盈亏:{(local.analyise.owner + local.analyise.total).toFixed(2)}</span><Divider type="vertical" />
+          <span style={{ color: local.analyise.owner >= 0 ? 'red' : 'green' }}>持有市值:{local.analyise.owner}</span><Divider type="vertical" />
+          <span style={{ color: local.analyise.owner + local.analyise.total >= 0 ? 'red' : 'green' }}>总盈亏:{(local.analyise.owner + local.analyise.total).toFixed(2)}</span><Divider type="vertical" />
           <span style={{ color: 'green' }}>费用:-{local.analyise.fee}</span><Divider type="vertical" />
           <span style={{ color: 'red' }}>分红:+{local.analyise.bonus}</span><Divider type="vertical" />
           <span>买入次数:{local.analyise.buys}</span><Divider type="vertical" />
@@ -83,7 +83,7 @@ export default function TaskList() {
         <Right style={{ flex: 0, whiteSpace: 'nowrap' }}>
           <Button type="primary" onClick={e => {
             local.temp = {
-              type: '1', amount: 0, price: 0, trade: 0, total: 0, currency: '人民币', fee: 0, fees: [
+              type: 1, amount: 0, price: 0, trade: 0, total: 0, currency: '人民币', fee: 0, fees: [
                 { key: '佣金', value: 0 },
                 { key: '规费', value: 0 },
                 { key: '印花税', value: 0 },

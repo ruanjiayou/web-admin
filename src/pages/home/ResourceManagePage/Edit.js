@@ -8,15 +8,18 @@ import store from '../../../store'
 export default function ResourceEdit({ data, cancel, save, }) {
   const lb = { span: 3 }, rb = { span: 18 }
   const local = useLocalStore(() => ({
-    data: data.id ? _.cloneDeep(data) : { tags: [] },
+    data: data.id ? _.cloneDeep(data) : { tags: [], types: [] },
     loading: false,
     ref: '',
     poster: data.poster || store.app.imageLine + '/poster/nocover.jpg',
     maps: [],
     tagAddVisible: false,
+    typeAddVisible: false,
     tempTag: '',
+    tempType: '',
   }))
   const inp = useRef(null)
+  const inputType = useRef(null)
   const file = useRef(null)
   const picture = useRef(null)
   return <Observer>{() => (
@@ -58,20 +61,45 @@ export default function ResourceEdit({ data, cancel, save, }) {
               {store.types.map(type => <Select.Option value={type.name} key={type.name}>{type.title}</Select.Option>)}
             </Select>
           </Form.Item>
-          <Form.Item label="类别" labelCol={lb} wrapperCol={rb}>
-            {/* <Select value={local.data.type} onChange={e => local.data.type = e.target.value}>
-              <Select.Option value="">请选择</Select.Option>
-              {catas.map(cata => (<Select.Option value={cata.name}>{cata.title}</Select.Option>))}
-            </Select> */}
-            <Input value={local.data.type} onChange={e => local.data.type = e.target.value} />
-          </Form.Item>
           <Form.Item label="系列" labelCol={lb} wrapperCol={rb}>
-            <Input.TextArea rows={4} value={local.data.series} onChange={e => local.data.series = e.target.value} />
+            <Input value={local.data.series} onChange={e => local.data.series = e.target.value} />
           </Form.Item>
-          <Form.Item label="country" labelCol={lb} wrapperCol={rb}>
-            <Select value={local.data.country || ''} onChange={value => local.data.country = value}>
-              {store.city.map(city => <Select.Option value={city.name} key={city.name}>{city.title}</Select.Option>)}
-            </Select>
+          <Form.Item label="types" labelCol={lb} wrapperCol={rb}>
+            {local.data.types.map((type, index) => <Tag key={index} closable onClose={() => { local.data.types.filter(t => t !== type) }}>{type}</Tag>)}
+            {local.typeAddVisible && (
+              <Input
+                ref={inputType}
+                type="text"
+                size="small"
+                style={{ width: 78 }}
+                value={local.tempType}
+                autoFocus
+                onChange={e => local.tempType = e.target.value}
+                onBlur={() => {
+                  let type = local.tempType.trim()
+                  const types = local.data.types.toJSON()
+                  if (type !== '' && -1 === types.findIndex(t => t === type)) {
+                    local.data.types.push(type)
+                  }
+                  local.typeAddVisible = false
+                  local.tempType = ''
+                }}
+                onPressEnter={() => {
+                  let type = local.tempType.trim()
+                  const types = local.data.types.toJSON()
+                  if (type !== '' && -1 === types.findIndex(t => t === type)) {
+                    local.data.types.push(type)
+                  }
+                  local.typeAddVisible = false
+                  local.tempType = ''
+                }}
+              />
+            )}
+            {!local.tagAddVisible && (
+              <Tag onClick={() => local.tagAddVisible = true} style={{ background: '#fff', borderStyle: 'dashed' }}>
+                <PlusCircleOutlined />
+              </Tag>
+            )}
           </Form.Item>
           <Form.Item label="tags" labelCol={lb} wrapperCol={rb}>
             {local.data.tags.map((tag, index) => <Tag key={index} closable onClose={() => { local.data.tags.filter(t => t !== tag) }}>{tag}</Tag>)}
@@ -109,6 +137,11 @@ export default function ResourceEdit({ data, cancel, save, }) {
                 <PlusCircleOutlined />
               </Tag>
             )}
+          </Form.Item>
+          <Form.Item label="country" labelCol={lb} wrapperCol={rb}>
+            <Select value={local.data.country || ''} onChange={value => local.data.country = value}>
+              {store.city.map(city => <Select.Option value={city.name} key={city.name}>{city.title}</Select.Option>)}
+            </Select>
           </Form.Item>
           <Form.Item label="open" labelCol={lb} wrapperCol={rb}>
             <Switch checked={local.data.open} onClick={e => {

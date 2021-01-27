@@ -2,10 +2,10 @@ import React, { useEffect, useCallback } from 'react';
 import { useEffectOnce } from 'react-use'
 import { Observer, useLocalStore } from 'mobx-react-lite'
 import apis from '../../../api';
-import gstore from '../../../store/index'
 import ResourceList from './List'
 import ResourceEdit from './Edit'
-import { Button, Input, Select, Divider, Pagination } from 'antd';
+import { Button, Input, Select, Switch, Divider, Pagination, Modal, Form } from 'antd';
+import store from '../../../store'
 
 const { getResources, createResource, updateResource, destroyResource, getGroupTypes } = apis
 
@@ -13,14 +13,16 @@ async function destroy(data) {
   return await destroyResource(data)
 }
 
-async function store(data) {
-  window.open(`${gstore.app.baseUrl}/v1/admin/book/${data.id}/store?token=${gstore.user.token}`, '_blank')
+async function save(data) {
+  window.open(`${store.app.baseUrl}/v1/admin/book/${data.id}/store?token=${store.user.token}`, '_blank')
 }
 
 export default function ResourceManagePage() {
+  const lb = { span: 3 }, rb = { span: 18 }
   const local = useLocalStore(() => ({
     isLoading: false,
     showEdit: false,
+    showFastEdit: false,
     temp: null,
     count: 0,
     search_name: '',
@@ -50,6 +52,7 @@ export default function ResourceManagePage() {
   useEffectOnce(() => {
     getGroupTypes().then(result => {
       local.categories = result.data
+      console.log(result, 'types')
     })
   }, [])
   return (<Observer>{() => {
@@ -87,13 +90,14 @@ export default function ResourceManagePage() {
           <ResourceList
             items={local.resources}
             openEdit={(data) => { local.temp = data; local.showEdit = true; }}
+            fastEdit={(data) => { local.temp = data; local.showFastEdit = true; }}
             destroy={async function (data) {
               await destroy(data)
               search()
             }}
             categories={local.categories}
             search={search}
-            store={store}
+            store={save}
             local={local}
           />
         </div>
@@ -105,6 +109,51 @@ export default function ResourceManagePage() {
           return createResource(data)
         }
       }} />}
+      {
+        local.showFastEdit && (
+          <Modal
+            visible={true}
+            onCancel={() => local.showFastEdit = false}
+            okText={<Button type="primary" loading={local.isLoading}>确定</Button>}
+            onOk={() => {
+
+            }}
+          >
+            <Form>
+              <Form.Item label="标题" labelCol={lb} wrapperCol={rb}>
+                <Input value={local.temp.title} autoFocus onChange={e => local.temp.title = e.target.value} />
+              </Form.Item>
+              <Form.Item label="资源类型" labelCol={lb} wrapperCol={rb}>
+                <Select value={local.temp.source_type || ''} onChange={value => {
+                  local.temp.source_type = value
+                  local.temp.type = ""
+                }}>
+                  {store.types.map(type => <Select.Option value={type.name} key={type.name}>{type.title}</Select.Option>)}
+                </Select>
+              </Form.Item>
+              <Form.Item label="类别" labelCol={lb} wrapperCol={rb}>
+                <Select value={local.temp.type} onChange={e => local.temp.type = e.target.value}>
+                  <Select.Option value="">请选择</Select.Option>
+                  {(local.categories[local.temp.type] || []).map(cata => (<Select.Option value={cata.name}>{cata.title}</Select.Option>))}
+                </Select>
+              </Form.Item>
+              <Form.Item label="系列" labelCol={lb} wrapperCol={rb}>
+                <Input value={local.temp.series} onChange={e => local.temp.series = e.target.value} />
+              </Form.Item>
+              <Form.Item label="公开" labelCol={lb} wrapperCol={rb}>
+                <Switch checked={local.temp.open} onClick={e => {
+                  local.temp.open = !local.temp.open
+                }} /> {local.temp.open}
+              </Form.Item>
+              <Form.Item label="连载" labelCol={lb} wrapperCol={rb}>
+                <Switch checked={local.temp.status === 'loading'} onClick={e => {
+                  local.temp.status = local.temp.status === 'finished' ? 'finished' : 'loading'
+                }} />
+              </Form.Item>
+            </Form>
+          </Modal>
+        )
+      }
     </div>
   }}</Observer>)
 }

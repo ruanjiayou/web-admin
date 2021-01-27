@@ -39,7 +39,7 @@ export function updateResource(data) {
   const form = new FormData()
   for (let k in data) {
     if (data[k] instanceof Array) {
-      for (let i = 0; i < data.length; i++) {
+      for (let i = 0; i < data[k].length; i++) {
         form.append(k, data[k][i])
       }
     } else {

@@ -12,6 +12,7 @@ export default function ResourceEdit() {
   const ueditor = useRef(null)
   const picture = useRef(null)
   const inp = useRef(null)
+  const inputType = useRef(null)
   const lb = { span: 3 }, rb = { span: 18 }
   const query = qs.parse(window.location.search.substr(1))
   const store = useLocalStore(() => ({
@@ -21,7 +22,7 @@ export default function ResourceEdit() {
     content: '',
     createdAt: new Date().toISOString(),
     source_type: 'article',
-    type: '',
+    types: [],
     series: '',
     origin: '',
     // words: 0,
@@ -31,6 +32,8 @@ export default function ResourceEdit() {
     tempImg: '',
     tempTag: '',
     tagAddVisible: false,
+    tempType: '',
+    typeAddVisible: false,
     loading: false,
     categories: {},
     // 
@@ -140,19 +143,43 @@ export default function ResourceEdit() {
             <Select.Option value="private">私人</Select.Option>
           </Select>
         </Form.Item>
-        <Form.Item label="type" labelCol={lb} wrapperCol={rb}>
-          <Select value={store.type} onChange={v => {
-            store.type = v
-          }}>
-            {(store.categories[store.source_type] || []).map(it => <Select.Option key={it.id} value={it.name === '全部' ? '' : it.name}>{it.name}</Select.Option>)}
-          </Select>
-        </Form.Item>
-        <Form.Item label='开放' labelCol={lb} wrapperCol={rb}>
-          <Radio.Group
-            value={store.open}
-            options={[{ label: '显示', value: true }, { label: '隐藏', value: false }]}
-            onChange={e => store.open = e.target.value}
-          />
+
+        <Form.Item label="types" labelCol={lb} wrapperCol={rb}>
+          {store.types.map((type, index) => <Tag key={index} closable onClose={() => { store.types.filter(t => t !== type) }}>{type}</Tag>)}
+          {store.typeAddVisible && (
+            <Input
+              ref={inputType}
+              type="text"
+              size="small"
+              style={{ width: 78 }}
+              value={store.tempType}
+              autoFocus
+              onChange={e => store.tempType = e.target.value}
+              onBlur={() => {
+                let type = store.tempType.trim()
+                const types = store.types
+                if (type !== '' && -1 === types.findIndex(t => t === type)) {
+                  store.types.push(type)
+                }
+                store.typeAddVisible = false
+                store.tempType = ''
+              }}
+              onPressEnter={() => {
+                let type = store.tempType.trim()
+                const types = store.types
+                if (type !== '' && -1 === types.findIndex(t => t === type)) {
+                  store.types.push(type)
+                }
+                store.typeAddVisible = false
+                store.tempType = ''
+              }}
+            />
+          )}
+          {!store.typeAddVisible && (
+            <Tag onClick={() => store.typeAddVisible = true} style={{ background: '#fff', borderStyle: 'dashed' }}>
+              <Icon type="plus" />
+            </Tag>
+          )}
         </Form.Item>
         <Form.Item label="tags" labelCol={lb} wrapperCol={rb}>
           {store.tags.map((tag, index) => <Tag key={index} closable onClose={() => { store.tags.filter(t => t !== tag) }}>{tag}</Tag>)}

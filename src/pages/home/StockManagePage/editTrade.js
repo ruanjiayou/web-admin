@@ -1,6 +1,7 @@
 import React, { useRef } from 'react'
 import { Observer, useLocalStore } from 'mobx-react-lite'
 import { Button, Modal, Form, Input, Card, Select, Divider, notification, Table, message } from 'antd';
+import * as math from 'mathjs'
 
 const Big = require('big.js');
 const lb = { span: 6, offset: 3 }, rb = { span: 12 }
@@ -18,16 +19,13 @@ export default function ({ data, save, cancel }) {
     onCancel={e => { cancel() }}
     onOk={async () => {
       local.isLoading = true
-      let fees = new Big(0)
-      data.fees.forEach(fee => {
-        fee.value = new Big(fee.value)
-        fees.plus(fee.value)
-      })
-      if (data.fee !==0 && fees.eq(data.fee)) {
-        return message.error(`费用有出入: ${fees} ${data.fee}`)
+      if (!math.equal(local.data.fee, math.sum(local.data.fees.map(fee => fee.value)))) {
+        return message.error(`费用有出入: ${local.data.fees}`)
       }
       await save(local.data);
-      // cancel()
+      if (!local.inster) {
+        cancel()
+      }
       local.data = {
         settlement: local.data.settlement, name: local.data.name,
         type: '1', amount: 0, price: 0, trade: 0, total: 0, currency: '人民币', fee: 0,
@@ -60,43 +58,38 @@ export default function ({ data, save, cancel }) {
       <Form.Item style={{ marginBottom: 5 }} label="交易类别" labelCol={lb} wrapperCol={rb}>
         <Select value={local.data.type} onChange={value => local.data.type = value}>
           <Select.Option value="">请选择</Select.Option>
-          <Select.Option value="1">证券买入</Select.Option>
-          <Select.Option value="2">证券卖出</Select.Option>
-          <Select.Option value="3">红利入账</Select.Option>
-          <Select.Option value="4">股息个税征收</Select.Option>
-          <Select.Option value="5">利息归本</Select.Option>
+          <Select.Option value={1}>证券买入</Select.Option>
+          <Select.Option value={2}>证券卖出</Select.Option>
+          <Select.Option value={3}>红利入账</Select.Option>
+          <Select.Option value={4}>股息个税征收</Select.Option>
+          <Select.Option value={5}>利息归本</Select.Option>
+          <Select.Option value={6}>银行转证券</Select.Option>
+          <Select.Option value={7}>证券转银行</Select.Option>
+          <Select.Option value={8}>指定交易</Select.Option>
         </Select>
       </Form.Item>
       <Form.Item style={{ marginBottom: 5 }} label="成交数量" labelCol={lb} wrapperCol={rb}>
-        <Input placeholder="成交数量" disabled={data.type === '5'} value={local.data.amount} onChange={e => local.data.amount = e.target.value} />
+        <Input placeholder="成交数量" disabled={data.type === 5} value={local.data.amount} onChange={e => local.data.amount = e.target.value} />
       </Form.Item>
       <Form.Item style={{ marginBottom: 5 }} label="成交价格" labelCol={lb} wrapperCol={rb}>
-        <Input placeholder="成交价格" disabled={data.type === '5'} value={local.data.price} onChange={e => {
+        <Input placeholder="成交价格" disabled={data.type === 5} value={local.data.price} onChange={e => {
           local.data.price = e.target.value
-          const amount = parseInt(local.data.amount)
-          const price = parseFloat(local.data.price)
-          if (!isNaN(price) && !isNaN(amount)) {
-            local.data.trade = (amount * price).toFixed(3)
-          }
+          local.data.trade = math.multiply(local.data.amount, local.data.price)
         }} />
       </Form.Item>
       <Form.Item style={{ marginBottom: 5 }} label="成交金额" labelCol={lb} wrapperCol={rb}>
         <Input placeholder="成交金额" value={local.data.trade} onChange={e => {
           local.data.trade = e.target.value
-          if (local.data.type === '3') {
+          if (local.data.type === 3) {
             local.data.total = e.target.value
           }
         }} />
       </Form.Item>
       <Form.Item style={{ marginBottom: 5 }} label="费用合计" labelCol={lb} wrapperCol={rb}>
-        <Input placeholder="0" disabled={data.type === '5'} value={local.data.fee} onChange={e => {
+        <Input placeholder="0" disabled={data.type === 5} value={local.data.fee} onChange={e => {
           local.data.fee = e.target.value
-          const trade = parseInt(local.data.trade)
-          const fee = parseFloat(local.data.fee)
-          const pay = local.data.type === '1' ? true : false
-          if (!isNaN(fee) && !isNaN(trade)) {
-            local.data.total = pay ? -(trade + fee) : (trade - fee)
-          }
+          const k = [1, 4, 7].includes(local.data.type) ? -1 : 1
+          local.data.total = math.subtract(math.multiply(local.data.trade, k), local.data.fee)
         }} />
       </Form.Item>
       <Form.Item style={{ marginBottom: 5 }} label="发生金额" labelCol={lb} wrapperCol={rb}>
