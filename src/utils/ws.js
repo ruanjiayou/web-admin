@@ -1,6 +1,7 @@
 import io from 'socket.io-client';
 import store from '../store'
 import Message from '../models/message'
+import { notification } from 'antd'
 
 export const ws = io('/', {
   path: '/ws'
@@ -16,6 +17,10 @@ ws.on('disconnect', () => {
 });
 ws.on('message', (data) => {
   const key = `${data.module}-${data.name}`;
+  if (data.type === 'notify') {
+    // module robot name uin action chat
+    notification.info({ message: data.data.message, description: `from ${data.name}` })
+  }
   if (store.messages[key]) {
     store.messages[key].push(data)
   } else {
