@@ -42,7 +42,7 @@ export default function ResourceManagePage() {
         </Right>
       </FullHeightFix>
       <FullHeightAuto>
-        <Table dataSource={local.schedules} rowKey="name" scroll={{ y: 600 }} loading={local.isLoading}>
+        <Table pagination={false} dataSource={local.schedules} rowKey="name" scroll={{ y: 600 }} loading={local.isLoading}>
           <Column title="名称" dataIndex="name" key="name" />
           <Column title="活动状态" dataIndex="isRuning" key="isRuning" render={(text, record) => (
             <span>{record.isRuning ? '进行中' : '已停止'}</span>

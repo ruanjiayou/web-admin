@@ -37,13 +37,13 @@ export default function TaskList() {
   })
   return <Observer>{() => (
     <FullHeight>
-      <FullHeightFix style={{ padding: '20px 0' }}>
+      <FullHeightFix style={{ padding: 15 }}>
         <Right>
           <Button type="primary" onClick={e => { search() }}>刷新</Button>
         </Right>
       </FullHeightFix>
       <FullHeightAuto>
-        <Table className="box" dataSource={local.tasks} rowKey="resource_id" loading={local.isLoading} pagination={{
+        <Table className="box" scroll={{ y: 'calc(100vh - 250px)' }} dataSource={local.tasks} rowKey="resource_id" loading={local.isLoading} pagination={{
           pageSize: 20,
           current: local.search_page,
           total: local.count,

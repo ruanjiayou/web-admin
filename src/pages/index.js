@@ -15,7 +15,25 @@ import ExamineListPage from './home/ExamineManagePage/List'
 import ExamineDetailPage from './home/ExamineManagePage/Detail'
 import LinkManagePage from './home/LinkManagePage'
 import ConfigPage from './home/ConfigPage'
-import { LinkOutlined, DashboardOutlined, SettingOutlined, FieldTimeOutlined, UnorderedListOutlined, AppstoreAddOutlined, HddOutlined, RadarChartOutlined, UsbOutlined, OrderedListOutlined, CloudSyncOutlined, CloudServerOutlined, StockOutlined, TransactionOutlined } from '@ant-design/icons'
+import RobotManage from './home/RobotManage'
+import { 
+  LinkOutlined, 
+  DashboardOutlined, 
+  SettingOutlined, 
+  FieldTimeOutlined, 
+  UnorderedListOutlined, 
+  AppstoreAddOutlined, 
+  HddOutlined, 
+  RadarChartOutlined, 
+  UsbOutlined, 
+  OrderedListOutlined, 
+  CloudSyncOutlined, 
+  CloudServerOutlined, 
+  StockOutlined, 
+  TransactionOutlined,
+  AndroidOutlined,
+  QuestionCircleOutlined,
+} from '@ant-design/icons'
 
 const pages = [
   {
@@ -29,6 +47,13 @@ const pages = [
     title: '项目配置',
     icon: <SettingOutlined />,
     Page: ConfigPage,
+  },
+  // 机器人管理
+  {
+    pathname: '/admin/home/robot-manage',
+    title: '机器人管理',
+    icon: <AndroidOutlined />,
+    Page: RobotManage,
   },
   {
     pathname: '/admin/home/ui',
@@ -107,7 +132,7 @@ const pages = [
   {
     pathname: '/admin/home/examine-manage',
     title: '问答管理',
-    icon: <RadarChartOutlined />,
+    icon: <QuestionCircleOutlined />,
   },
   {
     pathname: '/admin/home/examine-manage/list',

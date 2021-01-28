@@ -13,6 +13,7 @@ import * as examine from './examine'
 import * as link from './link'
 import * as pub from './public'
 import * as config from './config'
+import * as robot from './robot'
 
 const boot = function () {
   return shttp({
@@ -45,4 +46,5 @@ export default {
   ...link,
   ...pub,
   ...config,
+  ...robot,
 }

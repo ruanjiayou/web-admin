@@ -54,7 +54,7 @@ export default function SpiderPage() {
   })
   return <Observer>{() => (
     <FullHeight>
-      <FullHeightFix style={{ padding: '20px 0', alignItems: 'flex-end' }}>
+      <FullHeightFix style={{ padding: 15, alignItems: 'flex-end' }}>
         <Button type="primary" onClick={() => {
           local.tempId = ''
           local.tempRule = {}
@@ -156,14 +156,7 @@ export default function SpiderPage() {
         <Button type="primary" onClick={e => { openEdit() }}>添加规则<Icon type="circle-plus" /></Button>
       </FullHeightFix>
       <FullHeightAuto>
-        <Table dataSource={local.rules} rowKey="id" scroll={{ y: 600 }} loading={local.isLoading} pagination={{
-          pageSize: 20,
-          current: local.search_page,
-          total: local.count,
-        }} onChange={(page) => {
-          local.search_page = page.current
-          init()
-        }}>
+        <Table dataSource={local.rules} rowKey="id" scroll={{ y: 600 }} loading={local.isLoading} pagination={false}>
           <Column title="规则id" dataIndex="id" key="id" render={(text) => (
             <a href={text} target="_blank">{text}</a>
           )} />

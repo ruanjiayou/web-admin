@@ -4,6 +4,7 @@ import { useStore } from '../../../contexts'
 import shttp from '../../../utils/shttp'
 import { Upload, Button } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
+import { Padding } from '../../../component/style'
 
 function testUpload(data) {
   const form = new FormData()
@@ -26,7 +27,7 @@ export default function SignInPage() {
     loading: false
   }))
   return <Observer>{() => (
-    <Fragment>
+    <Padding>
       <Upload ref={file} name="test" action={'/v1/public/test/upload'} headers={{}} onChange={info => {
         if (info.file.status === 'uploading') {
           local.loading = true
@@ -56,6 +57,6 @@ export default function SignInPage() {
         return <div key={i}>{key}</div>
       })}
       </div>
-    </Fragment>
+    </Padding>
   )}</Observer>
 }

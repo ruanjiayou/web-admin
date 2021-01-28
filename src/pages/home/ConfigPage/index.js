@@ -53,7 +53,7 @@ export default function ConfigPage() {
       }}>添加</Button>
       <Tabs defaultActiveKey="1" >
         {local.configs.map(([name, items], i) => <TabPane tab={name} key={i}>
-          <Table dataSource={items} rowKey="id" scroll={{ y: 600 }} loading={local.initing} pagination={{
+          <Table dataSource={items} rowKey="id" scroll={{ y: 'calc(100vh - 300px)' }} loading={local.initing} pagination={{
             pageSize: 20,
           }}>
             <Column title="名称" width={100} dataIndex="name" key="name" />

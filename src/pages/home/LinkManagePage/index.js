@@ -36,7 +36,7 @@ export default function TaskList() {
   });
   return <Observer>{() => (
     <FullHeight>
-      <FullHeightFix style={{ padding: '20px 0' }}>
+      <FullHeightFix style={{ padding: 15 }}>
         <div style={{ flex: 1 }}>
 
         </div>
@@ -54,7 +54,7 @@ export default function TaskList() {
           className="box"
           dataSource={local.links}
           rowKey="id"
-          scroll={{ y: 400 }}
+          scroll={{ y: 'calc(100vh - 240px)' }}
           loading={local.isLoading}
           pagination={{
             pageSize: 200,

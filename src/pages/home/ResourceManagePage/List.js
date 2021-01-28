@@ -16,7 +16,7 @@ export default function ResourceList({ items, children, categories, search, loca
 		updating: false
 	}))
 	return <Observer>{() => (
-		<Table dataSource={items} rowKey="id" scroll={{ y: 600 }} loading={local.isLoading} pagination={{
+		<Table dataSource={items} rowKey="id" scroll={{ y: 'calc(100vh - 240px)' }} loading={local.isLoading} pagination={{
 			pageSize: 20,
 			current: local.search_page,
 			total: local.count,

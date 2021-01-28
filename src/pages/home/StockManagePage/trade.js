@@ -71,7 +71,7 @@ export default function TaskList() {
   })
   return <Observer>{() => (
     <FullHeight>
-      <FullHeightFix style={{ padding: '20px 0' }}>
+      <FullHeightFix style={{ padding: 15 }}>
         <div style={{ flex: 1 }}>
           <span style={{ color: local.analyise.owner >= 0 ? 'red' : 'green' }}>持有市值:{local.analyise.owner}</span><Divider type="vertical" />
           <span style={{ color: local.analyise.owner + local.analyise.total >= 0 ? 'red' : 'green' }}>总盈亏:{(local.analyise.owner + local.analyise.total).toFixed(2)}</span><Divider type="vertical" />
@@ -102,7 +102,7 @@ export default function TaskList() {
         </Right>
       </FullHeightFix>
       <FullHeightAuto style={{ overflowY: 'hidden' }}>
-        <Table className="box" dataSource={local.trades} rowKey="id" scroll={{ y: 400 }} loading={local.isLoading} pagination={{
+        <Table className="box" dataSource={local.trades} rowKey="id" scroll={{ y: 'calc(100vh - 250px)' }} loading={local.isLoading} pagination={{
           pageSize: 200,
           current: local.search_page,
           total: local.count,
