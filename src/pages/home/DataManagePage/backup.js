@@ -3,7 +3,7 @@ import { Observer, useLocalStore } from 'mobx-react-lite'
 import { Table, Popconfirm, notification, Button, Divider, Input } from 'antd';
 import { DeleteOutlined, WarningOutlined, HddOutlined } from '@ant-design/icons'
 import apis from '../../../api'
-import { FullHeight, FullHeightFix, FullHeightAuto, Right } from '../../../component/style'
+import { FullHeight, FullHeightFix, FullHeightAuto, Right, padding } from '../../../component/style'
 import { VisualBox } from '../../../component'
 import Modal from 'antd/lib/modal/Modal';
 
@@ -36,7 +36,7 @@ export default function TaskList() {
   })
   return <Observer>{() => (
     <FullHeight>
-      <FullHeightFix style={{ padding: '20px 0' }}>
+      <FullHeightFix style={padding}>
         <Right>
           <Button type="primary" loading={local.isStoring} disabled={local.isLoading || local.isStoring} onClick={async (e) => {
             local.showModal = true

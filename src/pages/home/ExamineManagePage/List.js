@@ -4,7 +4,7 @@ import { toJS } from 'mobx'
 import { Table, Popconfirm, Switch, notification, Button, Divider } from 'antd';
 import { DeleteOutlined, WarningOutlined, FormOutlined } from '@ant-design/icons'
 import apis from '../../../api'
-import { FullHeight, FullHeightFix, FullHeightAuto, Right } from '../../../component/style'
+import { FullHeight, FullHeightFix, FullHeightAuto, Right, padding } from '../../../component/style'
 import Edit from './edit'
 import { useEffectOnce } from 'react-use';
 import { updateExamine } from '../../../api/examine';
@@ -41,7 +41,7 @@ export default function ExamineList() {
   })
   return <Observer>{() => (
     <FullHeight>
-      <FullHeightFix style={{ padding: '20px 0' }}>
+      <FullHeightFix style={padding}>
         <div style={{ flex: 1 }}>
 
         </div>
@@ -59,7 +59,7 @@ export default function ExamineList() {
         <Table className="box"
           dataSource={local.examines}
           rowKey="id"
-          scroll={{ y: 400 }}
+          scroll={{ y: 'calc(100vh - 240px)' }}
           loading={local.isLoading}
           pagination={{
             pageSize: 200,

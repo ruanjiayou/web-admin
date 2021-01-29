@@ -3,7 +3,7 @@ import { types } from 'mobx-state-tree'
 const Message = types.model('Message', {
   key: types.string,
   stack: types.array(types.model({
-    name: types.string,
+    name: types.union(types.number, types.string),
     module: types.string,
     type: types.string,
     data: types.frozen({}),

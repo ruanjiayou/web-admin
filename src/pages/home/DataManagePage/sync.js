@@ -5,7 +5,7 @@ import { DeleteOutlined, WarningOutlined, UploadOutlined, CloudDownloadOutlined,
 import apis from '../../../api'
 import EditorPage from './sync-edit'
 import VisualBox from '../../../component/VisualBox'
-import { FullHeight, FullHeightFix, FullHeightAuto, Right } from '../../../component/style'
+import { FullHeight, FullHeightFix, FullHeightAuto, Right, padding } from '../../../component/style'
 
 const { getSyncs, createSync, destroySync, updateSync, updateSyncProd, updateSyncDev } = apis
 const { Column } = Table;
@@ -50,7 +50,7 @@ export default function SyncListPage() {
   })
   return <Observer>{() => (
     <FullHeight>
-      <FullHeightFix style={{ padding: '20px 0' }}>
+      <FullHeightFix style={padding}>
         <Right>
           <Button type="primary" onClick={e => {
             local.temp = {}
@@ -61,7 +61,7 @@ export default function SyncListPage() {
         </Right>
       </FullHeightFix>
       <FullHeightAuto>
-        <Table dataSource={local.syncs} rowKey="id" scroll={{ y: 600 }} loading={local.isLoading} pagination={false}>
+        <Table dataSource={local.syncs} rowKey="id" scroll={{ y: 'calc(100vh - 200px)' }} loading={local.isLoading} pagination={false}>
           <Column title="名称" width={100} dataIndex="name" key="name" />
           <Column title="id" width={150} dataIndex="id" key="id" render={text => <span style={{ width: 100, overflow: 'hidden', display: 'block', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{text}</span>} />
           <Column title="主键" width={100} dataIndex="key" key="key" />

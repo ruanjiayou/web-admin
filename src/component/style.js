@@ -58,4 +58,10 @@ export const Padding = styled.div`
 export const PaddingSide = styled.div`
   padding: 0 15px;
 `
+export const padding = {
+  padding: 15
+}
 
+export const paddingSide = {
+  padding: '0 15px'
+}

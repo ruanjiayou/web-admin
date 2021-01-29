@@ -6,6 +6,7 @@ import apis from '../../../api'
 import { FullHeight, FullHeightFix, FullHeightAuto, Right, Padding } from '../../../component/style'
 import { useEffectOnce } from 'react-use';
 import md5 from 'js-md5'
+import { events } from '../../../utils/events'
 
 const { TabPane } = Tabs;
 const { Column } = Table;
@@ -13,8 +14,6 @@ export default function ConfigPage() {
     const lb = { span: 3 }, rb = { span: 18 }
     const local = useLocalStore(() => ({
         robots: [],
-        friends: [],
-        groups: [],
         loading: false,
         initing: false,
     }))
@@ -31,13 +30,30 @@ export default function ConfigPage() {
         local.initing = true
         const res = await apis.getRobots()
         if (res.code === 0) {
-            local.robots = res.data.map(robot => ({ friends: [], groups: [], ...robot }))
+            local.robots = res.data
         }
         local.initing = false
     }, [])
 
     useEffectOnce(() => {
+        function fn({ uin, action }) {
+            const robot = local.robots.find(robot => robot.uin === uin + '')
+            if (robot) {
+                if (action === 'online') {
+                    robot.isLogin = true
+                } else if (action === 'offline') {
+                    robot.isLogin = false
+                    robot.friends = []
+                    robot.groups = []
+                    robot.discuss = []
+                }
+            }
+        }
+        events.on('qqSystem', fn)
         getRobots()
+        return () => {
+            events.off('qqSystem', fn)
+        }
     })
     return <Observer>{() => (
         <Padding>
@@ -45,9 +61,9 @@ export default function ConfigPage() {
                 getRobots()
             }}>刷新</Button>
             <Tabs defaultActiveKey="1" >
-                {local.robots.map(({ uin, detail, friends, groups }, i) => <TabPane tab={uin} key={i}>
+                {local.robots.map(({ uin, isLogin, friends, groups, discuss }, i) => <TabPane tab={uin} key={i}>
                     <Padding>
-                        <Button type="primary" disabled={detail.isLogin || local.loading} onClick={async () => {
+                        <Button type="primary" disabled={isLogin || local.loading} onClick={async () => {
                             const input = prompt('请输入密码')
                             if (!input) {
                                 return
@@ -57,7 +73,6 @@ export default function ConfigPage() {
                             try {
                                 local.loading = true
                                 await apis.sendRobotCMD({ params, data })
-                                detail.isLogin = true
                                 notification.info({ message: '发送命令成功' })
                             } catch (e) {
                                 notification.info({ message: e.message })
@@ -66,12 +81,47 @@ export default function ConfigPage() {
                             }
                         }}>登陆</Button>
                         <Divider type="vertical" />
-                        <Button type="primary" disabled={!detail.isLogin || local.loading} onClick={async () => {
+                        <Button type="primary" disabled={isLogin || local.loading} onClick={async () => {
+                            const ticket = prompt('请输入ticket')
+                            if (!ticket) {
+                                return
+                            }
+                            const params = { uin, cmd: 'sliderLogin' }
+                            const data = { ticket }
+                            try {
+                                local.loading = true
+                                await apis.sendRobotCMD({ params, data })
+                                notification.info({ message: '发送命令成功' })
+                            } catch (e) {
+                                notification.info({ message: e.message })
+                            } finally {
+                                local.loading = false
+                            }
+                        }}>滑动登陆</Button>
+                        <Divider type="vertical" />
+                        <Button type="primary" disabled={isLogin || local.loading} onClick={async () => {
+                            const captcha = prompt('请输入验证码')
+                            if (!captcha) {
+                                return
+                            }
+                            const params = { uin, cmd: 'captchaLogin' }
+                            const data = { captcha }
+                            try {
+                                local.loading = true
+                                await apis.sendRobotCMD({ params, data })
+                                notification.info({ message: '发送命令成功' })
+                            } catch (e) {
+                                notification.info({ message: e.message })
+                            } finally {
+                                local.loading = false
+                            }
+                        }}>验证码登陆</Button>
+                        <Divider type="vertical" />
+                        <Button type="primary" disabled={!isLogin || local.loading} onClick={async () => {
                             const params = { uin, cmd: 'logout' }
                             try {
                                 local.loading = true
                                 await apis.sendRobotCMD({ params })
-                                detail.isLogin = false
                                 notification.info({ message: '发送命令成功' })
                             } catch (e) {
                                 notification.info({ message: e.message })
@@ -81,9 +131,25 @@ export default function ConfigPage() {
 
                         }}>退出</Button>
                         <Divider type="vertical" />
-                        <Button type="primary" disabled={!detail.isLogin || local.loading}>{detail.online ? '在线' : '离线'}</Button>
+                        <Button type="primary" disabled={!isLogin || local.loading} onClick={async () => {
+                            const params = { uin }
+                            const uid = prompt('输入号码')
+                            if (!uid) {
+                                return
+                            }
+                            const data = { uin: uid, type: 'friend' }
+                            try {
+                                local.loading = true
+                                const result = await apis.addFriend({ params, data })
+                                notification.info({ message: '发送命令成功' })
+                            } catch (e) {
+                                notification.info({ message: e.message })
+                            } finally {
+                                local.loading = false
+                            }
+                        }}>添加好友</Button>
                         <Divider type="vertical" />
-                        <Button type="primary" disabled={!detail.isLogin || local.loading} onClick={async () => {
+                        <Button type="primary" disabled={!isLogin || local.loading} onClick={async () => {
                             const params = { uin }
                             try {
                                 local.loading = true
@@ -104,13 +170,11 @@ export default function ConfigPage() {
                         }}>刷新列表</Button>
                         <Divider type="vertical" />
                     </Padding>
-                    <Table dataSource={friends} rowKey="user_id" scroll={{ y: 'calc(100vh - 300px)' }} loading={local.initing} pagination={{
-                        pageSize: 20,
-                    }}>
-                        <Column title="uin" width={100} dataIndex="user_id" key="user_id" />
+                    <Table pagination={false} dataSource={friends} rowKey="user_id" scroll={{ y: 'calc(100vh - 300px)' }} loading={local.initing} >
+                        <Column title="uin" width={120} dataIndex="user_id" key="user_id" />
                         <Column title="备注" dataIndex="remark" key="remark" />
                         <Column title="昵称" dataIndex="nickname" key="nickname" />
-                        <Column title="操作" width={100} dataIndex="action" key="action" align="center" render={(text, record) => (
+                        <Column title="操作" dataIndex="action" key="action" align="center" render={(text, record) => (
                             <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly' }}>
                                 <FormOutlined onClick={async () => {
                                     const message = prompt('输入要说的话')
@@ -118,7 +182,7 @@ export default function ConfigPage() {
                                         return
                                     }
                                     const params = { uin }
-                                    const data = { uin: record.user_id, message }
+                                    const data = { uin: record.user_id, message, type: 'friend' }
                                     try {
                                         local.loading = true
                                         const result = await apis.sendRobotMsg({ params, data })
@@ -134,7 +198,17 @@ export default function ConfigPage() {
                                     }
                                 }} />
                                 <Popconfirm title="确定?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={async () => {
-
+                                    const params = { uin }
+                                    const data = { uin: record.user_id, type: 'friend' }
+                                    try {
+                                        local.loading = true
+                                        const result = await apis.removeFriend({ params, data })
+                                        notification.info({ message: '发送命令成功' })
+                                    } catch (e) {
+                                        notification.info({ message: e.message })
+                                    } finally {
+                                        local.loading = false
+                                    }
                                 }}>
                                     <DeleteOutlined />
                                 </Popconfirm>

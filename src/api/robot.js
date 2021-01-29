@@ -29,3 +29,19 @@ export function getFriends({ params }) {
     method: 'GET',
   })
 }
+
+export function addFriend({ params, data }) {
+  return shttp({
+    url: `/v1/admin/qq-robot/${params.uin}/friend`,
+    method: 'POST',
+    data,
+  })
+}
+
+export function removeFriend({ params, data }) {
+  return shttp({
+    url: `/v1/admin/qq-robot/${params.uin}/friend`,
+    method: 'DELETE',
+    data,
+  })
+}

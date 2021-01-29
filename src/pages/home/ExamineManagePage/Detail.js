@@ -4,7 +4,7 @@ import { toJS } from 'mobx'
 import { Table, Popconfirm, Switch, notification, Button, Divider } from 'antd';
 import { DeleteOutlined, WarningOutlined, FormOutlined } from '@ant-design/icons'
 import apis from '../../../api'
-import { FullHeight, FullHeightFix, FullHeightAuto, Right } from '../../../component/style'
+import { FullHeight, FullHeightFix, FullHeightAuto, Right, padding } from '../../../component/style'
 import Edit from './QuestionEdit'
 import { useEffectOnce } from 'react-use';
 import store from '../../../store';
@@ -53,7 +53,7 @@ export default function QuestionList() {
   })
   return <Observer>{() => (
     <FullHeight>
-      <FullHeightFix style={{ padding: '20px 0' }}>
+      <FullHeightFix style={padding}>
         <div style={{ flex: 1 }}>
 
         </div>
@@ -72,7 +72,7 @@ export default function QuestionList() {
         <Table className="box"
           dataSource={local.questions}
           rowKey="id"
-          scroll={{ y: 400 }}
+          scroll={{ y: 'calc(100vh - 240px)' }}
           loading={local.isLoading}
           pagination={{
             pageSize: 200,
