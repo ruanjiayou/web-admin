@@ -3,7 +3,7 @@ import { Observer, useLocalStore } from 'mobx-react-lite'
 import apis from '../../../api';
 import { Button, Divider, Table, Popconfirm, Switch } from 'antd';
 import { RedoOutlined, WarningOutlined, PoweroffOutlined, PlayCircleOutlined } from '@ant-design/icons'
-import { FullHeight, FullHeightFix, FullHeightAuto, Right } from '../../../component/style'
+import { FullHeight, FullHeightFix, FullHeightAuto, Right, padding } from '../../../component/style'
 
 const { Column } = Table;
 const { getSchedules, tickSchedule, switchSchedule } = apis
@@ -35,7 +35,7 @@ export default function ResourceManagePage() {
   return (<Observer>{() => (
     <FullHeight>
       <FullHeightFix>
-        <Right style={{ padding: '10px 0' }}>
+        <Right style={padding}>
           <Button type="primary" onClick={() => {
             refresh()
           }}>刷新</Button>

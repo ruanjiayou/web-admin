@@ -16,20 +16,22 @@ import ExamineDetailPage from './home/ExamineManagePage/Detail'
 import LinkManagePage from './home/LinkManagePage'
 import ConfigPage from './home/ConfigPage'
 import RobotManage from './home/RobotManage'
-import { 
-  LinkOutlined, 
-  DashboardOutlined, 
-  SettingOutlined, 
-  FieldTimeOutlined, 
-  UnorderedListOutlined, 
-  AppstoreAddOutlined, 
-  HddOutlined, 
-  RadarChartOutlined, 
-  UsbOutlined, 
-  OrderedListOutlined, 
-  CloudSyncOutlined, 
-  CloudServerOutlined, 
-  StockOutlined, 
+import BackupTablePage from './home/DataManagePage/table'
+
+import {
+  LinkOutlined,
+  DashboardOutlined,
+  SettingOutlined,
+  FieldTimeOutlined,
+  UnorderedListOutlined,
+  AppstoreAddOutlined,
+  HddOutlined,
+  RadarChartOutlined,
+  UsbOutlined,
+  OrderedListOutlined,
+  CloudSyncOutlined,
+  CloudServerOutlined,
+  StockOutlined,
   TransactionOutlined,
   AndroidOutlined,
   QuestionCircleOutlined,
@@ -103,7 +105,13 @@ const pages = [
   {
     pathname: '/admin/home/data-manage/backup',
     Page: BackupPage,
-    title: '数据备份',
+    title: '数据库备份',
+    icon: <CloudServerOutlined />,
+  },
+  {
+    pathname: '/admin/home/data-manage/backup-table',
+    Page: BackupTablePage,
+    title: '日志表备份',
     icon: <CloudServerOutlined />,
   },
   {

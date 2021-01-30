@@ -36,3 +36,25 @@ export function recoveryByBackup(params) {
     method: 'POST'
   })
 }
+
+export function getTableBackups() {
+  return shttp({
+    url: '/v1/admin/backups-table',
+    method: 'GET',
+  })
+}
+
+export function createTableBackup(data) {
+  return shttp({
+    url: `/v1/admin/backups-table`,
+    method: 'POST',
+    data,
+  })
+}
+
+export function destroyTableBackup(params) {
+  return shttp({
+    url: `/v1/admin/backups-table/${params.dir}`,
+    method: 'DELETE',
+  })
+}

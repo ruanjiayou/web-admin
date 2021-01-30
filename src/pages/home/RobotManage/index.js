@@ -57,9 +57,33 @@ export default function ConfigPage() {
     })
     return <Observer>{() => (
         <Padding>
-            <Button type="primary" loading={local.loading} onClick={() => {
-                getRobots()
-            }}>刷新</Button>
+            <Right>
+                <Button type="primary" disabled={local.loading} loading={local.loading} onClick={async () => {
+                    try {
+                        const uin = prompt('帐号')
+                        if (uin) {
+                            const pass = prompt('密码')
+                            if (pass) {
+                                local.loading = true
+                                const params = { uin, cmd: 'signin' }
+                                const data = { pass: md5(pass) }
+                                await apis.sendRobotCMD({ params, data })
+                                notification.info({ message: '发送命令成功' })
+                                getRobots()
+                            }
+                        }
+                    } catch (e) {
+                        notification.info(e.message)
+                    } finally {
+                        local.loading = false
+                    }
+                }}>新增</Button>
+                <Divider type="vertical" />
+                <Button type="primary" loading={local.loading || local.initing} onClick={() => {
+                    getRobots()
+                }}>刷新</Button>
+            </Right>
+            {local.robots.length === 0 && <div>还没有机器人在线，添加一个试试</div>}
             <Tabs defaultActiveKey="1" >
                 {local.robots.map(({ uin, isLogin, friends, groups, discuss }, i) => <TabPane tab={uin} key={i}>
                     <Padding>
