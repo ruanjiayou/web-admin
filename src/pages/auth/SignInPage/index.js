@@ -32,13 +32,18 @@ export default function SignInPage() {
         <Form.Item style={{ textAlign: 'center' }}>
           <Button id="signin" type="primary" loading={local.isFetch} block onClick={async () => {
             local.isFetch = true
-            const res = await apis.signIn({ data: { name: local.username, password: local.password } })
-            local.isFetch = false
-            if (res.code === 0) {
-              store.user.signIn({ token: res.data.token, username: local.username })
-              router.goPage('/admin/home/dashboard')
-            } else {
-              message.error(res.message)
+            try {
+              const res = await apis.signIn({ data: { name: local.username, password: local.password } })
+              if (res.code === 0) {
+                store.user.signIn({ token: res.data.token, username: local.username })
+                router.goPage('/admin/home/dashboard')
+              } else {
+                message.error(res.message)
+              }
+            } catch (e) {
+              message.error(e.message)
+            } finally {
+              local.isFetch = false
             }
           }}>登录</Button>
         </Form.Item>
