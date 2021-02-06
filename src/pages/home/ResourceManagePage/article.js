@@ -42,7 +42,7 @@ export default function ResourceEdit() {
   const edit = useCallback(() => {
     if (ueditor.current) {
       const content = decodeURIComponent(ueditor.current.getUEContent().replace(/%[^2]/g, '%25'))
-      const data = _.pick(store, ['id', 'title', 'poster', 'source_type', 'type', 'origin', 'open', 'tags'])
+      const data = _.pick(store, ['id', 'title', 'poster', 'source_type', 'types', 'origin', 'open', 'tags'])
       data.content = content
       data.createdAt = new Date(store.createdAt)
       const api = data.id ? apis.updateResource : apis.createResource
@@ -53,7 +53,7 @@ export default function ResourceEdit() {
           store.title = ''
           store.author = ''
           store.content = ''
-          store.createdAt = ''
+          store.createdAt = new Date().toISOString()
           window.editor.setContent('')
         } else {
           notification.error({ message: '操作失败' })
@@ -93,7 +93,7 @@ export default function ResourceEdit() {
           store.poster = data.poster
           store.open = data.open
           store.source_type = data.source_type
-          store.type = data.type
+          store.types = data.types
           store.origin = data.origin
           //
           store.tempImg = data.poster

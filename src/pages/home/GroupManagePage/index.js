@@ -3,7 +3,7 @@ import { Observer, useLocalStore, useComputed } from 'mobx-react-lite'
 import apis from '../../../api';
 import { useStore } from '../../../contexts'
 import { Button, Switch, Modal, Form, Input, notification, Radio, Select, Card, Row, Col, Divider, message } from 'antd';
-import { FullHeight, FullHeightFix, FullHeightAuto, CenterXY, AlignAside, Right, FullWidth, FullWidthFix, FullWidthAuto } from '../../../component/style'
+import { FullHeight, FullHeightFix, FullHeightAuto, CenterXY, AlignAside, Right, FullWidth, FullWidthFix, FullWidthAuto, Padding } from '../../../component/style'
 import AutoView from '../../../Group/AutoView'
 import { Mobile, Icon, VisualBox } from '../../../component'
 import GroupAdd from './Edit'
@@ -97,68 +97,70 @@ export default function GroupManagePage() {
     <FullHeight>
       {/* 自定义右键菜单 */}
       <GroupMenu />
-      <AlignAside style={{ margin: '0 15%' }}>
-        {/* 顶部操作栏 */}
-        <Select disabled={local.refreshing} style={{ width: 200, marginRight: 20 }} value={local.tree ? local.tree.title : ''} onChange={async (value) => {
-          if (local.diff) {
-            Modal.confirm({
-              title: "confirm",
-              content: "数据发生变化,确定要离开吗?",
-              onOk() {
-                local.tree.huifu()
-                local.showGroupEdit = false;
-                local.temp = null
-                store.app.setEditGroupId('')
-                local.tree_id = value
-                storage.setValue('choose_group_id', local.tree_id)
-                local.tree = store.groups.find(group => group.id === value)
-              },
-              onCancel() {
+      <Padding>
+        <AlignAside>
+          {/* 顶部操作栏 */}
+          <Select disabled={local.refreshing} style={{ width: 200, marginRight: 20 }} value={local.tree ? local.tree.title : ''} onChange={async (value) => {
+            if (local.diff) {
+              Modal.confirm({
+                title: "confirm",
+                content: "数据发生变化,确定要离开吗?",
+                onOk() {
+                  local.tree.huifu()
+                  local.showGroupEdit = false;
+                  local.temp = null
+                  store.app.setEditGroupId('')
+                  local.tree_id = value
+                  storage.setValue('choose_group_id', local.tree_id)
+                  local.tree = store.groups.find(group => group.id === value)
+                },
+                onCancel() {
 
-              },
-            })
-          } else {
-            local.showGroupEdit = false;
-            local.temp = null
-            store.app.setEditGroupId('')
-            local.tree_id = value
-            storage.setValue('choose_group_id', local.tree_id)
-            local.tree = store.groups.find(group => group.id === value)
-          }
-        }}>
-          <Select.Option value={local.tree_id}>请选择</Select.Option>
-          {store.groups.map((group, i) => (
-            <Select.Option key={i} value={group.id}>{group.title}</Select.Option>
-          ))}
-        </Select>
-        <Button.Group>
-          <Button type="primary" disabled={local.tree === null || local.refreshing} onClick={() => {
-            local.temp = local.tree
-            local.showGroupEdit = true
-          }}>编辑root</Button>
-          <Button type="primary" onClick={() => {
-            local.temp = createEmptyGroup()
-            local.showGroupAdd = true
-          }}>添加root</Button>
-          <Button type="primary" onClick={async () => {
-            await apis.destroyGroup(local.tree)
-            local.tree = null
-          }}>删除root</Button>
-        </Button.Group>
-        <Divider type="verticle" />
-        <Button type="primary" loading={local.refreshing} onClick={async () => {
-          init()
-        }}>刷新数据</Button>
-        <Divider type="verticle" />
-        <Switch title="编辑" checked={store.app.groupMode === 'edit'} onChange={() => {
-          if (store.app.groupMode === 'edit') {
-            local.showGroupEdit = false
-          } else {
-          }
-          store.app.toggleGroupMode()
-        }} />
-      </AlignAside>
-      <FullWidth style={{ height: '100%', margin: '10px 0' }}>
+                },
+              })
+            } else {
+              local.showGroupEdit = false;
+              local.temp = null
+              store.app.setEditGroupId('')
+              local.tree_id = value
+              storage.setValue('choose_group_id', local.tree_id)
+              local.tree = store.groups.find(group => group.id === value)
+            }
+          }}>
+            <Select.Option value={local.tree_id}>请选择</Select.Option>
+            {store.groups.map((group, i) => (
+              <Select.Option key={i} value={group.id}>{group.title}</Select.Option>
+            ))}
+          </Select>
+          <Button.Group>
+            <Button type="primary" disabled={local.tree === null || local.refreshing} onClick={() => {
+              local.temp = local.tree
+              local.showGroupEdit = true
+            }}>编辑root</Button>
+            <Button type="primary" onClick={() => {
+              local.temp = createEmptyGroup()
+              local.showGroupAdd = true
+            }}>添加root</Button>
+            <Button type="primary" onClick={async () => {
+              await apis.destroyGroup(local.tree)
+              local.tree = null
+            }}>删除root</Button>
+          </Button.Group>
+          <Divider type="verticle" />
+          <Button type="primary" loading={local.refreshing} onClick={async () => {
+            init()
+          }}>刷新数据</Button>
+          <Divider type="verticle" />
+          <Switch title="编辑" checked={store.app.groupMode === 'edit'} onChange={() => {
+            if (store.app.groupMode === 'edit') {
+              local.showGroupEdit = false
+            } else {
+            }
+            store.app.toggleGroupMode()
+          }} />
+        </AlignAside>
+      </Padding>
+      <FullWidth style={{ height: '100%', }}>
         <FullWidthAuto style={{ height: '100%' }}>
           <FullHeight style={{ overflow: 'auto', alignItems: 'center' }}>
             <FullHeightFix>
@@ -172,7 +174,7 @@ export default function GroupManagePage() {
               </div>
             </FullHeightFix>
             <FullHeightAuto style={{ display: 'flex', alignItems: 'center' }}>
-              <Mobile style={{ boxShadow: '#77b6e4 5px 5px 16px 7px', border: '1px solid #77b6e4' }}>
+              <Mobile style={{ boxShadow: 'rgb(119, 182, 228) 5px 5px 4px 0px', marginRight: 10, border: '1px solid #77b6e4' }}>
                 {local.refreshing === false && local.tree && (
                   <AutoView
                     self={local.tree}
@@ -212,7 +214,7 @@ export default function GroupManagePage() {
               </Mobile>
             </FullHeightAuto>
             <FullHeightFix>
-              <Button type="primary" disabled={!local.diff} loading={local.submitting} onClick={async () => {
+              <Button type="primary" style={{ margin: 10 }} disabled={!local.diff} loading={local.submitting} onClick={async () => {
                 await apis.updateGroupTree(local.tree);
                 init()
               }}>提交</Button>

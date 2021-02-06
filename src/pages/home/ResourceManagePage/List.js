@@ -27,19 +27,20 @@ export default function ResourceList({ items, children, categories, search, loca
 			<Column title="标题" dataIndex="title" key="title" render={(text, record) => {
 				let url = ''
 				if (record.source_type === 'novel') {
-					url = (window.origin + '/root/home/BookInfo?home.tab=&BookInfo.id=' + record.id)
+					url = (window.origin + '/novel/home/BookInfo?home.tab=&BookInfo.id=' + record.id)
 				} else if (['news', 'article', 'private'].includes(record.source_type)) {
-					url = (window.origin + '/root/home/Article?home.tab=QD7vNfJCU&Article.id=' + record.id)
+					url = (window.origin + '/novel/home/Article?home.tab=QD7vNfJCU&Article.id=' + record.id)
 				} else if (['image'].includes(record.source_type)) {
-					url = (window.origin + '/root/groups/GroupTree/Image?GroupTree.name=image&Image.id=' + record.id)
+					url = (window.origin + '/novel/groups/GroupTree/Image?GroupTree.name=image&Image.id=' + record.id)
 				}
-				return <span style={{ color: '#1890ff', cursor: 'pointer' }} title={url} onClick={() => {
+				return <a style={{ color: '#1890ff', cursor: 'pointer' }} title={url} href={url} onClick={(e) => {
+					e.preventDefault()
 					if (url) {
 						window.open(url)
 					} else {
 						notification.info({ message: '类型不可预览' })
 					}
-				}}>{text}</span>
+				}}>{text}</a>
 			}} />
 			<Column title="类型" width={100} dataIndex="source_type" key="source_type" render={(text, record) => (
 				<Observer>{() => (

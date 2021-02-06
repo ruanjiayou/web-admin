@@ -5,7 +5,8 @@ import { notification, Modal } from 'antd'
 import { events } from './events'
 
 export const ws = io('/', {
-  path: '/ws'
+  path: '/ws',
+  reconnectionAttempts: 3
 });
 
 ws.on('connect', (socket) => {

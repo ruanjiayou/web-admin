@@ -35,12 +35,12 @@ const GroupModel = types.model('Group', {
   view: types.optional(types.string, ''),
   refs: types.array(types.string),
   data: types.array(resource),
-  attrs: types.frozen(types.model({
+  attrs: types.model({
     random: types.union(types.boolean, types.null, types.undefined),
     selected: types.union(types.boolean, types.null, types.undefined),
     timeout: types.union(types.number, types.null, types.undefined),
     columns: types.union(types.number, types.null, types.undefined),
-  }), {}),
+  }),
   // query/
   params: types.frozen(null, {}),
   more: types.optional(types.model({

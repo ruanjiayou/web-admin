@@ -82,10 +82,13 @@ export default function TaskList() {
             return <Fragment>
               <VisualBox visible={record.type === 'dir'}>
                 <Popconfirm title="确定恢复这个备份?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={() => {
+                  local.isStoring = true
                   recoveryByBackup(record).then(res => {
                     if (res.code === 0) {
+                      local.isStoring = false
                       notification.success({ message: '操作成功' });
                     } else {
+                      local.isStoring = false
                       notification.error({ message: '操作失败' });
                     }
                   })

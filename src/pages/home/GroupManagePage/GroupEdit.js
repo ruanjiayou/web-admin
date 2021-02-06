@@ -46,7 +46,7 @@ export default function GroupEdit({ group, onClose, openPick }) {
         <RenderHeader tabs={tabs} tab={local.tab} setTab={local.setTab} onClose={onClose} />
       </FullWidth>
       <FullHeightAuto>
-        <Form style={{ height: 700, display: local.tab === 'base' ? 'block' : 'none' }}>
+        <Form style={{ height: 'calc(100vh - 180px)', display: local.tab === 'base' ? 'block' : 'none' }}>
           <Form.Item label='是否删除' labelCol={lb} wrapperCol={rb}>
             <FullWidth>
               <Switch checked={group.$delete} onChange={() => group.setKey('$delete', !group.$delete)} /><Divider type="vertical" />{group.$delete ? '删除' : '不删除'}
@@ -96,7 +96,7 @@ export default function GroupEdit({ group, onClose, openPick }) {
             /> */}
           </Form.Item>
         </Form>
-        <Form style={{ height: 700, display: local.tab === 'attrs' ? 'block' : 'none' }}>
+        <Form style={{ height: 'calc(100vh - 180px)', display: local.tab === 'attrs' ? 'block' : 'none' }}>
           <Row>
             <Col>
               <h2 style={{ textIndent: 20 }}>attr属性</h2>
@@ -119,7 +119,7 @@ export default function GroupEdit({ group, onClose, openPick }) {
             </Col>
           </Row>
         </Form>
-        <Form style={{ height: 700, display: local.tab === 'route' ? 'block' : 'none' }}>
+        <Form style={{ height: 'calc(100vh - 180px)', display: local.tab === 'route' ? 'block' : 'none' }}>
           <Row>
             <Col>
               <h2 style={{ textIndent: 20 }}>更多跳转设置</h2>
@@ -135,15 +135,15 @@ export default function GroupEdit({ group, onClose, openPick }) {
             </Col>
           </Row>
         </Form>
-        <Form style={{ height: 700, display: local.tab === 'more' ? 'block' : 'none' }}>
+        <Form style={{ height: 'calc(100vh - 180px)', display: local.tab === 'more' ? 'block' : 'none' }}>
           <Row>
             <Col>
               <h2 style={{ textIndent: 20 }}>params与query</h2>
-              <Form.Item label='频道' labelCol={lb} wrapperCol={rb}>
+              <Form.Item label='频道' labelCol={lb} >
                 <Input.TextArea
-                  style={{ borderColor: local.paramsError ? 'red' : '' }}
+                  style={{ borderColor: local.paramsError ? 'red' : '', minHeight: 220 }}
                   ref={ref => jsoneditor.current = ref}
-                  defaultValue={JSON.stringify(group.params)}
+                  defaultValue={JSON.stringify(group.params, null, 2)}
                   onBlur={(e) => {
                     let params = {}
                     if (jsoneditor.current) {
