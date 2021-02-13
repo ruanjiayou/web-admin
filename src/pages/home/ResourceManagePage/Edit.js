@@ -4,19 +4,22 @@ import { Modal, Form, Input, notification, Select, Upload, Button, Switch, Tag }
 import { Observer, useLocalStore } from 'mobx-react-lite';
 import { UploadOutlined, PlusCircleOutlined } from '@ant-design/icons'
 import store from '../../../store'
+import { VisualBox } from '../../../component'
 
 export default function ResourceEdit({ data, cancel, save, }) {
   const lb = { span: 3 }, rb = { span: 18 }
   const local = useLocalStore(() => ({
-    data: data.id ? _.cloneDeep(data) : { tags: [], types: [] },
+    data: data.id ? _.cloneDeep(data) : { tags: [], types: [], poster: '', urls: [], open: false, status: 'finished' },
     loading: false,
     ref: '',
-    poster: data.poster || store.app.imageLine + '/poster/nocover.jpg',
+    poster: data.poster || '',
     maps: [],
     tagAddVisible: false,
     typeAddVisible: false,
+    urlAddVisible: false,
     tempTag: '',
     tempType: '',
+    tempUrl: '',
   }))
   const inp = useRef(null)
   const inputType = useRef(null)
@@ -95,8 +98,8 @@ export default function ResourceEdit({ data, cancel, save, }) {
                 }}
               />
             )}
-            {!local.tagAddVisible && (
-              <Tag onClick={() => local.tagAddVisible = true} style={{ background: '#fff', borderStyle: 'dashed' }}>
+            {!local.typeAddVisible && (
+              <Tag onClick={() => local.typeAddVisible = true} style={{ background: '#fff', borderStyle: 'dashed' }}>
                 <PlusCircleOutlined />
               </Tag>
             )}
@@ -166,7 +169,7 @@ export default function ResourceEdit({ data, cancel, save, }) {
               }} beforeUpload={(f) => {
                 return false
               }}>
-              <img width="100%" src={store.app.imageLine + local.poster} alt="" />
+              <img width="100%" src={(local.poster.startsWith('data') ? local.poster : store.app.imageLine + (local.poster || '/images/poster/nocover.jpg'))} alt="" />
               <Button style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)' }}>
                 <UploadOutlined /> 上传
               </Button>
@@ -183,6 +186,45 @@ export default function ResourceEdit({ data, cancel, save, }) {
               </Button>
             </Upload>
           </Form.Item>
+          <VisualBox visible={local.data.source_type === 'video' && !local.data.id}>
+            <Form.Item label="urls" labelCol={lb} wrapperCol={rb}>
+              {local.data.urls && local.data.urls.map((url, index) => <div key={index}><Tag closable onClose={() => { local.data.urls = local.data.urls.filter(t => t !== url) }}>{url}</Tag></div>)}
+              {local.urlAddVisible && (
+                <Input
+                  ref={inputType}
+                  type="text"
+                  size="small"
+                  style={{ width: 78 }}
+                  value={local.tempUrl}
+                  autoFocus
+                  onChange={e => local.tempUrl = e.target.value}
+                  onBlur={() => {
+                    let url = local.tempUrl.trim()
+                    const urls = local.data.urls
+                    if (url !== '' && -1 === urls.findIndex(t => t === url)) {
+                      local.data.urls.push(url)
+                    }
+                    local.urlAddVisible = false
+                    local.tempUrl = ''
+                  }}
+                  onPressEnter={() => {
+                    let url = local.tempUrl.trim()
+                    const urls = local.data.urls
+                    if (url !== '' && -1 === urls.findIndex(t => t === url)) {
+                      local.data.urls.push(url)
+                    }
+                    local.urlAddVisible = false
+                    local.tempUrl = ''
+                  }}
+                />
+              )}
+              {!local.urlAddVisible && (
+                <Tag onClick={() => local.urlAddVisible = true} style={{ background: '#fff', borderStyle: 'dashed' }}>
+                  <PlusCircleOutlined />
+                </Tag>
+              )}
+            </Form.Item>
+          </VisualBox>
         </Form>
       </Modal>
     </Fragment>

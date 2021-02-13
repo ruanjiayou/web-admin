@@ -23,7 +23,14 @@ export function getResource(query) {
 export function createResource(data) {
   const form = new FormData()
   for (let k in data) {
-    form.append(k, data[k])
+    if (data[k] instanceof Array) {
+      data[k].forEach(v => {
+        form.append(k, v)
+      })
+    } else {
+      form.append(k, data[k])
+    }
+
   }
   return shttp({
     url: `/v1/admin/resource`,

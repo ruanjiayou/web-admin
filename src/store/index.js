@@ -12,8 +12,8 @@ const store = {
   groups: [],
   types: [
     { name: '', title: '无'},
+    { name: 'torrent', title: '种子'},
     { name: 'image', title: '图片'},
-    { name: 'animation', title: '动漫'},
     { name: 'music', title: '音频'},
     { name: 'video', title: '视频'},
     { name: 'novel', title: '小说'},

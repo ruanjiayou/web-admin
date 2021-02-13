@@ -126,6 +126,63 @@ export default function ResourceList({ items, children, categories, search, loca
 				)}
 				</Observer>
 			)} />
+			<Column title="标签" dataIndex="types" key="types" render={(text, record) => (
+				<Observer>{() => (
+					<Fragment>
+						{record.tags.map(tag => <Tag key={tag} closable={!state.updating} onClose={async () => {
+							try {
+								state.updating = true
+								const tags = record.tags.filter(item => item !== tag)
+								await apis.updateResource({ id: record.id, tags })
+								record.tags = tags
+								notification.info({ message: '修改成功' })
+							} catch (e) {
+								notification.info({ message: '修改失败' })
+							} finally {
+								state.updating = false
+							}
+						}}>{tag}</Tag>)}
+						<div style={{ marginTop: 10 }}>
+							<Input.Group>
+								<Input
+									type="text"
+									size="small"
+									style={{ width: 50 }}
+									disabled={state.updating}
+								/>
+								<Tag onClick={async (e) => {
+									if (state.updating) {
+										return
+									}
+									if (e.currentTarget) {
+										const inp = e.currentTarget.previousElementSibling
+										const tag = inp.value.trim()
+										const tags = record.tags.map(item => item)
+										if (tags.includes(tag)) {
+											return notification.info('类型已存在')
+										}
+										try {
+											state.updating = true
+											await apis.updateResource({ id: record.id, tags: [...tags, tag] })
+											record.tags = [...tags, tag]
+											notification.info({ message: '修改成功' })
+										} catch (e) {
+											notification.info({ message: '修改失败' })
+										} finally {
+											state.updating = false
+											inp.value = ''
+										}
+
+									}
+								}} style={{ background: '#fff', borderStyle: 'dashed' }}>
+									<PlusCircleOutlined />
+								</Tag>
+							</Input.Group>
+						</div>
+					</Fragment>
+				)}
+				</Observer>
+			)} />
 			<Column title="系列" width={100} dataIndex="series" key="series" render={(text, record) => (
 				<Observer>{() => (<span style={{ backgroundColor: '#eee', border: '1px solid #eee', borderRadius: 4, padding: '3px 5px' }} onClick={async () => {
 					const res = prompt('请输入系列名')
