@@ -70,8 +70,8 @@ export default function ResourceManagePage() {
             search()
           }}>
             <Select.Option value="">全部</Select.Option>
+            <Select.Option value="file">文件</Select.Option>
             <Select.Option value="image">图片</Select.Option>
-            <Select.Option value="animation">动漫</Select.Option>
             <Select.Option value="music">音频</Select.Option>
             <Select.Option value="video">视频</Select.Option>
             <Select.Option value="novel">小说</Select.Option>
@@ -102,12 +102,15 @@ export default function ResourceManagePage() {
           />
         </div>
       </div>
-      {local.showEdit && <ResourceEdit data={local.temp} categories={local.categories[local.search_type] || []} cancel={() => { local.showEdit = false }} save={data => {
+      {local.showEdit && <ResourceEdit data={local.temp} categories={local.categories[local.search_type] || []} cancel={() => { local.showEdit = false }} save={async (data) => {
+        let res
         if (data.id) {
-          return updateResource(data)
+          res = await updateResource(data)
         } else {
-          return createResource(data)
+          res = await createResource(data)
         }
+        search()
+        return res
       }} />}
       {
         local.showFastEdit && (
@@ -115,9 +118,6 @@ export default function ResourceManagePage() {
             visible={true}
             onCancel={() => local.showFastEdit = false}
             okText={<Button type="primary" loading={local.isLoading}>确定</Button>}
-            onOk={() => {
-
-            }}
           >
             <Form>
               <Form.Item label="标题" labelCol={lb} wrapperCol={rb}>

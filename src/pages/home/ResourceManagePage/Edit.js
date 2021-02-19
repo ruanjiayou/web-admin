@@ -175,9 +175,9 @@ export default function ResourceEdit({ data, cancel, save, }) {
               </Button>
             </Upload>
           </Form.Item>
-          <Form.Item label="音频资源" labelCol={lb} wrapperCol={rb}>
-            <Upload ref={file} name="music" onChange={e => {
-              local.data.music = e.file
+          <Form.Item label="资源" labelCol={lb} wrapperCol={rb}>
+            <Upload ref={file} name="file" onChange={e => {
+              local.data.file = e.file
             }} beforeUpload={(f) => {
               return false
             }}>

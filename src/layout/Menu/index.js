@@ -8,7 +8,7 @@ import storage from '../../utils/storage'
 const data = []
 pages.forEach(page => {
   let curr = data;
-  if (!page.pathname.startsWith('/admin/home')) {
+  if (!page.pathname.startsWith('/admin/home') || page.hide === true) {
     return;
   }
   if (data.length === 0) {

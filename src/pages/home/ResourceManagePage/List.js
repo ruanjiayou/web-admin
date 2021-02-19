@@ -4,9 +4,10 @@ import { Link } from 'react-router-dom'
 import { toJS } from 'mobx'
 // import LoadingView from '../HolderView/LoadingView'
 import apis from '../../../api';
-import { Table, Popconfirm, Switch, notification, Select, Tag, Input, } from 'antd';
+import { Table, Popconfirm, Switch, notification, Select, Tag, Input, Popover } from 'antd';
 import { FormOutlined, DeleteOutlined, WarningOutlined, CloudServerOutlined, SyncOutlined, PlusCircleOutlined } from '@ant-design/icons'
-import { Icon } from '../../../component'
+import { Icon, VisualBox } from '../../../component'
+import { AlignAround } from '../../../component/style'
 
 const { Column } = Table;
 
@@ -57,6 +58,7 @@ export default function ResourceList({ items, children, categories, search, loca
 						}
 					}}>
 						<Select.Option value="">全部</Select.Option>
+						<Select.Option value="file">文件</Select.Option>
 						<Select.Option value="image">图片</Select.Option>
 						<Select.Option value="animation">动漫</Select.Option>
 						<Select.Option value="music">音频</Select.Option>
@@ -241,20 +243,32 @@ export default function ResourceList({ items, children, categories, search, loca
 			)}/> */}
 			<Column title="操作" width={100} dataIndex="action" key="action" align="center" render={(text, record) => (
 				<div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly' }}>
-					{record.source_type === 'article' || record.source_type === 'news' ?
-						<Link style={{ display: 'inherit' }} to={'/admin/home/resource-manage/edit?id=' + record.id} ><FormOutlined /></Link> :
-						<FormOutlined onClick={() => { props.openEdit(record) }} />}
-					<Popconfirm title="确定?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={() => {
-						props.destroy(record)
-					}}>
-						<DeleteOutlined />
-					</Popconfirm>
-					<CloudServerOutlined title="保存" onClick={() => props.store(record)} />
-					<SyncOutlined title="抓取image" onClick={() => {
-						apis.grabImages({ id: record.id }).then(res => {
-							notification.info({ message: `success:${res.data.success} fail:${res.data.fail}` })
-						})
-					}} />
+					<Popover trigger="hover" title="操作" placement="topRight" content={<AlignAround>
+						<VisualBox visible={record.source_type === 'article' || record.source_type === 'news'}>
+							<Link title="编辑" style={{ display: 'inherit' }} to={'/admin/home/resource-manage/edit?id=' + record.id} ><FormOutlined /></Link>
+						</VisualBox>
+						<VisualBox visible={record.source_type === 'video' || record.source_type === 'image'}>
+							<Link title="编辑" style={{ display: 'inherit' }} to={'/admin/home/resource-manage/edit-multi?id=' + record.id} ><FormOutlined /></Link>
+						</VisualBox>
+						<VisualBox visible={record.source_type === 'novel'}>
+							<CloudServerOutlined title="保存小说" onClick={() => props.store(record)} />
+						</VisualBox>
+						<VisualBox visible={record.source_type === 'article' || record.source_type === 'news'}>
+							<SyncOutlined title="抓取image" onClick={() => {
+								apis.grabImages({ id: record.id }).then(res => {
+									notification.info({ message: `success:${res.data.success} fail:${res.data.fail}` })
+								})
+							}} />
+						</VisualBox>
+						<Popconfirm title="确定?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={() => {
+							props.destroy(record)
+						}}>
+							<DeleteOutlined title="删除" />
+						</Popconfirm>
+					</AlignAround>}>
+						<Icon type="more" style={{ padding: '4px 8px' }} />
+					</Popover>
+
 				</div>
 			)} />
 		</Table>

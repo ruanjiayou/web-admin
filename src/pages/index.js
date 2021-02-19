@@ -17,6 +17,7 @@ import LinkManagePage from './home/LinkManagePage'
 import ConfigPage from './home/ConfigPage'
 import RobotManage from './home/RobotManage'
 import BackupTablePage from './home/DataManagePage/table'
+import MuiltiEdit from './home/ResourceManagePage/multi'
 
 import {
   LinkOutlined,
@@ -88,8 +89,15 @@ const pages = [
   {
     pathname: '/admin/home/resource-manage/edit',
     Page: ResourceEdit,
-    title: '资源编辑',
+    title: '文章编辑',
     icon: <UnorderedListOutlined />,
+  },
+  {
+    pathname: '/admin/home/resource-manage/edit-multi',
+    Page: MuiltiEdit,
+    title: '媒体资源管理',
+    icon: <UnorderedListOutlined />,
+    hide: true
   },
   {
     pathname: '/admin/home/schedule-manage',

@@ -17,6 +17,12 @@ justify-content: space-between;
 align-items: center;
 `;
 
+export const AlignAround = styled.div`
+display: flex;
+justify-content: space-around;
+align-items: center;
+`;
+
 export const FullHeight = styled.div`
 display: flex;
 flex-direction: column;

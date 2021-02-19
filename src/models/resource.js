@@ -13,6 +13,12 @@ export default types.model('Resource', {
   source_type: types.optional(types.string, ''),
   tags: types.optional(types.array(types.string), []),
   images: types.optional(types.array(types.string), []),
+  children: types.optional(types.array(types.model({
+    id: types.string,
+    url: types.string,
+    path: types.string,
+    title: types.optional(types.string, ''),
+  })), []),
   status: types.optional(types.enumeration(['loading', 'finished']), 'finished'),
   types: types.array(types.string),
   series: types.optional(types.string, ''),
