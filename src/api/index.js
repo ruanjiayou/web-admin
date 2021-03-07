@@ -29,9 +29,17 @@ const analyise = function () {
   })
 };
 
+const getTradeBalance = function () {
+  return shttp({
+    url: '/v1/admin/analyise/trade-balance',
+    method: 'GET'
+  })
+}
+
 export default {
   boot,
   analyise,
+  getTradeBalance,
   ...backup,
   ...channel,
   ...group,
