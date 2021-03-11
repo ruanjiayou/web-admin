@@ -35,16 +35,16 @@ export function updateSync(params) {
   })
 }
 
-export function updateSyncProd(params) {
+export function sync2prod(params) {
   return shttp({
-    url: '/v1/admin/sync-prod/' + params.id,
+    url: '/v1/admin/sync2prod/' + params.id,
     method: 'PUT',
   })
 }
 
-export function updateSyncDev(params) {
+export function sync2dev(params) {
   return shttp({
-    url: '/v1/admin/sync-dev/' + params.id,
+    url: '/v1/admin/sync2dev/' + params.id,
     method: 'PUT',
   })
 }

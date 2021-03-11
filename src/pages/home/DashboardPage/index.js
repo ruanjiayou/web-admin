@@ -74,7 +74,7 @@ export default function SignInPage() {
                 const total = parseFloat(item.total)
                 return {
                   value: total,
-                  itemStyle: { color: total >= 0 ? 'red' : 'green' }
+                  itemStyle: { color: total >= 0 ? '#d93025' : '#34a853' }
                 }
               }),
               type: 'bar'

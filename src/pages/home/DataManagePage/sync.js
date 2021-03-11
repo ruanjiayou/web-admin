@@ -7,7 +7,7 @@ import EditorPage from './sync-edit'
 import VisualBox from '../../../component/VisualBox'
 import { FullHeight, FullHeightFix, FullHeightAuto, Right, padding } from '../../../component/style'
 
-const { getSyncs, createSync, destroySync, updateSync, updateSyncProd, updateSyncDev } = apis
+const { getSyncs, createSync, destroySync, updateSync, sync2prod, sync2dev } = apis
 const { Column } = Table;
 
 function editSync(data, local, search) {
@@ -76,12 +76,12 @@ export default function SyncListPage() {
           />
           <Column title="操作" width={150} dataIndex="action" key="action" align="center" render={(text, record) => (
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly' }}>
-              <VisualBox visible={process.env.NODE_ENV === 'development'}>
-                <Popconfirm title="确定?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={() => { updateSyncProd(record) }}>
+              <VisualBox visible={window.location.href.startsWith('http://localhost')}>
+                <Popconfirm title="确定同步到线上?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={() => { sync2prod(record) }}>
                   <UploadOutlined />
                 </Popconfirm>
                 <Divider type="vertical" />
-                <Popconfirm title="确定?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={() => { updateSyncDev(record) }}>
+                <Popconfirm title="确定同步到本地?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={() => { sync2dev(record) }}>
                   <CloudDownloadOutlined />
                 </Popconfirm>
                 <Divider type="vertical" />

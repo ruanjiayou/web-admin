@@ -67,6 +67,30 @@ export function destroyResource(params) {
   })
 }
 
+export function addResourceVideo({ id, ...data }) {
+  return shttp({
+    url: `/v1/admin/resource/${id}/video`,
+    method: 'POST',
+    data,
+  })
+}
+
+export function removeResourceVideo({ id, mid }) {
+  return shttp({
+    url: `/v1/admin/resource/${mid}/video`,
+    method: 'DELETE',
+    data: { id }
+  })
+}
+
+export function sortResourceVideo({ id, data }) {
+  return shttp({
+    url: `/v1/admin/resource/${id}/video`,
+    method: 'PUT',
+    data,
+  })
+}
+
 export function grabImages(params) {
   return shttp({
     url: `/v1/admin/resource-grab-images/${params.id}`,

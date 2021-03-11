@@ -3,12 +3,15 @@ import { useEffectOnce } from 'react-use'
 import { Observer, useLocalStore } from 'mobx-react-lite'
 import apis from '../../../api'
 import { Button, notification, Input, Form, Radio, Tag, Upload, Select, Divider } from 'antd';
+import { SortListView } from '../../../component'
 import Icon from '../../../component/Icon'
 import qs from 'qs'
 import * as _ from 'lodash'
 import store from '../../../store'
 import { toJS } from 'mobx';
 import { useRouter } from '../../../contexts'
+import { UploadOutlined, PlusCircleOutlined } from '@ant-design/icons'
+import api from '../../../api';
 
 
 function deepEqual(a, b) {
@@ -34,11 +37,12 @@ export default function ResourceEdit() {
     const picture = useRef(null)
     const inp = useRef(null)
     const inputType = useRef(null)
+    const inputUrl = useRef(null)
     const lb = { span: 3 }, rb = { span: 18 }
     const query = qs.parse(window.location.search.substr(1))
     const local = useLocalStore(() => ({
         id: query.id,
-        data: { tags: [], types: [], children: [] },
+        data: { tags: [], types: [], children: [], urls: [] },
         origin: {},
         // 临时
         tempImg: '',
@@ -46,9 +50,9 @@ export default function ResourceEdit() {
         tagAddVisible: false,
         tempType: '',
         typeAddVisible: false,
+        tempUrl: '',
+        urlAddVisible: false,
         loading: false,
-        // 
-        fetching: false,
     }))
     const onEdit = useCallback(async () => {
         const changed = !deepEqual(toJS(local.origin), toJS(local.data))
@@ -197,6 +201,84 @@ export default function ResourceEdit() {
                             </Button>
                         )}
                     </Upload>
+                </Form.Item>
+                <Form.Item label="urls" labelCol={lb} wrapperCol={rb}>
+                    <SortListView
+                        isLoading={local.loading}
+                        direction="vertical"
+                        mode="edit"
+                        sort={async (oldIndex, newIndex) => {
+                            const data = local.data.urls.map(item => ({ id: item.id, url: item.url }))
+                            const id = data.splice(oldIndex, 1)
+                            data.splice(newIndex, 0, ...id)
+                            data.forEach((d, i) => {
+                                d.nth = i + 1
+                            })
+                            local.loading = false
+                            try {
+                                await api.sortResourceVideo({ id: local.id, data })
+                                local.data.urls = data
+                            } finally {
+                                local.loading = false
+                            }
+                        }}
+                        items={local.data.urls}
+                        droppableId={local.id}
+                        listStyle={{ boxSizing: 'border-box' }}
+                        itemStyle={{ lineHeight: 1, margin: '0 5px' }}
+                        renderItem={({ item, index }) => (
+                            <div key={index}><Tag closable onClose={async () => {
+                                local.loading = true
+                                try {
+                                    await api.removeResourceVideo({ id: item.id, mid: local.id })
+                                    local.data.urls = local.data.urls.filter(t => t.url !== item.url)
+                                } finally {
+                                    local.loading = false
+                                }
+                            }}>{item.url}</Tag></div>
+                        )}
+                    />
+                    {local.urlAddVisible && (
+                        <Input
+                            ref={inputUrl}
+                            type="text"
+                            size="small"
+                            style={{ width: 78 }}
+                            value={local.tempUrl}
+                            autoFocus
+                            disabled={local.isDealUrl}
+                            onChange={e => local.tempUrl = e.target.value}
+                            onBlur={async () => {
+                                let url = local.tempUrl.trim()
+                                if ('' === url) {
+                                    local.urlAddVisible = false
+                                    return;
+                                }
+                                if (-1 !== local.data.urls.findIndex(t => t.url === url)) {
+                                    return notification.info('exists')
+                                }
+                                local.isDealUrl = true
+                                try {
+                                    const res = await api.addResourceVideo({ id: local.id, title: local.data.title, url })
+                                    const urls = local.data.urls
+                                    if (res && res.code === 0) {
+                                        local.data.urls.push({ url: res.data.url, id: res.data.id })
+                                        local.urlAddVisible = false
+                                        local.tempUrl = ''
+                                    } else {
+                                        notification.info('fail')
+                                    }
+                                } finally {
+                                    local.isDealUrl = false
+                                }
+                            }}
+                        />
+                    )}
+                    {!local.urlAddVisible && (
+                        <Tag onClick={() => local.urlAddVisible = true} style={{ background: '#fff', borderStyle: 'dashed' }}>
+                            <PlusCircleOutlined />
+                        </Tag>
+                    )}
                 </Form.Item>
             </div>
             <Form.Item label="" style={{ textAlign: 'center', backgroundColor: '#b5cbde', height: 50, lineHeight: '50px', margin: 0, }}>
