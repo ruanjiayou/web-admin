@@ -41,7 +41,7 @@ export default function ResourceEdit() {
   }))
   const edit = useCallback(() => {
     if (ueditor.current) {
-      const content = decodeURIComponent(ueditor.current.getUEContent().replace(/%[^2]/g, '%25'))
+      const content = decodeURIComponent(ueditor.current.getUEContent().replace(/%/g, '%25'))
       const data = _.pick(store, ['id', 'title', 'poster', 'source_type', 'types', 'origin', 'open', 'tags'])
       data.content = content
       data.createdAt = new Date(store.createdAt)

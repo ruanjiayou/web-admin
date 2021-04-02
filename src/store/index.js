@@ -6,7 +6,6 @@ const store = {
   app: models.app.create(),
   user: models.user.create(),
   ws,
-  messages: {},
   config: models.config.create(),
   channels: [],
   groups: [],

@@ -35,6 +35,9 @@ export default function SignInPage() {
     api.getTradeBalance().then((res) => {
       if (res.code === 0) {
         if (echartRef.current) {
+          res.data = res.data.sort((a, b) => {
+            return a.total - b.total
+          })
           const option = {
             tooltip: {
               trigger: 'axis',
@@ -118,23 +121,6 @@ export default function SignInPage() {
           <UploadOutlined /> 上传
         </Button>
       </Upload>
-      <div>
-        Hello, World!
-        {Object.keys(store.messages).map((key, i) => {
-        const message = store.messages[key].stack
-        if (message) {
-          return <div key={i}>
-            <Button onClick={() => {
-              store.messages[key].clear()
-            }}>clear</Button>
-            <div>
-              {message.length ? JSON.stringify(message[message.length - 1]) : key}
-            </div>
-          </div>
-        }
-        return <div key={i}>{key}</div>
-      })}
-      </div>
     </Padding>
   )}</Observer>
 }

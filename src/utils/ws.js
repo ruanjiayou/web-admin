@@ -28,11 +28,6 @@ ws.on('message', (data) => {
   } else if (data.type === 'modal') {
     Modal.info({ title: data.action, content: 'from: ' + data.name + ' ' + data.message })
   }
-  if (store.messages[key]) {
-    store.messages[key].push(data)
-  } else {
-    store.messages[key] = Message.create({ key, stack: [] })
-  }
 })
 
 ws.on('open', () => {
