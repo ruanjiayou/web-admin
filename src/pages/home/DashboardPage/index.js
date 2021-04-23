@@ -2,13 +2,10 @@ import React, { Fragment, useRef } from 'react'
 import { Observer, useLocalStore } from 'mobx-react-lite'
 import { useStore } from '../../../contexts'
 import shttp from '../../../utils/shttp'
-import { Upload, Button } from 'antd'
-import { UploadOutlined } from '@ant-design/icons'
 import { Padding } from '../../../component/style'
 import ReactECharts from 'echarts-for-react';
 import { useEffectOnce } from 'react-use'
 import api from '../../../api'
-import { re } from 'mathjs'
 
 function testUpload(data) {
   const form = new FormData()
@@ -109,18 +106,6 @@ export default function SignInPage() {
         style={{ height: '600px', width: '100%' }}
         className='echarts-for-echarts'
         theme='my_theme' />
-      <Upload ref={file} name="test" action={'/v1/public/test/upload'} headers={{}} onChange={info => {
-        if (info.file.status === 'uploading') {
-          local.loading = true
-        }
-        if (info.file.status === 'done' || info.file.status === 'error') {
-          local.loading = false
-        }
-      }}>
-        <Button loading={local.loading}>
-          <UploadOutlined /> 上传
-        </Button>
-      </Upload>
     </Padding>
   )}</Observer>
 }

@@ -22,3 +22,7 @@
 - updateResource的array数据bug
 - stock数据编辑计算
 - resource快速编辑
+
+# 2021-04-24 01:26
+- 文件管理
+- 界面优化

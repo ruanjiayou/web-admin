@@ -5,6 +5,7 @@ import ChannelManagePage from './home/ChannelManagePage'
 import GroupManagePage from './home/GroupManagePage'
 import ResourceManagePage from './home/ResourceManagePage'
 import BackupPage from './home/DataManagePage/backup'
+import FilePage from './home/DataManagePage/file'
 import SyncPage from './home/DataManagePage/sync'
 import RulePage from './home/SpiderManagePage/rule'
 import TaskPage from './home/SpiderManagePage/task'
@@ -109,6 +110,12 @@ const pages = [
     pathname: '/admin/home/data-manage',
     title: '数据管理',
     icon: <UsbOutlined />,
+  },
+  {
+    pathname: '/admin/home/data-manage/file',
+    Page: FilePage,
+    title: '文件管理',
+    icon: <CloudServerOutlined />,
   },
   {
     pathname: '/admin/home/data-manage/backup',

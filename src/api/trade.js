@@ -1,8 +1,9 @@
 import shttp from '../utils/shttp'
+const qs = require('querystring')
 
 export function getTrades(query) {
   return shttp({
-    url: `/v1/admin/trades`,
+    url: `/v1/admin/trades?${qs.stringify(query)}`,
     method: 'GET',
   })
 }

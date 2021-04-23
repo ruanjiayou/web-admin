@@ -1,9 +1,9 @@
 import React, { useEffect, useCallback, Fragment } from 'react';
 import { Observer, useLocalStore } from 'mobx-react-lite'
-import { Table, Popconfirm, Switch, notification, Button, Divider } from 'antd';
+import { Table, Popconfirm, Switch, notification, Button, Divider, DatePicker, Input, Select, } from 'antd';
 import { DeleteOutlined, WarningOutlined, SyncOutlined, LoadingOutlined, FormOutlined, CheckCircleOutlined } from '@ant-design/icons'
 import apis from '../../../api'
-import { FullHeight, FullHeightFix, FullHeightAuto, Right } from '../../../component/style'
+import { FullHeight, FullHeightFix, FullHeightAuto, Right, FullWidthFix } from '../../../component/style'
 import Edit from './editTrade'
 import { useEffectOnce } from 'react-use';
 
@@ -27,6 +27,12 @@ export default function TaskList() {
     showEdit: false,
     temp: null,
     analyise: {},
+    // query
+    s_name: '',
+    s_code: '',
+    s_st: 0,
+    s_se: 0,
+    s_type: '',
     // 总操作盈亏
     get total() {
       if (this.trades.length) {
@@ -44,6 +50,11 @@ export default function TaskList() {
     local.isLoading = true
     const query = {
       page: local.search_page,
+      name: local.s_name,
+      code: local.s_code,
+      st: local.s_st,
+      se: local.s_se,
+      type: local.s_type,
     }
     getTrades(query).then(res => {
       local.isLoading = false
@@ -61,7 +72,6 @@ export default function TaskList() {
     local.isLoading = true;
     try {
       const res = await apis.analyise()
-      console.log(res);
       local.analyise = res.data
     } catch (e) {
 
@@ -71,16 +81,47 @@ export default function TaskList() {
   })
   return <Observer>{() => (
     <FullHeight>
-      <FullHeightFix style={{ padding: 15 }}>
-        <div style={{ flex: 1 }}>
-          <span style={{ color: local.analyise.owner >= 0 ? 'red' : 'green' }}>持有市值:{local.analyise.owner}</span><Divider type="vertical" />
-          <span style={{ color: local.analyise.owner + local.analyise.total >= 0 ? 'red' : 'green' }}>总盈亏:{(local.analyise.owner + local.analyise.total).toFixed(2)}</span><Divider type="vertical" />
-          <span style={{ color: 'green' }}>费用:-{local.analyise.fee}</span><Divider type="vertical" />
-          <span style={{ color: 'red' }}>分红:+{local.analyise.bonus}</span><Divider type="vertical" />
-          <span>买入次数:{local.analyise.buys}</span><Divider type="vertical" />
-          <span>卖出次数:{local.analyise.sells}</span><Divider type="vertical" />
+      <FullWidthFix style={{ alignItems: 'center', height: 40, padding: '0 15px' }}>
+        <span style={{ color: local.analyise.owner >= 0 ? 'red' : 'green' }}>持有市值:{local.analyise.owner}</span><Divider type="vertical" />
+        <span style={{ color: local.analyise.owner + local.analyise.total >= 0 ? 'red' : 'green' }}>总盈亏:{(local.analyise.owner + local.analyise.total).toFixed(2)}</span><Divider type="vertical" />
+        <span style={{ color: 'green' }}>费用:-{local.analyise.fee}</span><Divider type="vertical" />
+        <span style={{ color: 'red' }}>分红:+{local.analyise.bonus}</span><Divider type="vertical" />
+        <span>买入次数:{local.analyise.buys}</span><Divider type="vertical" />
+        <span>卖出次数:{local.analyise.sells}</span><Divider type="vertical" />
+      </FullWidthFix>
+      <FullHeightFix style={{ padding: 15, justifyContent: 'space-between' }}>
+        <div>
+          <Input addonBefore='名称' style={{ width: 150 }} value={local.s_name} onChange={e => {
+            local.s_name = e.target.value
+          }} />
+          <Divider type="vertical" />
+          <Input addonBefore='代码' style={{ width: 150 }} value={local.s_code} onChange={e => {
+            local.s_code = e.target.value
+          }} />
+          <Divider type="vertical" />
+          <Select style={{ width: 100 }} value={local.s_type} onChange={value => {
+            local.s_type = value
+          }}>
+            <Select.Option value="">全部</Select.Option>
+            <Select.Option value="1">证券买入</Select.Option>
+            <Select.Option value="2">证券卖出</Select.Option>
+            <Select.Option value="3">红利入账</Select.Option>
+            <Select.Option value="4">股息个税征收</Select.Option>
+            <Select.Option value="5">利息归本</Select.Option>
+            <Select.Option value="6">银行转证券</Select.Option>
+            <Select.Option value="7">证券转银行</Select.Option>
+          </Select>
+          <Divider type="vertical" />
+          <DatePicker size='middle' style={{ width: 120 }} placeholder='开始时间' format='YYYY-MM-DD' onChange={(mom, ds) => {
+            local.s_st = mom.toNow()
+          }} />-
+          <DatePicker size='middle' style={{ width: 120 }} placeholder='结束时间' format='YYYY-MM-DD' onChange={(mom, ds) => {
+            local.s_se = mom.toNow()
+          }} />
         </div>
-        <Right style={{ flex: 0, whiteSpace: 'nowrap' }}>
+        <div>
+          <Button type="primary" onClick={e => { search(); init() }}>查询</Button>
+          <Divider type="vertical" />
           <Button type="primary" onClick={e => {
             local.temp = {
               type: 1, amount: 0, price: 0, trade: 0, total: 0, currency: '人民币', fee: 0, fees: [
@@ -97,16 +138,10 @@ export default function TaskList() {
               ]
             }; local.showEdit = true
           }}>添加记录</Button>
-          <Divider type="vertical" />
-          <Button type="primary" onClick={e => { search(); init() }}>刷新</Button>
-        </Right>
+        </div>
       </FullHeightFix>
       <FullHeightAuto style={{ overflowY: 'hidden' }}>
-        <Table className="box" dataSource={local.trades} rowKey="id" scroll={{ y: 'calc(100vh - 250px)' }} loading={local.isLoading} pagination={{
-          pageSize: 200,
-          current: local.search_page,
-          total: local.count,
-        }} onChange={(page) => {
+        <Table className="box" dataSource={local.trades} rowKey="id" scroll={{ y: 'calc(100vh - 250px)' }} loading={local.isLoading} pagination={null} onChange={(page) => {
           local.search_page = page.current
           search()
         }}>
