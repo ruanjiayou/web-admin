@@ -5,7 +5,7 @@ import { toJS } from 'mobx'
 // import LoadingView from '../HolderView/LoadingView'
 import apis from '../../../api';
 import { Table, Popconfirm, Switch, notification, Select, Tag, Input, Popover } from 'antd';
-import { FormOutlined, DeleteOutlined, WarningOutlined, CloudServerOutlined, SyncOutlined, PlusCircleOutlined } from '@ant-design/icons'
+import { FormOutlined, DeleteOutlined, WarningOutlined, CloudServerOutlined, SyncOutlined, PlusCircleOutlined, UploadOutlined } from '@ant-design/icons'
 import { Icon, VisualBox } from '../../../component'
 import { AlignAround } from '../../../component/style'
 
@@ -14,7 +14,8 @@ const { Column } = Table;
 
 export default function ResourceList({ items, children, categories, search, local, ...props }) {
 	const state = useLocalStore(() => ({
-		updating: false
+		updating: false,
+		syncItems: {},
 	}))
 	return <Observer>{() => (
 		<Table dataSource={items} rowKey="id" scroll={{ y: 'calc(100vh - 240px)' }} loading={local.isLoading} pagination={{
@@ -244,6 +245,20 @@ export default function ResourceList({ items, children, categories, search, loca
 			<Column title="操作" width={100} dataIndex="action" key="action" align="center" render={(text, record) => (
 				<div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly' }}>
 					<Popover trigger="hover" title="操作" placement="topRight" content={<AlignAround>
+						<Popconfirm title="确定同步到线上?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={async() => {
+							if (state.syncItems[record.id]) {
+								alert('正在同步中...')
+							} else {
+								state.syncItems[record.id] = true
+								apis.syncOne(record).catch(()=>{
+									alert('同步失败')
+								}).finally(()=>{
+									state.syncItems[record.id] = false
+								})
+							}
+						}}>
+							<UploadOutlined spin={state.syncItems[record.id] ? true : false} />
+						</Popconfirm>
 						<VisualBox visible={record.source_type === 'article' || record.source_type === 'news'}>
 							<Link title="编辑" style={{ display: 'inherit' }} to={'/admin/home/resource-manage/edit?id=' + record.id} ><FormOutlined /></Link>
 						</VisualBox>

@@ -35,6 +35,13 @@ export function updateSync(params) {
   })
 }
 
+export function syncOne(params) {
+  return shttp({
+    url: `/v1/admin/sync-resource/${params.id}`,
+    method: 'PUT'
+  })
+}
+
 export function sync2prod(params) {
   return shttp({
     url: '/v1/admin/sync2prod/' + params.id,

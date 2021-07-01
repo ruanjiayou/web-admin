@@ -22,10 +22,9 @@ export function updateTask(params) {
   });
 }
 
-export function updateTaskResource(params) {
-  const { id, ...data } = params
+export function updateTaskResource(data) {
   return shttp({
-    url: '/v1/admin/task-resource',
+    url: `/v1/admin/task`,
     method: 'PATCH',
     data,
   });

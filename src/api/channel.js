@@ -41,7 +41,7 @@ export function destroyChannel(data) {
 export function addTask(rule, origin) {
   return shttp({
     url: `/v1/admin/task/`,
-    data: { origin, id: rule.id },
+    data: { origin, id: rule.id, type: rule.type },
     method: 'POST',
   })
 }

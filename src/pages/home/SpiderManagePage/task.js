@@ -50,6 +50,7 @@ export default function TaskList() {
           <Select.Option value="">全部</Select.Option>
           <Select.Option value="novel">小说</Select.Option>
           <Select.Option value="image">图片</Select.Option>
+          <Select.Option value="video">视频</Select.Option>
         </Select>
         <Divider type="vertical" />
         状态:
@@ -58,6 +59,7 @@ export default function TaskList() {
           search()
         }}>
           <Select.Option value="">全部</Select.Option>
+          <Select.Option value="init">init</Select.Option>
           <Select.Option value="loading">loading</Select.Option>
           <Select.Option value="fail">失败</Select.Option>
           <Select.Option value="finished">成功</Select.Option>
@@ -99,7 +101,7 @@ export default function TaskList() {
               <Icon type="copy" title={record.id} />
               <Divider type="vertical" />
               <SyncOutlined title="更新资源" onClick={() => {
-                updateTaskResource({ id: record.id }).then(() => {
+                updateTaskResource(record).then(() => {
                   notification.info({ message: '操作成功' })
                 });
               }} />

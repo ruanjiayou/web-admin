@@ -8,6 +8,7 @@ import BackupPage from './home/DataManagePage/backup'
 import FilePage from './home/DataManagePage/file'
 import SyncPage from './home/DataManagePage/sync'
 import RulePage from './home/SpiderManagePage/rule'
+import Rule2Page from './home/SpiderManagePage/rule2'
 import TaskPage from './home/SpiderManagePage/task'
 import SchedulePage from './home/ScheduleManagePage'
 import ResourceEdit from './home/ResourceManagePage/article'
@@ -37,6 +38,7 @@ import {
   TransactionOutlined,
   AndroidOutlined,
   QuestionCircleOutlined,
+  FolderOutlined,
 } from '@ant-design/icons'
 
 const pages = [
@@ -107,6 +109,12 @@ const pages = [
     icon: <FieldTimeOutlined />,
   },
   {
+    pathname: '/admin/home/rule2-manage',
+    Page: Rule2Page,
+    title: '新规则管理',
+    icon: <FieldTimeOutlined />,
+  },
+  {
     pathname: '/admin/home/data-manage',
     title: '数据管理',
     icon: <UsbOutlined />,
@@ -115,7 +123,7 @@ const pages = [
     pathname: '/admin/home/data-manage/file',
     Page: FilePage,
     title: '文件管理',
-    icon: <CloudServerOutlined />,
+    icon: <FolderOutlined />,
   },
   {
     pathname: '/admin/home/data-manage/backup',
