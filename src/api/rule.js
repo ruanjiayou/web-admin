@@ -79,3 +79,13 @@ export function v2getRules() {
     method: 'GET',
   })
 }
+
+export function v2GetResourceByRule(ruleId, url) {
+  return shttp({
+    url: '/v2/admin/rule/' + ruleId,
+    method: 'PATCH',
+    data: {
+      origin: url,
+    }
+  })
+}

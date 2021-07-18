@@ -21,3 +21,9 @@ export function fetchCrawler({ data }) {
     data
   })
 }
+
+export function getGroupResources(id) {
+  return shttp({
+    url: `/v1/public/group/${id}/resources`,
+  })
+}

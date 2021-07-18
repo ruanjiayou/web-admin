@@ -8,7 +8,7 @@ import { UploadOutlined, } from '@ant-design/icons'
 import { FullHeight, FullHeightFix, FullHeightAuto } from '../../../component/style'
 
 const { Column } = Table;
-const { v2getRules, v2createRule, v2updateRule, addTask } = apis
+const { v2getRules, v2createRule, v2updateRule, v2GetResourceByRule,  } = apis
 
 export default function SpiderPage() {
   const lb = { span: 6, offset: 3 }, rb = { span: 12 }
@@ -135,14 +135,14 @@ export default function SpiderPage() {
           Modal.confirm({
             title: '添加任务',
             content: <Observer>{() => (<Fragment>
-              <Select disabled value={local.tempId} onSelect={value => { local.tempId = value }}>
+              <Select value={local.tempId} onSelect={value => { local.tempId = value }}>
                 <Select.Option value="">自动选择规则</Select.Option>
                 {local.rules.map(rule => <Select.Option key={rule.id} value={rule.id}>{rule.name}</Select.Option>)}
               </Select>
               <Input style={{ marginTop: 10 }} ref={ref => urlRef.current = ref} onPaste={e => {
                 const url = e.clipboardData.getData('text/plain');
                 local.rules.forEach(rule => {
-                  if (url.startsWith(rule.id)) {
+                  if (url.startsWith(rule.host)) {
                     local.tempId = rule.id
                     local.tempRule = rule
                   }
@@ -153,7 +153,7 @@ export default function SpiderPage() {
             cancelText: '取消',
             onOk: () => {
               if (urlRef.current) {
-                addTask(local.tempRule, urlRef.current.state.value).then(res => {
+                v2GetResourceByRule(local.tempId, urlRef.current.state.value).then(res => {
                   if (res.code === 0) {
                     notification.success({ message: 'success' })
                   } else {

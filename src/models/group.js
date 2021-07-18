@@ -148,6 +148,9 @@ const GroupModel = types.model('Group', {
     }
     self.children.forEach((child, i) => child.nth = i)
   },
+  setData(data) {
+    self.data = data || []
+  },
 }))
 
 export default GroupModel

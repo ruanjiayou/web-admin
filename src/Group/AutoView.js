@@ -4,6 +4,7 @@ import { Observer, useLocalStore } from 'mobx-react-lite';
 import { useStore } from '../contexts';
 import Icon from '../component/Icon'
 import Picker from './Picker'
+import Random from './Random'
 import Filter from './Filter'
 import FilterRow from './FilterRow'
 import FilterTag from './FilterTag'
@@ -31,6 +32,11 @@ export const mapping = {
     name: '人工手选',
     component: Picker,
     leaf: true,
+  },
+  'random': {
+    name: '随机',
+    component: Random,
+    leaf: true
   },
   'filter': {
     name: '复合过滤',
