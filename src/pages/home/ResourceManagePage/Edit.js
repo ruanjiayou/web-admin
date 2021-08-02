@@ -169,7 +169,7 @@ export default function ResourceEdit({ data, cancel, save, }) {
               }} beforeUpload={(f) => {
                 return false
               }}>
-              <img width="100%" src={(local.poster.startsWith('data') ? local.poster : store.app.imageLine + (local.poster || '/images/poster/nocover.jpg'))} alt="" />
+              <img width="100%" src={(local.poster.startsWith('data') ? local.poster : store.app.imageLine + (local.data.poster || '/images/poster/nocover.jpg'))} alt="" />
               <Button style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)' }}>
                 <UploadOutlined /> 上传
               </Button>

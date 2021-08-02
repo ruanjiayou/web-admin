@@ -35,7 +35,7 @@ export function createEmptyGroup(parent = {}, view = '') {
     $new: true,
     tree_id: parent.tree_id || uuid,
     id: uuid,
-    parent_id: parent.id || uuid,
+    parent_id: parent.id || '',
     title: 'new',
     name: '',
     desc: '',

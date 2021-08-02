@@ -29,9 +29,20 @@ export function createFile(data) {
     })
 }
 
-export function destroyFile({ param = '/' }) {
+export function destroyFile({ param = '/', isDir = '0' }) {
     return shttp({
-        url: `/v1/admin/file${param}`,
+        url: `/v1/admin/file${param}?isDir=${isDir}`,
         method: 'DELETE',
+    })
+}
+
+export function renameFile({ dirpath, oldname, newname }) {
+    return shttp({
+        url: `/v1/admin/file${dirpath}`,
+        method: 'PUT',
+        data: {
+            oldname,
+            newname,
+        },
     })
 }

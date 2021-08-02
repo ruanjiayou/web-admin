@@ -8,18 +8,46 @@ export function getChannels() {
 }
 
 export function createChannel(data) {
+  const form = new FormData()
+  for (let k in data) {
+    if (data[k] instanceof Array) {
+      data[k].forEach(v => {
+        form.append(k, v)
+      })
+    } else {
+      form.append(k, data[k])
+    }
+
+  }
   return shttp({
     url: '/v1/admin/channel',
     method: 'POST',
-    data
+    headers: {
+      'Content-Type': 'multipart/form-data;charset=UTF-8'
+    },
+    data: form,
   })
 }
 
 export function updateChannel(data) {
+  const form = new FormData()
+  for (let k in data) {
+    if (data[k] instanceof Array) {
+      data[k].forEach(v => {
+        form.append(k, v)
+      })
+    } else {
+      form.append(k, data[k])
+    }
+
+  }
   return shttp({
     url: `/v1/admin/channel/${data.id}`,
     method: 'PUT',
-    data
+    headers: {
+      'Content-Type': 'multipart/form-data;charset=UTF-8'
+    },
+    data: form,
   })
 }
 

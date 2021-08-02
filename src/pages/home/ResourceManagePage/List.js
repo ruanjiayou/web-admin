@@ -1,16 +1,16 @@
 import React, { Fragment } from 'react'
-import { Observer, useLocalStore } from 'mobx-react-lite'
+import { Observer, useLocalStore, } from 'mobx-react-lite'
+import { getSnapshot } from 'mobx-state-tree'
 import { Link } from 'react-router-dom'
-import { toJS } from 'mobx'
 // import LoadingView from '../HolderView/LoadingView'
 import apis from '../../../api';
-import { Table, Popconfirm, Switch, notification, Select, Tag, Input, Popover } from 'antd';
+import { Table, Popconfirm, Switch, notification, Select, Tag, Input, Popover, Divider } from 'antd';
 import { FormOutlined, DeleteOutlined, WarningOutlined, CloudServerOutlined, SyncOutlined, PlusCircleOutlined, UploadOutlined } from '@ant-design/icons'
 import { Icon, VisualBox } from '../../../component'
 import { AlignAround } from '../../../component/style'
+import store from '../../../store'
 
 const { Column } = Table;
-
 
 export default function ResourceList({ items, children, categories, search, local, ...props }) {
 	const state = useLocalStore(() => ({
@@ -42,7 +42,7 @@ export default function ResourceList({ items, children, categories, search, loca
 					} else {
 						notification.info({ message: '类型不可预览' })
 					}
-				}}>{text}</a>
+				}}><img src={store.app.imageLine + (record.poster || record.thumbnail || '/images/poster/nocover.jpg')} style={{ width: 30, height: 30, borderRadius: '50%', marginRight: 10, }} alt="" />{text}</a>
 			}} />
 			<Column title="类型" width={100} dataIndex="source_type" key="source_type" render={(text, record) => (
 				<Observer>{() => (
@@ -239,33 +239,32 @@ export default function ResourceList({ items, children, categories, search, loca
 					}} />)}
 				</Observer>
 			)} />
-			{/* <Column title="快速编辑" render={(text, record)=>(
-				<FormOutlined onClick={() => { props.fastEdit(toJS(record)) }} />
-			)}/> */}
 			<Column title="操作" width={100} dataIndex="action" key="action" align="center" render={(text, record) => (
 				<div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly' }}>
+					<FormOutlined title="快速编辑" onClick={() => { props.fastEdit(record) }} />
 					<Popover trigger="hover" title="操作" placement="topRight" content={<AlignAround>
-						<Popconfirm title="确定同步到线上?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={async() => {
+						<Popconfirm title="确定同步到线上?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={async () => {
 							if (state.syncItems[record.id]) {
 								alert('正在同步中...')
 							} else {
 								state.syncItems[record.id] = true
-								apis.syncOne(record).catch(()=>{
+								apis.syncOne(record).catch(() => {
 									alert('同步失败')
-								}).finally(()=>{
+								}).finally(() => {
 									state.syncItems[record.id] = false
 								})
 							}
 						}}>
 							<UploadOutlined spin={state.syncItems[record.id] ? true : false} />
 						</Popconfirm>
-						<VisualBox visible={record.source_type === 'article' || record.source_type === 'news'}>
+						<VisualBox visible={['article', 'news'].includes(record.source_type)}>
 							<Link title="编辑" style={{ display: 'inherit' }} to={'/admin/home/resource-manage/edit?id=' + record.id} ><FormOutlined /></Link>
 						</VisualBox>
 						<VisualBox visible={record.source_type === 'video' || record.source_type === 'image'}>
 							<Link title="编辑" style={{ display: 'inherit' }} to={'/admin/home/resource-manage/edit-multi?id=' + record.id} ><FormOutlined /></Link>
 						</VisualBox>
 						<VisualBox visible={record.source_type === 'novel'}>
+							<Divider type="vertical" />
 							<CloudServerOutlined title="保存小说" onClick={() => props.store(record)} />
 						</VisualBox>
 						<VisualBox visible={record.source_type === 'article' || record.source_type === 'news'}>
@@ -283,7 +282,6 @@ export default function ResourceList({ items, children, categories, search, loca
 					</AlignAround>}>
 						<Icon type="more" style={{ padding: '4px 8px' }} />
 					</Popover>
-
 				</div>
 			)} />
 		</Table>

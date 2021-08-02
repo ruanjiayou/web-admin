@@ -1,8 +1,9 @@
-import { types, getSnapshot } from 'mobx-state-tree'
+import { types, } from 'mobx-state-tree'
 
 export default types.model('Channel', {
   id: types.string,
   title: types.string,
+  cover: types.optional(types.string, ''),
   desc: types.string,
   enable: types.boolean,
   editable: types.boolean,

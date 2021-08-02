@@ -1,7 +1,7 @@
-import React, { useRef } from 'react'
+import React, { useRef, Fragment } from 'react'
 import { Observer, useLocalStore } from 'mobx-react-lite'
-import { Button, Switch, Form, Input, notification, Radio, Select, Card, Row, Col, Divider } from 'antd';
-import { FullHeight, FullHeightFix, FullHeightAuto, CenterXY, AlignAside, Right, FullWidth, FullWidthFix, FullWidthAuto } from '../../../component/style'
+import { Button, Switch, Form, Input, Select, Row, Col, Divider } from 'antd';
+import { FullHeight, FullHeightAuto, FullWidth } from '../../../component/style'
 import { Icon, } from '../../../component'
 import { TabHeader, TabTag } from './style'
 
@@ -69,6 +69,10 @@ export default function GroupEdit({ group, onClose, openPick }) {
               <Select.Option value="">请选择</Select.Option>
               {/* TODO: views */}
               {[].map(m => <Select.Option key={m.key} value={m.key}>{m.value}</Select.Option>)}
+              {['picker', 'random'].includes(group.view) && (<Fragment>
+                <Select.Option key={'1'} value={'picker'}>人工手选</Select.Option>
+                <Select.Option key={'2'} value={'random'}>随机</Select.Option>
+              </Fragment>)}
             </Select>
           </Form.Item>
           <Form.Item label='开放' labelCol={lb} wrapperCol={rb}>
@@ -102,12 +106,12 @@ export default function GroupEdit({ group, onClose, openPick }) {
               <h2 style={{ textIndent: 20 }}>attr属性</h2>
               <Form.Item label='默认选中' labelCol={lb} wrapperCol={rb}>
                 <FullWidth>
-                  <Switch checked={group.attrs.selected} onChange={() => group.setKey('attrs.selected', !group.attrs.selected)} /><Divider type="vertical" />{group.open ? '选中' : '不选中'}
+                  <Switch checked={group.attrs.selected} onChange={() => group.setKey('attrs.selected', !group.attrs.selected)} /><Divider type="vertical" />{group.attrs.selected ? '选中' : '不选中'}
                 </FullWidth>
               </Form.Item>
               <Form.Item label='换一换' labelCol={lb} wrapperCol={rb}>
                 <FullWidth>
-                  <Switch checked={group.attrs.random} onChange={() => group.setKey('attrs.random', !group.attrs.random)} /><Divider type="vertical" />{group.open ? '显示' : '不显示'}
+                  <Switch checked={group.attrs.random} onChange={() => group.setKey('attrs.random', !group.attrs.random)} /><Divider type="vertical" />{group.attrs.random ? '显示' : '不显示'}
                 </FullWidth>
               </Form.Item>
               <Form.Item label='轮播延时' labelCol={lb} wrapperCol={rb}>

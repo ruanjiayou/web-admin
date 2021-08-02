@@ -1,11 +1,13 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useRef, } from 'react';
 import { useEffectOnce } from 'react-use'
 import { Observer, useLocalStore } from 'mobx-react-lite'
 import apis from '../../../api';
 import ResourceList from './List'
 import ResourceEdit from './Edit'
-import { Button, Input, Select, Switch, Divider, Pagination, Modal, Form } from 'antd';
+import { Button, Input, Select, Switch, Divider, Pagination, Modal, Form, Upload, } from 'antd';
+import { UploadOutlined } from '@ant-design/icons'
 import store from '../../../store'
+import { Right } from '../../../component/style';
 
 const { getResources, createResource, updateResource, destroyResource, getGroupTypes } = apis
 
@@ -19,11 +21,13 @@ async function save(data) {
 
 export default function ResourceManagePage() {
   const lb = { span: 3 }, rb = { span: 18 }
+  const picture = useRef(null)
   const local = useLocalStore(() => ({
     isLoading: false,
     showEdit: false,
     showFastEdit: false,
     temp: null,
+    thumbnail: '',
     count: 0,
     search_name: '',
     search_type: 'novel',
@@ -67,6 +71,7 @@ export default function ResourceManagePage() {
           资源类型<Divider type="vertical" />
           <Select style={{ width: 150 }} value={local.search_type} onChange={value => {
             local.search_type = value
+            local.search_page = 1
             search()
           }}>
             <Select.Option value="">全部</Select.Option>
@@ -116,12 +121,46 @@ export default function ResourceManagePage() {
         local.showFastEdit && (
           <Modal
             visible={true}
-            onCancel={() => local.showFastEdit = false}
-            okText={<Button type="primary" loading={local.isLoading}>确定</Button>}
+            closable={false}
+            footer={<Right>
+              <Button type="ghost" loading={local.isLoading} onClick={() => local.showFastEdit = false}>取消</Button>
+              <Divider type="vertical" />
+              <Button type="primary" loading={local.isLoading} onClick={async () => {
+                local.isLoading = true
+                try {
+                  await updateResource(local.temp)
+                  local.showFastEdit = false
+                  local.thumbnail = ''
+                } catch (e) {
+
+                }
+                local.isLoading = false
+
+              }}>确定</Button>
+            </Right>}
           >
             <Form>
               <Form.Item label="标题" labelCol={lb} wrapperCol={rb}>
                 <Input value={local.temp.title} autoFocus onChange={e => local.temp.title = e.target.value} />
+              </Form.Item>
+              <Form.Item label="缩略图" labelCol={lb} wrapperCol={rb}>
+                <Upload
+                  style={{ position: 'relative' }}
+                  listType="picture-card"
+                  className="avatar-uploader"
+                  showUploadList={false} ref={picture} name="thumbnail" onChange={e => {
+                    local.temp.thumbnail = e.file
+                    const reader = new FileReader();
+                    reader.addEventListener('load', () => { local.thumbnail = reader.result });
+                    reader.readAsDataURL(e.file);
+                  }} beforeUpload={(f) => {
+                    return false
+                  }}>
+                  <img width="100%" src={(local.thumbnail.startsWith('data') ? local.thumbnail : store.app.imageLine + (local.temp.thumbnail || '/images/poster/nocover.jpg'))} alt="" />
+                  <Button style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)' }}>
+                    <UploadOutlined /> 上传
+              </Button>
+                </Upload>
               </Form.Item>
               <Form.Item label="资源类型" labelCol={lb} wrapperCol={rb}>
                 <Select value={local.temp.source_type || ''} onChange={value => {

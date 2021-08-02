@@ -8,6 +8,7 @@ export default types.model('Resource', {
   country: types.optional(types.string, ''),
   title: types.optional(types.string, ''),
   poster: types.optional(types.string, ''),
+  thumbnail: types.optional(types.string, ''),
   desc: types.optional(types.string, ''),
   url: types.optional(types.string, ''),
   source_type: types.optional(types.string, ''),
