@@ -30,7 +30,7 @@ export default function ResourceManagePage() {
     thumbnail: '',
     count: 0,
     search_name: '',
-    search_type: 'novel',
+    search_type: '',
     search_page: 1,
     categories: {},
     resources: [],

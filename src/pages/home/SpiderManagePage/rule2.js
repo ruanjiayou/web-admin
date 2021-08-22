@@ -6,9 +6,15 @@ import apis from '../../../api';
 import store from '../../../store'
 import { UploadOutlined, } from '@ant-design/icons'
 import { FullHeight, FullHeightFix, FullHeightAuto } from '../../../component/style'
+import IconCode from '../../../images/code.svg'
+import { UnControlled as CodeMirror } from 'react-codemirror2'
+import 'codemirror/lib/codemirror.css';
+import 'codemirror/theme/material.css';
+require('codemirror/mode/xml/xml');
+require('codemirror/mode/javascript/javascript');
 
 const { Column } = Table;
-const { v2getRules, v2createRule, v2updateRule, v2GetResourceByRule,  } = apis
+const { v2getRules, v2createRule, v2updateRule, v2GetResourceByRule, v2UpdateRuleCode, v2getRuleCode } = apis
 
 export default function SpiderPage() {
   const lb = { span: 6, offset: 3 }, rb = { span: 12 }
@@ -36,6 +42,10 @@ export default function SpiderPage() {
     inster: false,
     search_page: 1,
     count: 0,
+    // code
+    showCodeId: '',
+    loadCode: false,
+    code: '',
   }))
   function openEdit(data) {
     if (data) {
@@ -188,9 +198,23 @@ export default function SpiderPage() {
           <Column title="名称" dataIndex="name" key="name" />
           <Column title="类型" dataIndex="type" key="type" />
           <Column title="操作" width={200} dataIndex="action" key="action" align="center" render={(text, record) => (
-            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
               <Icon type="edit" title="编辑" onClick={e => {
                 openEdit(record)
+              }} />
+              <Divider type="vertical" />
+              <img src={IconCode} style={{ width: 20, height: 24, cursor: 'pointer' }} alt="" onClick={async (e) => {
+                if (!local.loadCode) {
+                  local.showCodeId = record.id;
+                  const result = await v2getRuleCode(record.id);
+                  local.loadCode = false;
+                  if (result.code === 0) {
+                    local.code = result.data.code;
+                  } else {
+                    notification.error('获取code失败')
+                    local.showCodeId = '';
+                  }
+                }
               }} />
               <Divider type="vertical" />
               <Icon type="delete" title="删除" onClick={e => {
@@ -206,6 +230,8 @@ export default function SpiderPage() {
           style={{ overflow: 'auto', padding: 0 }}
           width={700}
           title={local.inster ? '添加规则' : '修改规则'}
+          okText="提交"
+          cancelText="取消"
           onCancel={e => { local.inster = false; local.showEdit = false }}
           onOk={async () => {
             local.isLoading = true
@@ -264,6 +290,32 @@ export default function SpiderPage() {
               </Upload>
             </Form.Item>
           </Form>
+        </Modal>
+      )}
+      {local.showCodeId && (
+        <Modal visible
+          style={{ overflow: 'auto', padding: 0 }}
+          width={700}
+          title="脚本编辑"
+          okText="提交"
+          cancelText="取消"
+          onCancel={e => { local.showCodeId = '' }}
+          onOk={e => {
+            v2UpdateRuleCode(local.showCodeId, local.code).then(() => {
+              local.showCodeId = ''
+            });
+          }} >
+          <CodeMirror
+            value={local.code}
+            options={{
+              mode: 'javascript',
+              theme: 'material',
+              lineNumbers: true
+            }}
+            onChange={(editor, data, value) => {
+              local.code = value;
+            }}
+          />
         </Modal>
       )}
     </FullHeight>

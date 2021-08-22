@@ -89,3 +89,18 @@ export function v2GetResourceByRule(ruleId, url) {
     }
   })
 }
+
+export function v2getRuleCode(ruleId) {
+  return shttp({
+    url: `/v2/admin/rules/${ruleId}/code`,
+    method: 'GET',
+  })
+}
+
+export function v2UpdateRuleCode(ruleId, code) {
+  return shttp({
+    url: `/v2/admin/rules/${ruleId}/code`,
+    method: 'PUT',
+    data: { code }
+  })
+}

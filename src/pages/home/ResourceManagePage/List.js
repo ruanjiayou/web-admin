@@ -1,10 +1,9 @@
 import React, { Fragment } from 'react'
 import { Observer, useLocalStore, } from 'mobx-react-lite'
-import { getSnapshot } from 'mobx-state-tree'
 import { Link } from 'react-router-dom'
 // import LoadingView from '../HolderView/LoadingView'
 import apis from '../../../api';
-import { Table, Popconfirm, Switch, notification, Select, Tag, Input, Popover, Divider } from 'antd';
+import { Table, Popconfirm, Switch, notification, Select, Tag, Input, Popover, Divider, } from 'antd';
 import { FormOutlined, DeleteOutlined, WarningOutlined, CloudServerOutlined, SyncOutlined, PlusCircleOutlined, UploadOutlined } from '@ant-design/icons'
 import { Icon, VisualBox } from '../../../component'
 import { AlignAround } from '../../../component/style'
@@ -26,9 +25,33 @@ export default function ResourceList({ items, children, categories, search, loca
 			local.search_page = page.current
 			search()
 		}}>
+			<Column title="封面" width={100} dataIndex="poster" key="id" render={(text, record) => (
+				<Observer>{() => (
+					<div style={{ position: 'relative' }}>
+						<img src={store.app.imageLine + (record.poster || record.thumbnail || '/images/poster/nocover.jpg')}
+							style={{ width: 60, height: 60, borderRadius: '50%', marginRight: 10, }}
+							alt=""
+						/>
+						<Icon type={'download'} style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)' }} onClick={async (e) => {
+							try {
+								await apis.downloadResourceCover({ id: record.id, })
+								search()
+								notification.info({ message: '修改成功' })
+							} catch (e) {
+								notification.info({ message: '修改失败' })
+							} finally {
+
+							}
+						}} />
+					</div>
+				)}
+				</Observer>
+			)} />
 			<Column title="标题" dataIndex="title" key="title" render={(text, record) => {
 				let url = ''
-				if (record.source_type === 'novel') {
+				if (record.source_type === 'video') {
+					url = (window.origin + '/novel/groups/GroupTree/VideoInfo?GroupTree.name=video&VideoInfo.id=' + record.id)
+				} else if (record.source_type === 'novel') {
 					url = (window.origin + '/novel/home/BookInfo?home.tab=&BookInfo.id=' + record.id)
 				} else if (['news', 'article', 'private'].includes(record.source_type)) {
 					url = (window.origin + '/novel/home/Article?home.tab=QD7vNfJCU&Article.id=' + record.id)
@@ -42,7 +65,7 @@ export default function ResourceList({ items, children, categories, search, loca
 					} else {
 						notification.info({ message: '类型不可预览' })
 					}
-				}}><img src={store.app.imageLine + (record.poster || record.thumbnail || '/images/poster/nocover.jpg')} style={{ width: 30, height: 30, borderRadius: '50%', marginRight: 10, }} alt="" />{text}</a>
+				}}>{text}</a>
 			}} />
 			<Column title="类型" width={100} dataIndex="source_type" key="source_type" render={(text, record) => (
 				<Observer>{() => (
@@ -129,7 +152,7 @@ export default function ResourceList({ items, children, categories, search, loca
 				)}
 				</Observer>
 			)} />
-			<Column title="标签" dataIndex="types" key="types" render={(text, record) => (
+			<Column title="标签" dataIndex="types" key="types" width={100} render={(text, record) => (
 				<Observer>{() => (
 					<Fragment>
 						{record.tags.map(tag => <Tag key={tag} closable={!state.updating} onClose={async () => {

@@ -16,6 +16,7 @@ import {
   CloudServerOutlined,
   DragOutlined,
   EllipsisOutlined,
+  CloudDownloadOutlined,
 } from '@ant-design/icons'
 
 const IconMap = {
@@ -35,9 +36,10 @@ const IconMap = {
   'store': CloudServerOutlined,
   'drag': DragOutlined,
   'more': EllipsisOutlined,
+  'download': CloudDownloadOutlined,
 };
 
-export default function Icon({ type, ...props }) {
+export default function Icon({ type, style = {}, ...props }) {
   const I = IconMap[type]
-  return <I {...props} />
+  return <span style={style}><I {...props} /></span>
 }

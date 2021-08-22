@@ -75,6 +75,27 @@ export function addResourceVideo({ id, ...data }) {
   })
 }
 
+export function updateResourceVideo(id, data) {
+  return shttp({
+    url: `/v1/admin/resource/${id}/video/${data.id}`,
+    method: 'PUT',
+    data,
+  })
+}
+
+export function downloadResourceVideo(mid, id) {
+  return shttp({
+    url: `/v1/admin/resource/${mid}/video/${id}`,
+    method: 'PATCH',
+  })
+}
+
+export function downloadResourceCover({ id }) {
+  return shttp({
+    url: `/v1/admin/resource/${id}/cover`,
+    method: 'PATCH',
+  })
+}
 export function removeResourceVideo({ id, mid }) {
   return shttp({
     url: `/v1/admin/resource/${mid}/video`,

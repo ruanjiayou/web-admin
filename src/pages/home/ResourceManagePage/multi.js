@@ -10,7 +10,7 @@ import * as _ from 'lodash'
 import store from '../../../store'
 import { toJS } from 'mobx';
 import { useRouter } from '../../../contexts'
-import { UploadOutlined, PlusCircleOutlined } from '@ant-design/icons'
+import { UploadOutlined, PlusCircleOutlined, CloudDownloadOutlined, CloseOutlined } from '@ant-design/icons'
 import api from '../../../api';
 
 
@@ -194,7 +194,7 @@ export default function ResourceEdit() {
                         }} beforeUpload={(f) => {
                             return false
                         }}>
-                        <img width="100%" src={local.tempImg || (store.app.imageLine + (local.data.poster || '/images/poster/nocover.jpg'))} alt="" />
+                        <img width="100%" src={local.tempImg || (store.app.imageLine + (local.data.poster || local.data.thumbnail || '/images/poster/nocover.jpg'))} alt="" />
                         {local.data.poster === '' && (
                             <Button style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)' }}>
                                 <Icon type="arrow-up-line" /> 编辑
@@ -227,15 +227,46 @@ export default function ResourceEdit() {
                         listStyle={{ boxSizing: 'border-box' }}
                         itemStyle={{ lineHeight: 1, margin: '0 5px' }}
                         renderItem={({ item, index }) => (
-                            <div key={index}><Tag closable onClose={async () => {
-                                local.loading = true
-                                try {
-                                    await api.removeResourceVideo({ id: item.id, mid: local.id })
-                                    local.data.urls = local.data.urls.filter(t => t.url !== item.url)
-                                } finally {
-                                    local.loading = false
-                                }
-                            }}>{item.url}</Tag></div>
+                            <Input
+                                key={index}
+                                value={item.url}
+                                disabled
+                                addonBefore={<Observer>{() => (
+                                    <Select disabled={item.loading || item.status === 'downloading'} value={item.status} onChange={async (status) => {
+                                        item.loading = true
+                                        try {
+                                            await api.updateResourceVideo(local.id, { id: item.id, status })
+                                            item.status = status
+                                        } finally {
+                                            item.loading = false
+                                        }
+                                    }}>
+                                        <Select.Option value="init">初始化</Select.Option>
+                                        <Select.Option value="finished">已下载</Select.Option>
+                                        <Select.Option value="fail">失败</Select.Option>
+                                    </Select>
+                                )}</Observer>}
+                                suffix={<CloseOutlined disabled={item.loading || item.status === 'downloading'} onClick={async () => {
+                                    item.loading = true
+                                    try {
+                                        await api.removeResourceVideo({ id: item.id, mid: local.id })
+                                        local.data.urls = local.data.urls.filter(t => t.url !== item.url)
+                                    } finally {
+                                        item.loading = false
+                                    }
+                                }} />}
+                                addonAfter={<Observer>{() => (
+                                    <Icon type={item.loading || item.status === 'downloading' ? 'loading' : 'download'} disabled={item.loading} onClick={async () => {
+                                        item.loading = true
+                                        try {
+                                            await api.downloadResourceVideo(local.id, item.id)
+                                            item.status = 'finished'
+                                        } finally {
+                                            item.loading = false
+                                        }
+                                    }} />
+                                )}</Observer>}
+                            />
                         )}
                     />
                     {local.urlAddVisible && (
@@ -243,7 +274,7 @@ export default function ResourceEdit() {
                             ref={inputUrl}
                             type="text"
                             size="small"
-                            style={{ width: 78 }}
+                            style={{ width: 78, margin: '10px 5px' }}
                             value={local.tempUrl}
                             autoFocus
                             disabled={local.isDealUrl}
@@ -260,9 +291,8 @@ export default function ResourceEdit() {
                                 local.isDealUrl = true
                                 try {
                                     const res = await api.addResourceVideo({ id: local.id, title: local.data.title, url })
-                                    const urls = local.data.urls
                                     if (res && res.code === 0) {
-                                        local.data.urls.push({ url: res.data.url, id: res.data.id })
+                                        local.data.urls.push({ url: res.data.url, id: res.data.id, status: 'init' })
                                         local.urlAddVisible = false
                                         local.tempUrl = ''
                                     } else {
@@ -275,7 +305,7 @@ export default function ResourceEdit() {
                         />
                     )}
                     {!local.urlAddVisible && (
-                        <Tag onClick={() => local.urlAddVisible = true} style={{ background: '#fff', borderStyle: 'dashed' }}>
+                        <Tag onClick={() => local.urlAddVisible = true} style={{ margin: '10px 5px', background: '#fff', borderStyle: 'dashed' }}>
                             <PlusCircleOutlined />
                         </Tag>
                     )}
