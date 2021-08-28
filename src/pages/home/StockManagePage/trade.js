@@ -1,11 +1,12 @@
-import React, { useEffect, useCallback, Fragment } from 'react';
+import React, { useCallback } from 'react';
 import { Observer, useLocalStore } from 'mobx-react-lite'
-import { Table, Popconfirm, Switch, notification, Button, Divider, DatePicker, Input, Select, } from 'antd';
-import { DeleteOutlined, WarningOutlined, SyncOutlined, LoadingOutlined, FormOutlined, CheckCircleOutlined } from '@ant-design/icons'
+import { Table, Popconfirm, Button, Divider, DatePicker, Input, Select, } from 'antd';
+import { DeleteOutlined, WarningOutlined, FormOutlined } from '@ant-design/icons'
 import apis from '../../../api'
-import { FullHeight, FullHeightFix, FullHeightAuto, Right, FullWidthFix } from '../../../component/style'
+import { FullHeight, FullHeightFix, FullHeightAuto, FullWidthFix } from '../../../component/style'
 import Edit from './editTrade'
 import { useEffectOnce } from 'react-use';
+import moment from 'moment'
 
 const { Column } = Table;
 const { getTrades, createTrade, updateTrade, destroyTrade } = apis
@@ -124,7 +125,7 @@ export default function TaskList() {
           <Divider type="vertical" />
           <Button type="primary" onClick={e => {
             local.temp = {
-              type: 1, amount: 0, price: 0, trade: 0, total: 0, currency: '人民币', fee: 0, fees: [
+              type: 1, amount: 0, price: 0, trade: 0, total: 0, currency: '人民币', fee: 0, se: 'SH', settlement: moment(new Date()).format('YYYYMMDD'), code: '', fees: [
                 { key: '佣金', value: 0 },
                 { key: '规费', value: 0 },
                 { key: '印花税', value: 0 },
@@ -145,7 +146,6 @@ export default function TaskList() {
           local.search_page = page.current
           search()
         }}>
-          {/* <Column title="id" width={100} dataIndex="id" key="id" render={text => <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block', width: '100%' }}>{text}</span>} /> */}
           <Column title="名称" width={100} dataIndex="name" key="name" />
           <Column title="交收日期" width={100} dataIndex="settlement" key="settlement" />
           <Column title="交易类别" width={120} dataIndex="type" key="type" render={text => <span>

@@ -1,9 +1,10 @@
 import React, { useRef } from 'react'
 import { Observer, useLocalStore } from 'mobx-react-lite'
-import { Button, Modal, Form, Input, Card, Select, Divider, notification, Table, message } from 'antd';
+import { Modal, Form, Input, Select, message, Col, Row, DatePicker } from 'antd';
 import * as math from 'mathjs'
+import moment from 'moment'
 
-const lb = { span: 6, offset: 3 }, rb = { span: 12 }
+const lb = { span: 4, offset: 2 }, rb = { span: 15 }
 export default function ({ data, save, cancel }) {
   const iref = useRef(null)
   const local = useLocalStore(() => ({
@@ -13,8 +14,11 @@ export default function ({ data, save, cancel }) {
   return <Observer>{() => <Modal
     visible={true}
     style={{ overflow: 'auto', padding: 0 }}
-    width={600}
+    width={650}
+    closable={false}
     title={local.inster ? '添加记录' : '修改记录'}
+    cancelText="取消"
+    okText="保存"
     onCancel={e => { cancel() }}
     onOk={async () => {
       local.isLoading = true
@@ -30,6 +34,7 @@ export default function ({ data, save, cancel }) {
       }
       local.data = {
         settlement: local.data.settlement, name: local.data.name,
+        se: 'SH', code: '',
         type: 1, amount: 0, price: 0, trade: 0, total: 0, currency: '人民币', fee: 0,
         fees: [
           { key: '佣金', value: 0 },
@@ -51,55 +56,77 @@ export default function ({ data, save, cancel }) {
     }}
   >
     <Form>
-      <Form.Item style={{ marginBottom: 5 }} label="交收日期" labelCol={lb} wrapperCol={rb}>
-        <Input placeholder="交收日期" autoFocus ref={ref => iref.current = ref} value={local.data.settlement} onChange={e => local.data.settlement = e.target.value} />
+      <Form.Item style={{ marginBottom: 5 }} label="交割日期" labelCol={lb} wrapperCol={rb}>
+        <Row gutter={16}>
+          <Col span={8}>
+            <DatePicker style={{ width: '100%' }} defaultValue={moment(new Date(), 'YYYYMMDD')} format="YYYYMMDD" onChange={(d, s) => {
+              local.data.settlement = s;
+            }} />
+          </Col>
+          <Col span={16}>
+            <Select value={local.data.type} style={{ width: '100%' }} onChange={value => local.data.type = value}>
+              <Select.Option value={1}>证券买入</Select.Option>
+              <Select.Option value={2}>证券卖出</Select.Option>
+              <Select.Option value={3}>红利入账</Select.Option>
+              <Select.Option value={4}>股息个税征收</Select.Option>
+              <Select.Option value={5}>利息归本</Select.Option>
+              <Select.Option value={6}>银行转证券</Select.Option>
+              <Select.Option value={7}>证券转银行</Select.Option>
+              <Select.Option value={8}>指定交易</Select.Option>
+            </Select>
+          </Col>
+        </Row>
       </Form.Item>
-      <Form.Item style={{ marginBottom: 5 }} label="证券名称" labelCol={lb} wrapperCol={rb}>
-        <Input placeholder="证券名称" value={local.data.name} onChange={e => local.data.name = e.target.value} />
-      </Form.Item>
-      <Form.Item style={{ marginBottom: 5 }} label="交易类别" labelCol={lb} wrapperCol={rb}>
-        <Select value={local.data.type} onChange={value => local.data.type = value}>
-          <Select.Option value="">请选择</Select.Option>
-          <Select.Option value={1}>证券买入</Select.Option>
-          <Select.Option value={2}>证券卖出</Select.Option>
-          <Select.Option value={3}>红利入账</Select.Option>
-          <Select.Option value={4}>股息个税征收</Select.Option>
-          <Select.Option value={5}>利息归本</Select.Option>
-          <Select.Option value={6}>银行转证券</Select.Option>
-          <Select.Option value={7}>证券转银行</Select.Option>
-          <Select.Option value={8}>指定交易</Select.Option>
-        </Select>
-      </Form.Item>
-      <Form.Item style={{ marginBottom: 5 }} label="成交数量" labelCol={lb} wrapperCol={rb}>
-        <Input placeholder="成交数量" disabled={data.type === 5} type='number' value={local.data.amount} onChange={e => local.data.amount = parseFloat(e.target.value)} />
-      </Form.Item>
-      <Form.Item style={{ marginBottom: 5 }} label="成交价格" labelCol={lb} wrapperCol={rb}>
-        <Input placeholder="成交价格" disabled={data.type === 5} type='number' value={local.data.price} onChange={e => {
-          local.data.price = parseFloat(e.target.value) || 0
-          local.data.trade = math.multiply(math.bignumber(local.data.amount), math.bignumber(local.data.price)).toNumber()
-        }} />
-      </Form.Item>
-      <Form.Item style={{ marginBottom: 5 }} label="成交金额" labelCol={lb} wrapperCol={rb}>
-        <Input placeholder="成交金额" value={local.data.trade} type='number' onChange={e => {
-          local.data.trade = e.target.value
-          if (local.data.type === 3) {
-            local.data.total = e.target.value
-          }
-        }} />
-      </Form.Item>
-      <Form.Item style={{ marginBottom: 5 }} label="费用合计" labelCol={lb} wrapperCol={rb}>
-        <Input placeholder="0" disabled={data.type === 5} value={local.data.fee} onChange={e => {
-          local.data.fee = e.target.value
-          const k = [1, 4, 7].includes(local.data.type) ? -1 : 1
-          local.data.total = math.subtract(math.multiply(math.bignumber(local.data.trade), k), math.bignumber(local.data.fee)).toNumber()
-        }} />
-      </Form.Item>
-      <Form.Item style={{ marginBottom: 5 }} label="发生金额" labelCol={lb} wrapperCol={rb}>
-        <Input placeholder="发生金额" value={local.data.total} type='number' onChange={e => local.data.total = e.target.value} />
-      </Form.Item>
+      <Row gutter={8} style={{ marginBottom: 5 }}>
+        <Col offset={6} span={7}>
+          <Input placeholder="证券代码" addonBefore={<Select value={local.data.se} onChange={v => local.data.se = v}>
+            <Select.Option key="SH" value="SH">上海</Select.Option>
+            <Select.Option key="SZ" value="SZ">深圳</Select.Option>
+            <Select.Option key="HK" value="HK">香港</Select.Option>
+            <Select.Option key="NASDAQ" value="NASDAQ">纳斯达克</Select.Option>
+            <Select.Option key="NYSE" value="NYSE">纽交所</Select.Option>
+          </Select>} value={local.data.code} onChange={e => local.data.code = e.target.value} />
+        </Col>
+        <Col offset={1} span={7}>
+          <Input placeholder="证券名称" addonBefore="名称" value={local.data.name} onChange={e => local.data.name = e.target.value} />
+        </Col>
+      </Row>
+      <Row gutter={8} style={{ marginBottom: 5 }}>
+        <Col offset={6} span={7}>
+          <Input addonBefore="数量" placeholder="成交数量" disabled={data.type === 5} type='number' value={local.data.amount} onChange={e => local.data.amount = parseFloat(e.target.value)} />
+        </Col>
+        <Col offset={1} span={7}>
+          <Input addonBefore="价格" placeholder="成交价格" disabled={data.type === 5} type='number' value={local.data.price} onChange={e => {
+            local.data.price = parseFloat(e.target.value) || 0
+            local.data.trade = math.multiply(math.bignumber(local.data.amount), math.bignumber(local.data.price)).toNumber()
+          }} />
+        </Col>
+      </Row>
+      <Row gutter={8} style={{ marginBottom: 5 }} >
+        <Col offset={6} span={15}>
+          <Input addonBefore="费用合计" placeholder="0" disabled={data.type === 5} value={local.data.fee} onChange={e => {
+            local.data.fee = e.target.value
+            const k = [1, 4, 7].includes(local.data.type) ? -1 : 1
+            local.data.total = math.subtract(math.multiply(math.bignumber(local.data.trade), k), math.bignumber(local.data.fee)).toNumber()
+          }} />
+        </Col>
+      </Row>
+      <Row gutter={8} style={{ marginBottom: 5 }}>
+        <Col offset={6} span={7}>
+          <Input placeholder="成交金额" addonBefore="成交金额" value={local.data.trade} type='number' onChange={e => {
+            local.data.trade = e.target.value
+            if (local.data.type === 3) {
+              local.data.total = e.target.value
+            }
+          }} />
+        </Col>
+        <Col offset={1} span={7}>
+          <Input placeholder="发生金额" addonBefore="发生金额" value={local.data.total} type='number' onChange={e => local.data.total = e.target.value} />
+        </Col>
+      </Row>
       <Form.Item style={{ marginBottom: 5 }} label="费用明细" labelCol={lb} wrapperCol={rb}>
         {local.data.fees.map((fee, i) => (
-          <Input key={i} addonBefore={fee.key} placeholder="费用" type='number' value={fee.value} onChange={e => fee.value = e.target.value} />
+          <Input key={i} addonBefore={fee.key} placeholder="费用" type='number' style={{ marginBottom: 2 }} value={fee.value} onChange={e => fee.value = e.target.value} />
         ))}
       </Form.Item>
       <Form.Item style={{ marginBottom: 5 }} label="币种" labelCol={lb} wrapperCol={rb}>
