@@ -62,7 +62,7 @@ export default function ResourceManagePage() {
   return (<Observer>{() => {
     return <div className={'box'}>
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-        <div style={{ padding: '10px 0' }}>
+        <div style={{ padding: 10 }}>
           名称<Divider type="vertical" />
           <Input style={{ width: 250 }} value={local.search_name} onChange={e => {
             local.search_name = e.target.value

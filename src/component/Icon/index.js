@@ -17,11 +17,13 @@ import {
   DragOutlined,
   EllipsisOutlined,
   CloudDownloadOutlined,
+  CheckOutlined,
 } from '@ant-design/icons'
 
 const IconMap = {
   'loading': LoadingOutlined,
   'plus': PlusOutlined,
+  'check': CheckOutlined,
   'circle-plus': PlusCircleOutlined,
   'circle-info': InfoCircleOutlined,
   'circle-minus': MinusCircleOutlined,

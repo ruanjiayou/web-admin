@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 import apis from '../../../api';
 import { Table, Popconfirm, Switch, notification, Select, Tag, Input, Popover, Divider, } from 'antd';
 import { FormOutlined, DeleteOutlined, WarningOutlined, CloudServerOutlined, SyncOutlined, PlusCircleOutlined, UploadOutlined } from '@ant-design/icons'
-import { Icon, VisualBox } from '../../../component'
+import { Icon, VisualBox, EditTag } from '../../../component'
 import { AlignAround } from '../../../component/style'
 import store from '../../../store'
 
@@ -47,7 +47,7 @@ export default function ResourceList({ items, children, categories, search, loca
 				)}
 				</Observer>
 			)} />
-			<Column title="标题" dataIndex="title" key="title" render={(text, record) => {
+			<Column title="标题" width={200} dataIndex="title" key="title" render={(text, record) => {
 				let url = ''
 				if (record.source_type === 'video') {
 					url = (window.origin + '/novel/groups/GroupTree/VideoInfo?GroupTree.name=video&VideoInfo.id=' + record.id)
@@ -95,64 +95,38 @@ export default function ResourceList({ items, children, categories, search, loca
 				)}
 				</Observer>
 			)} />
-			<Column title="分类" dataIndex="types" key="types" render={(text, record) => (
+			<Column title="分类" width={120} dataIndex="types" key="types" render={(text, record) => (
 				<Observer>{() => (
 					<Fragment>
-						{record.types.map(type => <Tag key={type} closable={!state.updating} onClose={async () => {
+						{record.types.map(type => <Tag key={type} closable={true} onClose={async () => {
 							try {
-								state.updating = true
 								const types = record.types.filter(item => item !== type)
 								await apis.updateResource({ id: record.id, types })
 								record.types = types
 								notification.info({ message: '修改成功' })
 							} catch (e) {
 								notification.info({ message: '修改失败' })
-							} finally {
-								state.updating = false
 							}
 						}}>{type}</Tag>)}
-						<div style={{ marginTop: 10 }}>
-							<Input.Group>
-								<Input
-									type="text"
-									size="small"
-									style={{ width: 50 }}
-									disabled={state.updating}
-								/>
-								<Tag onClick={async (e) => {
-									if (state.updating) {
-										return
-									}
-									if (e.currentTarget) {
-										const inp = e.currentTarget.previousElementSibling
-										const type = inp.value.trim()
-										const types = record.types.map(item => item)
-										if (types.includes(type)) {
-											return notification.info('类型已存在')
-										}
-										try {
-											state.updating = true
-											await apis.updateResource({ id: record.id, types: [...types, type] })
-											record.types = [...types, type]
-											notification.info({ message: '修改成功' })
-										} catch (e) {
-											notification.info({ message: '修改失败' })
-										} finally {
-											state.updating = false
-											inp.value = ''
-										}
-
-									}
-								}} style={{ background: '#fff', borderStyle: 'dashed' }}>
-									<PlusCircleOutlined />
-								</Tag>
-							</Input.Group>
-						</div>
+						<EditTag save={async (type) => {
+							type = type.trim();
+							const types = record.types.map(item => item)
+							if (types.includes(type)) {
+								return notification.info('类型已存在')
+							}
+							try {
+								await apis.updateResource({ id: record.id, types: [...types, type] })
+								record.types = [...types, type]
+								notification.info({ message: '修改成功' })
+							} catch (e) {
+								notification.info({ message: '修改失败' })
+							}
+						}} />
 					</Fragment>
 				)}
 				</Observer>
 			)} />
-			<Column title="标签" dataIndex="types" key="types" width={100} render={(text, record) => (
+			<Column title="标签" dataIndex="types" key="types" width={110} render={(text, record) => (
 				<Observer>{() => (
 					<Fragment>
 						{record.tags.map(tag => <Tag key={tag} closable={!state.updating} onClose={async () => {
@@ -168,43 +142,20 @@ export default function ResourceList({ items, children, categories, search, loca
 								state.updating = false
 							}
 						}}>{tag}</Tag>)}
-						<div style={{ marginTop: 10 }}>
-							<Input.Group>
-								<Input
-									type="text"
-									size="small"
-									style={{ width: 50 }}
-									disabled={state.updating}
-								/>
-								<Tag onClick={async (e) => {
-									if (state.updating) {
-										return
-									}
-									if (e.currentTarget) {
-										const inp = e.currentTarget.previousElementSibling
-										const tag = inp.value.trim()
-										const tags = record.tags.map(item => item)
-										if (tags.includes(tag)) {
-											return notification.info('类型已存在')
-										}
-										try {
-											state.updating = true
-											await apis.updateResource({ id: record.id, tags: [...tags, tag] })
-											record.tags = [...tags, tag]
-											notification.info({ message: '修改成功' })
-										} catch (e) {
-											notification.info({ message: '修改失败' })
-										} finally {
-											state.updating = false
-											inp.value = ''
-										}
-
-									}
-								}} style={{ background: '#fff', borderStyle: 'dashed' }}>
-									<PlusCircleOutlined />
-								</Tag>
-							</Input.Group>
-						</div>
+						<EditTag save={async (tag) => {
+							tag = tag.trim();
+							const tags = record.tags.map(item => item)
+							if (tags.includes(tag)) {
+								return notification.info('类型已存在')
+							}
+							try {
+								await apis.updateResource({ id: record.id, tags: [...tags, tag] })
+								record.tags = [...tags, tag]
+								notification.info({ message: '修改成功' })
+							} catch (e) {
+								notification.info({ message: '修改失败' })
+							}
+						}} />
 					</Fragment>
 				)}
 				</Observer>
