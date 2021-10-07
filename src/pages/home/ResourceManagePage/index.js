@@ -31,6 +31,7 @@ export default function ResourceManagePage() {
     count: 0,
     search_name: '',
     search_type: '',
+    search_status: '',
     search_page: 1,
     categories: {},
     resources: [],
@@ -40,6 +41,7 @@ export default function ResourceManagePage() {
     const query = {
       search: local.search_name,
       source_type: local.search_type,
+      status: local.search_status,
       page: local.search_page,
     }
     getResources(query).then(res => {
@@ -66,9 +68,28 @@ export default function ResourceManagePage() {
           名称<Divider type="vertical" />
           <Input style={{ width: 250 }} value={local.search_name} onChange={e => {
             local.search_name = e.target.value
+          }} onKeyDown={e => {
+            if (e.keyCode === 13) {
+              search()
+            }
           }} />
           <Divider type="vertical" />
-          资源类型<Divider type="vertical" />
+          状态
+          <Divider type="vertical" />
+          <Select style={{ width: 150 }} value={local.search_status} onChange={value => {
+            local.search_status = value
+            local.search_page = 1
+            search()
+          }}>
+            <Select.Option value="">全部</Select.Option>
+            <Select.Option value="init">初始化</Select.Option>
+            <Select.Option value="loading">loading</Select.Option>
+            <Select.Option value="finished">成功</Select.Option>
+            <Select.Option value="fail">失败</Select.Option>
+          </Select>
+          <Divider type="vertical" />
+          资源类型
+          <Divider type="vertical" />
           <Select style={{ width: 150 }} value={local.search_type} onChange={value => {
             local.search_type = value
             local.search_page = 1

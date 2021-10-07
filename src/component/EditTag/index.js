@@ -11,7 +11,7 @@ export default function EditTag(props) {
   }));
   return <Observer>{() => {
     if (local.edit) {
-      return <div style={{ display: 'inline-block', width: 90 }}>
+      return <div style={{ display: 'block', width: 90, }}>
         <Input disabled={local.loading} autoFocus addonAfter={<Icon type={local.loading ? 'loading' : 'check'} onClick={async (e) => {
           const oinput = e.currentTarget.parentElement.parentElement.previousElementSibling;
           if (!local.loading) {

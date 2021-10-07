@@ -33,7 +33,6 @@ function deepEqual(a, b) {
 }
 
 export default function ResourceEdit() {
-    const router = useRouter()
     const picture = useRef(null)
     const inp = useRef(null)
     const inputType = useRef(null)
@@ -47,8 +46,10 @@ export default function ResourceEdit() {
         // 临时
         tempImg: '',
         tempTag: '',
+        tempStatus: 'init',
         tagAddVisible: false,
-        tempType: '',
+        tempType: 'normal',
+        tempTypes: '',
         typeAddVisible: false,
         tempUrl: '',
         urlAddVisible: false,
@@ -107,32 +108,32 @@ export default function ResourceEdit() {
 
                 <Form.Item label="types" labelCol={lb} wrapperCol={rb}>
                     {local.data.types.map((type, index) => <Tag key={index} closable onClose={() => { local.data.types.filter(t => t !== type) }}>{type}</Tag>)}
-                    {local.data.typeAddVisible && (
+                    {local.typeAddVisible && (
                         <Input
                             ref={inputType}
                             type="text"
                             size="small"
                             style={{ width: 78 }}
-                            value={local.tempType}
+                            value={local.tempTypes}
                             autoFocus
-                            onChange={e => local.tempType = e.target.value}
+                            onChange={e => local.tempTypes = e.target.value}
                             onBlur={() => {
-                                let type = local.tempType.trim()
+                                let type = local.tempTypes.trim()
                                 const types = local.data.types
                                 if (type !== '' && -1 === types.findIndex(t => t === type)) {
                                     local.data.types.push(type)
                                 }
                                 local.typeAddVisible = false
-                                local.tempType = ''
+                                local.tempTypes = ''
                             }}
                             onPressEnter={() => {
-                                let type = local.tempType.trim()
+                                let type = local.tempTypes.trim()
                                 const types = local.data.types
                                 if (type !== '' && -1 === types.findIndex(t => t === type)) {
                                     local.data.types.push(type)
                                 }
                                 local.typeAddVisible = false
-                                local.tempType = ''
+                                local.tempTypes = ''
                             }}
                         />
                     )}
@@ -217,7 +218,10 @@ export default function ResourceEdit() {
                             local.loading = false
                             try {
                                 await api.sortResourceVideo({ id: local.id, data })
-                                local.data.urls = data
+                                const items = local.data.urls.map(item => item)
+                                const item = items.splice(oldIndex, 1);
+                                items.splice(newIndex, 0, ...item)
+                                local.data.urls = items
                             } finally {
                                 local.loading = false
                             }
@@ -229,22 +233,41 @@ export default function ResourceEdit() {
                         renderItem={({ item, index }) => (
                             <Input
                                 key={index}
-                                value={item.url}
+                                value={(index + 1) + ' ' + item.url}
+                                style={{ marginBottom: 5 }}
                                 disabled
                                 addonBefore={<Observer>{() => (
-                                    <Select disabled={item.loading || item.status === 'downloading'} value={item.status} onChange={async (status) => {
-                                        item.loading = true
-                                        try {
-                                            await api.updateResourceVideo(local.id, { id: item.id, status })
-                                            item.status = status
-                                        } finally {
-                                            item.loading = false
-                                        }
-                                    }}>
-                                        <Select.Option value="init">初始化</Select.Option>
-                                        <Select.Option value="finished">已下载</Select.Option>
-                                        <Select.Option value="fail">失败</Select.Option>
-                                    </Select>
+                                    <Fragment>
+                                        <Icon type="drag" />
+                                        <Divider type="vertical" />
+                                        <Select style={{ width: 90 }} disabled={item.loading || item.status === 'downloading'} value={item.status} onChange={async (status) => {
+                                            item.loading = true
+                                            try {
+                                                await api.updateResourceVideo(local.id, { id: item.id, status })
+                                                item.status = status
+                                            } finally {
+                                                item.loading = false
+                                            }
+                                        }}>
+                                            <Select.Option value="init">初始化</Select.Option>
+                                            <Select.Option value="finished">已下载</Select.Option>
+                                            <Select.Option value="fail">失败</Select.Option>
+                                        </Select>
+                                        <Divider type="vertical" />
+                                        <Select style={{ width: 80 }} disabled={item.loading || item.status === 'downloading'} value={item.type} onChange={async (type) => {
+                                            item.loading = true
+                                            try {
+                                                await api.updateResourceVideo(local.id, { id: item.id, type })
+                                                item.type = type
+                                            } finally {
+                                                item.loading = false
+                                            }
+                                        }}>
+                                            <Select.Option value="normal">正片</Select.Option>
+                                            <Select.Option value="trailer">预告</Select.Option>
+                                            <Select.Option value="tidbits">花絮</Select.Option>
+                                        </Select>
+                                    </Fragment>
                                 )}</Observer>}
                                 suffix={<CloseOutlined disabled={item.loading || item.status === 'downloading'} onClick={async () => {
                                     item.loading = true
@@ -274,12 +297,32 @@ export default function ResourceEdit() {
                             ref={inputUrl}
                             type="text"
                             size="small"
-                            style={{ width: 78, margin: '10px 5px' }}
+                            style={{ margin: '10px 5px' }}
                             value={local.tempUrl}
                             autoFocus
                             disabled={local.isDealUrl}
                             onChange={e => local.tempUrl = e.target.value}
-                            onBlur={async () => {
+                            addonBefore={<Fragment>
+                                <Select style={{ width: 90 }} disabled={local.isDealUrl} value={local.tempStatus} onChange={async (status) => {
+                                    local.tempStatus = status;
+                                }}>
+                                    <Select.Option value="init">初始化</Select.Option>
+                                    <Select.Option value="finished">已下载</Select.Option>
+                                    <Select.Option value="fail">失败</Select.Option>
+                                </Select>
+                                <Divider type="vertical" />
+                                <Select style={{ width: 80 }} disabled={local.isDealUrl} value={local.tempType} onChange={async (type) => {
+                                    local.tempType = type;
+                                }}>
+                                    <Select.Option value="normal">正片</Select.Option>
+                                    <Select.Option value="trailer">预告</Select.Option>
+                                    <Select.Option value="tidbits">花絮</Select.Option>
+                                </Select>
+                            </Fragment>}
+                            addonAfter={<Icon type="check" onClick={async () => {
+                                if (local.isDealUrl) {
+                                    return;
+                                }
                                 let url = local.tempUrl.trim()
                                 if ('' === url) {
                                     local.urlAddVisible = false
@@ -290,18 +333,20 @@ export default function ResourceEdit() {
                                 }
                                 local.isDealUrl = true
                                 try {
-                                    const res = await api.addResourceVideo({ id: local.id, title: local.data.title, url })
+                                    const res = await api.addResourceVideo({ id: local.id, title: local.data.title, url, type: local.tempType, status: local.tempStatus })
                                     if (res && res.code === 0) {
-                                        local.data.urls.push({ url: res.data.url, id: res.data.id, status: 'init' })
+                                        local.data.urls.push({ url: res.data.url, id: res.data.id, status: local.tempStatus, type: local.tempType })
                                         local.urlAddVisible = false
-                                        local.tempUrl = ''
                                     } else {
                                         notification.info('fail')
                                     }
                                 } finally {
-                                    local.isDealUrl = false
+                                    local.tempUrl = '';
+                                    local.isDealUrl = false;
+                                    local.tempStatus = 'init';
+                                    local.tempType = 'normal';
                                 }
-                            }}
+                            }} />}
                         />
                     )}
                     {!local.urlAddVisible && (

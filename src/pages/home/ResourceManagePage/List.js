@@ -25,9 +25,9 @@ export default function ResourceList({ items, children, categories, search, loca
 			local.search_page = page.current
 			search()
 		}}>
-			<Column title="封面" width={100} dataIndex="poster" key="id" render={(text, record) => (
+			<Column title="封面" width={70} dataIndex="poster" key="id" align="center" render={(text, record) => (
 				<Observer>{() => (
-					<div style={{ position: 'relative' }}>
+					<div style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
 						<img src={store.app.imageLine + (record.poster || record.thumbnail || '/images/poster/nocover.jpg')}
 							style={{ width: 60, height: 60, borderRadius: '50%', marginRight: 10, }}
 							alt=""
@@ -98,7 +98,7 @@ export default function ResourceList({ items, children, categories, search, loca
 			<Column title="分类" width={120} dataIndex="types" key="types" render={(text, record) => (
 				<Observer>{() => (
 					<Fragment>
-						{record.types.map(type => <Tag key={type} closable={true} onClose={async () => {
+						{record.types.map(type => <Tag key={type} style={{ marginBottom: 5 }} closable={true} onClose={async () => {
 							try {
 								const types = record.types.filter(item => item !== type)
 								await apis.updateResource({ id: record.id, types })
@@ -126,10 +126,10 @@ export default function ResourceList({ items, children, categories, search, loca
 				)}
 				</Observer>
 			)} />
-			<Column title="标签" dataIndex="types" key="types" width={110} render={(text, record) => (
+			<Column title="标签" dataIndex="types" key="types" width={150} render={(text, record) => (
 				<Observer>{() => (
 					<Fragment>
-						{record.tags.map(tag => <Tag key={tag} closable={!state.updating} onClose={async () => {
+						{record.tags.map(tag => <Tag key={tag} style={{ marginBottom: 5 }} closable={!state.updating} onClose={async () => {
 							try {
 								state.updating = true
 								const tags = record.tags.filter(item => item !== tag)

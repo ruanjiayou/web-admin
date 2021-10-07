@@ -1,11 +1,13 @@
 import React, { Fragment } from 'react'
-import { Observer } from 'mobx-react-lite'
+import { Observer, useLocalStore } from 'mobx-react-lite'
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom'
 import { createRouter } from './contexts'
 
 import pages from './pages'
 import Layout from './layout'
 import { useStore } from './contexts'
+import { Icon } from './component';
+import { FullHeight, FullHeightAuto, FullHeightFix } from './component/style';
 
 function NoMatch() {
   const store = useStore()
@@ -20,6 +22,22 @@ function Poster(props) {
       return <Redirect to={'/admin/auth/sign-in'} />
     }
     return <Fragment>
+      <div style={{ position: 'fixed', bottom: 50, right: 50, zIndex: 9 }}>
+        <FullHeight style={{ width: 500, maxHeight: 600, display: store.logger.status === 'open' ? 'flex' : 'none', backgroundColor: 'gray', color: 'white', padding: 5, }}>
+          <FullHeightAuto>
+            {store.logger.logs.map(log => (<div key={log.no}>{log.message}</div>))}
+          </FullHeightAuto>
+          <FullHeightFix>
+            {store.logger.keys.map(key => (<div key={key}>{store.logger.progress.get(key).message}</div>))}
+          </FullHeightFix>
+        </FullHeight>
+
+        <div style={{ position: 'absolute', bottom: 0, right: 0, width: 30, height: 30, borderRadius: '50%', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#ffeb00' }} onClick={() => {
+          store.logger.toggle();
+        }}>
+          <Icon type={store.logger.status === 'open' ? 'delete' : 'more'} />
+        </div>
+      </div>
       <RouterContext.Provider value={router}>
         <Switch>
           {pages.filter(page => !!page.Page).map(({ pathname, Page, single = false }) => (
