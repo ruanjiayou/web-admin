@@ -14,7 +14,7 @@ require('codemirror/mode/xml/xml');
 require('codemirror/mode/javascript/javascript');
 
 const { Column } = Table;
-const { v2getRules, v2createRule, v2updateRule, v2GetResourceByRule, v2UpdateRuleCode, v2getRuleCode } = apis
+const { v2getRules, v2createRule, v2updateRule, v2GetResourceByRule, v2UpdateRuleCode, v2getRuleCode, v2previewRule } = apis
 
 export default function SpiderPage() {
   const lb = { span: 6, offset: 3 }, rb = { span: 12 }
@@ -94,7 +94,15 @@ export default function SpiderPage() {
                   <Input disabled value={local.tempRule ? local.tempRule.type : ''} />
                 </Col>
               </Row>
-              <Input ref={ref => originRef.current = ref} />
+              <Input ref={ref => originRef.current = ref} onPaste={e => {
+                const url = e.clipboardData.getData('text/plain');
+                local.rules.forEach(rule => {
+                  if (url.startsWith(rule.host)) {
+                    local.tempId = rule.id
+                    local.tempRule = rule
+                  }
+                })
+              }} />
             </Fragment>}</Observer>,
             okText: '预览',
             cancelText: '取消',
@@ -103,7 +111,7 @@ export default function SpiderPage() {
                 const id = originRef.current.state.value
                 let found = false
                 local.rules.forEach(rule => {
-                  if (id.startsWith(rule.id)) {
+                  if (id.startsWith(rule.host)) {
                     found = true
                   }
                 })
@@ -113,12 +121,25 @@ export default function SpiderPage() {
                 if (local.tempRule.type === 'pixiv') {
                   return window.open(`${store.app.baseUrl}/v1/admin/pixiv-preview?id=${id}`)
                 }
-                apis.previewTask({ origin: id, ruleId: local.tempId }).then(res => {
+                v2previewRule(local.tempId, { origin: id }).then(res => {
                   if (res.code === 0) {
                     notification.success({ message: 'success' })
                     Modal.confirm({
-                      title: 'preview',
-                      content: <code>{JSON.stringify(res.data, null, 2)}</code>
+                      title: '预览结果',
+                      okText: '确定',
+                      cancelButtonProps: { hidden: true },
+                      width: 700,
+                      content: <CodeMirror
+                        value={JSON.stringify(res.data, null, 2)}
+                        options={{
+                          mode: 'json',
+                          theme: 'material',
+                          lineNumbers: true
+                        }}
+                        onChange={(editor, data, value) => {
+                          local.code = value;
+                        }}
+                      />
                     })
                   } else {
                     notification.error({ message: res.message })

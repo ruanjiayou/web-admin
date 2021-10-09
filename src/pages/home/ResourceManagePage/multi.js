@@ -77,7 +77,7 @@ export default function ResourceEdit() {
 
     return <Observer>{() => (<Fragment>
         <div style={{ display: 'flex', flexDirection: 'column', height: '100%', }}>
-            <div style={{ flex: 1, overflowY: 'auto' }}>
+            <div style={{ flex: 1, overflowY: 'auto', paddingTop: 20 }}>
                 <Form.Item label="标题" labelCol={lb} wrapperCol={rb}>
                     <Input style={{ width: '50%' }} value={local.data.title} autoFocus onChange={e => local.data.title = e.target.value} />
                 </Form.Item>
@@ -208,6 +208,7 @@ export default function ResourceEdit() {
                         isLoading={local.loading}
                         direction="vertical"
                         mode="edit"
+                        handler={<Icon type="drag" style={{ marginRight: 10 }} />}
                         sort={async (oldIndex, newIndex) => {
                             const data = local.data.urls.map(item => ({ id: item.id, url: item.url }))
                             const id = data.splice(oldIndex, 1)
@@ -229,18 +230,15 @@ export default function ResourceEdit() {
                         items={local.data.urls}
                         droppableId={local.id}
                         listStyle={{ boxSizing: 'border-box' }}
-                        itemStyle={{ lineHeight: 1, margin: '0 5px' }}
+                        itemStyle={{ display: 'flex', alignItems: 'center', lineHeight: 1 }}
                         renderItem={({ item, index }) => (
                             <Input
                                 key={index}
-                                value={(index + 1) + ' ' + item.url}
-                                style={{ marginBottom: 5 }}
+                                value={item.nth + ' ' + item.url}
                                 disabled
                                 addonBefore={<Observer>{() => (
                                     <Fragment>
-                                        <Icon type="drag" />
-                                        <Divider type="vertical" />
-                                        <Select style={{ width: 90 }} disabled={item.loading || item.status === 'downloading'} value={item.status} onChange={async (status) => {
+                                        <Select style={{ width: 90 }} disabled={item.loading || item.status === 'loading'} value={item.status} onChange={async (status) => {
                                             item.loading = true
                                             try {
                                                 await api.updateResourceVideo(local.id, { id: item.id, status })
@@ -250,11 +248,12 @@ export default function ResourceEdit() {
                                             }
                                         }}>
                                             <Select.Option value="init">初始化</Select.Option>
+                                            <Select.Option value="loading">下载中</Select.Option>
                                             <Select.Option value="finished">已下载</Select.Option>
                                             <Select.Option value="fail">失败</Select.Option>
                                         </Select>
                                         <Divider type="vertical" />
-                                        <Select style={{ width: 80 }} disabled={item.loading || item.status === 'downloading'} value={item.type} onChange={async (type) => {
+                                        <Select style={{ width: 80 }} disabled={item.loading || item.status === 'loading'} value={item.type} onChange={async (type) => {
                                             item.loading = true
                                             try {
                                                 await api.updateResourceVideo(local.id, { id: item.id, type })
@@ -269,7 +268,7 @@ export default function ResourceEdit() {
                                         </Select>
                                     </Fragment>
                                 )}</Observer>}
-                                suffix={<CloseOutlined disabled={item.loading || item.status === 'downloading'} onClick={async () => {
+                                suffix={<CloseOutlined disabled={item.loading || item.status === 'loading'} onClick={async () => {
                                     item.loading = true
                                     try {
                                         await api.removeResourceVideo({ id: item.id, mid: local.id })
@@ -279,11 +278,11 @@ export default function ResourceEdit() {
                                     }
                                 }} />}
                                 addonAfter={<Observer>{() => (
-                                    <Icon type={item.loading || item.status === 'downloading' ? 'loading' : 'download'} disabled={item.loading} onClick={async () => {
+                                    <Icon type={item.loading || item.status === 'loading' ? 'loading' : 'download'} disabled={item.loading} onClick={async () => {
                                         item.loading = true
                                         try {
                                             await api.downloadResourceVideo(local.id, item.id)
-                                            item.status = 'finished'
+                                            item.status = 'loading'
                                         } finally {
                                             item.loading = false
                                         }
@@ -307,6 +306,7 @@ export default function ResourceEdit() {
                                     local.tempStatus = status;
                                 }}>
                                     <Select.Option value="init">初始化</Select.Option>
+                                    <Select.Option value="loading">下载中</Select.Option>
                                     <Select.Option value="finished">已下载</Select.Option>
                                     <Select.Option value="fail">失败</Select.Option>
                                 </Select>

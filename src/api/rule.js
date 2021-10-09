@@ -1,4 +1,5 @@
 import shttp from '../utils/shttp'
+import qs from 'querystring'
 
 export function createRule(data) {
   return shttp({
@@ -102,5 +103,12 @@ export function v2UpdateRuleCode(ruleId, code) {
     url: `/v2/admin/rules/${ruleId}/code`,
     method: 'PUT',
     data: { code }
+  })
+}
+
+export function v2previewRule(ruleId, query) {
+  return shttp({
+    url: `/v2/admin/rule/${ruleId}/preview?${qs.stringify(query)}`,
+    method: 'GET',
   })
 }

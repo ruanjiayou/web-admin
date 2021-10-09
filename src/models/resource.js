@@ -35,6 +35,6 @@ export default types.model('Resource', {
   },
 })).views(self => ({
   get cover() {
-    return store.app.imageLine + (self.poster || '/poster/nocover.jpg')
+    return (self.poster.startsWith('http') || self.thumbnail.startsWith('http')) ? self.poster || self.thumbnail : store.app.imageLine + (self.poster || self.thumbnail || '/poster/nocover.jpg')
   }
 }))

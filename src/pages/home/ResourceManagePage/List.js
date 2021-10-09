@@ -28,7 +28,7 @@ export default function ResourceList({ items, children, categories, search, loca
 			<Column title="封面" width={70} dataIndex="poster" key="id" align="center" render={(text, record) => (
 				<Observer>{() => (
 					<div style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
-						<img src={store.app.imageLine + (record.poster || record.thumbnail || '/images/poster/nocover.jpg')}
+						<img src={record.poster.startsWith('http') || record.thumbnail.startsWith('http') ? record.poster || record.thumbnail:store.app.imageLine + (record.poster || record.thumbnail || '/images/poster/nocover.jpg')}
 							style={{ width: 60, height: 60, borderRadius: '50%', marginRight: 10, }}
 							alt=""
 						/>
