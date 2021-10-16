@@ -3,10 +3,12 @@ import { useEffectOnce } from 'react-use'
 import { Observer, useLocalStore } from 'mobx-react-lite'
 import Ueditor from '../../../component/Ueditor'
 import apis from '../../../api'
-import { Button, notification, Input, Form, Radio, Tag, Upload, Select, Divider } from 'antd';
+import { Button, notification, Input, Form, Tag, Upload, Select, Divider } from 'antd';
 import Icon from '../../../component/Icon'
 import qs from 'qs'
 import * as _ from 'lodash'
+import { toJS } from 'mobx';
+import store from '../../../store'
 
 export default function ResourceEdit() {
   const ueditor = useRef(null)
@@ -15,19 +17,28 @@ export default function ResourceEdit() {
   const inputType = useRef(null)
   const lb = { span: 3 }, rb = { span: 18 }
   const query = qs.parse(window.location.search.substr(1))
-  const store = useLocalStore(() => ({
-    id: query.id || '',
-    title: '',
-    poster: '',
-    content: '',
-    createdAt: new Date().toISOString(),
-    source_type: 'article',
-    types: [],
-    series: '',
-    origin: '',
-    // words: 0,
-    open: true,
-    tags: [],
+  const local = useLocalStore(() => ({
+    data: {},
+    initData() {
+      this.data = {
+        id: query.id || '',
+        title: '',
+        alias: '',
+        poster: '',
+        desc: '',
+        content: '',
+        publishedAt: new Date().toISOString(),
+        source_id: '',
+        source_type: 'article',
+        source_name: '',
+        types: [],
+        tags: [],
+        series: '',
+        origin: '',
+        // words: 0,
+        open: true,
+      }
+    },
     // 临时
     tempImg: '',
     tempTag: '',
@@ -35,185 +46,171 @@ export default function ResourceEdit() {
     tempType: '',
     typeAddVisible: false,
     loading: false,
-    categories: {},
     // 
     fetching: false,
-  }))
+  }));
+  local.initData();
   const edit = useCallback(() => {
     if (ueditor.current) {
       const content = decodeURIComponent(ueditor.current.getUEContent().replace(/%/g, '%25'))
-      const data = _.pick(store, ['id', 'title', 'poster', 'source_type', 'types', 'origin', 'open', 'tags'])
+      const data = toJS(local.data);
       data.content = content
-      data.createdAt = new Date(store.createdAt)
+      data.publishedAt = new Date(local.data.publishedAt)
       const api = data.id ? apis.updateResource : apis.createResource
-      store.loading = true
+      local.data.loading = true
       api(data).then(res => {
         if (res.code === 0) {
           notification.info({ message: '操作成功' })
-          store.title = ''
-          store.author = ''
-          store.content = ''
-          store.createdAt = new Date().toISOString()
+          local.initData();
           window.editor.setContent('')
         } else {
           notification.error({ message: '操作失败' })
         }
-        store.loading = false
+        local.data.loading = false
       })
     } else {
       notification.error({ message: '获取ueditor失败' })
     }
   }, [])
   const crawler = useCallback(async () => {
-    store.fetching = true
+    local.data.fetching = true
     try {
-      const result = await apis.fetchCrawler({ data: { origin: store.origin } });
+      const result = await apis.fetchCrawler({ data: { origin: local.data.origin } });
       if (result.code === 0) {
-        store.title = result.data.title
-        store.author = result.data.author
-        store.createdAt = result.data.time
-        store.content = result.data.content
-        window.editor.setContent(store.content)
+        local.data.title = result.data.title
+        local.data.author = result.data.author
+        local.data.publishedAt = result.data.publishedAt
+        local.data.content = result.data.content
+        window.editor.setContent(local.data.content)
       }
     } finally {
-      store.fetching = false
+      local.data.fetching = false
     }
 
   }, [])
   useEffect(() => {
-    if (store.id) {
-      store.loading = true
-      apis.getResource({ id: store.id }).then(res => {
+    if (local.data.id) {
+      local.data.loading = true
+      apis.getResource({ id: local.data.id }).then(res => {
         if (res && res.status === 'success' && res.code === 0) {
           const data = res.data
-          store.title = data.title
-          store.content = data.content
-          store.createdAt = data.createdAt
-          store.tags = data.tags
-          store.poster = data.poster
-          store.open = data.open
-          store.source_type = data.source_type
-          store.types = data.types
-          store.origin = data.origin
-          //
-          store.tempImg = data.poster
-          window.editor && window.editor.ready(() => window.editor.setContent(store.content))
+          local.data = data;
+          local.tempImg = data.poster
+          window.editor && window.editor.ready(() => window.editor.setContent(local.data.content))
         } else {
           notification.error({ message: '请求失败' })
         }
-        store.loading = false
+        local.data.loading = false
       })
     }
   })
 
-  useEffectOnce(() => {
-    apis.getGroupTypes().then(result => {
-      store.categories = result.data
-    })
-  }, [])
   return <Observer>{() => (<Fragment>
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', }}>
       <div style={{ flex: 1, overflowY: 'auto' }}>
         <Form.Item label="标题" labelCol={lb} wrapperCol={rb}>
-          <Input style={{ width: '50%' }} value={store.title} autoFocus onChange={e => store.title = e.target.value} />
+          <Input style={{ width: '50%' }} value={local.data.title} autoFocus onChange={e => local.data.title = e.target.value} />
+        </Form.Item>
+        <Form.Item label="发布时间" labelCol={lb} wrapperCol={rb}>
+          <Input style={{ width: '50%' }} value={local.data.publishedAt} onChange={e => local.data.publishedAt = e.target.value} />
         </Form.Item>
         <Form.Item label="来源" labelCol={lb} wrapperCol={rb}>
-          <Input style={{ width: '50%' }} value={store.origin} onChange={e => store.origin = e.target.value} />
+          <Input style={{ width: '50%' }} value={local.data.origin} onChange={e => local.data.origin = e.target.value} />
           <Divider type="vertical" />
-          <Button type="primary" loading={store.fetching} onClick={crawler}>抓取</Button>
-        </Form.Item>
-        <Form.Item label="时间" labelCol={lb} wrapperCol={rb}>
-          <Input style={{ width: '50%' }} value={store.createdAt} onChange={e => store.createdAt = e.target.value} />
+          <Button type="primary" loading={local.data.fetching} onClick={crawler}>抓取</Button>
         </Form.Item>
         <Form.Item label="系列" labelCol={lb} wrapperCol={rb}>
-          <Input style={{ width: '50%' }} value={store.series} onChange={e => store.series = e.target.value} />
+          <Input style={{ width: '50%' }} value={local.data.series} onChange={e => local.data.series = e.target.value} />
         </Form.Item>
         <Form.Item label="资源类型" labelCol={lb} wrapperCol={rb}>
-          <Select value={store.source_type} onChange={value => {
-            store.source_type = value
+          <Select value={local.data.source_type} onChange={value => {
+            local.data.source_type = value
           }}>
-            <Select.Option value="">全部</Select.Option>
-            <Select.Option value="image">图片</Select.Option>
-            <Select.Option value="animation">动漫</Select.Option>
-            <Select.Option value="music">音频</Select.Option>
-            <Select.Option value="video">视频</Select.Option>
-            <Select.Option value="novel">小说</Select.Option>
-            <Select.Option value="article">文章</Select.Option>
-            <Select.Option value="news">资讯</Select.Option>
-            <Select.Option value="private">私人</Select.Option>
+            {store.resource_types.map(type => (
+              <Select.Option value={type.name}>{type.title}</Select.Option>
+            ))}
+          </Select>
+        </Form.Item>
+        <Form.Item label="国家地区" labelCol={lb} wrapperCol={rb}>
+          <Select value={local.data.country} onChange={value => {
+            local.data.country = value
+          }}>
+            {store.regions.map(region => (
+              <Select.Option value={region.name}>{region.title}</Select.Option>
+            ))}
           </Select>
         </Form.Item>
 
-        <Form.Item label="types" labelCol={lb} wrapperCol={rb}>
-          {store.types.map((type, index) => <Tag key={index} closable onClose={() => { store.types.filter(t => t !== type) }}>{type}</Tag>)}
-          {store.typeAddVisible && (
+        <Form.Item label="分类" labelCol={lb} wrapperCol={rb}>
+          {local.data.types.map((type, index) => <Tag key={index} closable onClose={() => { local.data.types.filter(t => t !== type) }}>{type}</Tag>)}
+          {local.data.typeAddVisible && (
             <Input
               ref={inputType}
               type="text"
               size="small"
               style={{ width: 78 }}
-              value={store.tempType}
+              value={local.tempType}
               autoFocus
-              onChange={e => store.tempType = e.target.value}
+              onChange={e => local.tempType = e.target.value}
               onBlur={() => {
-                let type = store.tempType.trim()
-                const types = store.types
+                let type = local.tempType.trim()
+                const types = local.data.types
                 if (type !== '' && -1 === types.findIndex(t => t === type)) {
-                  store.types.push(type)
+                  local.data.types.push(type)
                 }
-                store.typeAddVisible = false
-                store.tempType = ''
+                local.data.typeAddVisible = false
+                local.tempType = ''
               }}
               onPressEnter={() => {
-                let type = store.tempType.trim()
-                const types = store.types
+                let type = local.tempType.trim()
+                const types = local.data.types
                 if (type !== '' && -1 === types.findIndex(t => t === type)) {
-                  store.types.push(type)
+                  local.data.types.push(type)
                 }
-                store.typeAddVisible = false
-                store.tempType = ''
+                local.data.typeAddVisible = false
+                local.tempType = ''
               }}
             />
           )}
-          {!store.typeAddVisible && (
-            <Tag onClick={() => store.typeAddVisible = true} style={{ background: '#fff', borderStyle: 'dashed' }}>
+          {!local.data.typeAddVisible && (
+            <Tag onClick={() => local.data.typeAddVisible = true} style={{ background: '#fff', borderStyle: 'dashed' }}>
               <Icon type="plus" />
             </Tag>
           )}
         </Form.Item>
-        <Form.Item label="tags" labelCol={lb} wrapperCol={rb}>
-          {store.tags.map((tag, index) => <Tag key={index} closable onClose={() => { store.tags.filter(t => t !== tag) }}>{tag}</Tag>)}
-          {store.tagAddVisible && (
+        <Form.Item label="标签" labelCol={lb} wrapperCol={rb}>
+          {local.data.tags.map((tag, index) => <Tag key={index} closable onClose={() => { local.data.tags.filter(t => t !== tag) }}>{tag}</Tag>)}
+          {local.data.tagAddVisible && (
             <Input
               ref={inp}
               type="text"
               size="small"
               style={{ width: 78 }}
-              value={store.tempTag}
+              value={local.tempTag}
               autoFocus
-              onChange={e => store.tempTag = e.target.value}
+              onChange={e => local.tempTag = e.target.value}
               onBlur={() => {
-                let tag = store.tempTag.trim()
-                const tags = store.tags
+                let tag = local.tempTag.trim()
+                const tags = local.data.tags
                 if (tag !== '' && -1 === tags.findIndex(t => t === tag)) {
-                  store.tags.push(tag)
+                  local.data.tags.push(tag)
                 }
-                store.tagAddVisible = false
-                store.tempTag = ''
+                local.data.tagAddVisible = false
+                local.tempTag = ''
               }}
               onPressEnter={() => {
-                let tag = store.tempTag.trim()
-                const tags = store.tags
+                let tag = local.tempTag.trim()
+                const tags = local.data.tags
                 if (tag !== '' && -1 === tags.findIndex(t => t === tag)) {
-                  store.tags.push(tag)
+                  local.data.tags.push(tag)
                 }
-                store.tagAddVisible = false
-                store.tempTag = ''
+                local.data.tagAddVisible = false
+                local.tempTag = ''
               }}
             />
           )}
-          {!store.tagAddVisible && (
-            <Tag onClick={() => store.tagAddVisible = true} style={{ background: '#fff', borderStyle: 'dashed' }}>
+          {!local.data.tagAddVisible && (
+            <Tag onClick={() => local.data.tagAddVisible = true} style={{ background: '#fff', borderStyle: 'dashed' }}>
               <Icon type="plus" />
             </Tag>
           )}
@@ -224,17 +221,17 @@ export default function ResourceEdit() {
             listType="picture-card"
             className="avatar-uploader"
             showUploadList={false} ref={picture} name="poster" onChange={e => {
-              store.poster = e.file
+              local.data.poster = e.file
               const reader = new FileReader();
               reader.addEventListener('load', () => {
-                store.tempImg = reader.result
+                local.tempImg = reader.result
               });
               reader.readAsDataURL(e.file);
             }} beforeUpload={(f) => {
               return false
             }}>
-            <img width="100%" src={store.tempImg} alt="" />
-            {store.poster === '' && (
+            <img width="100%" src={local.tempImg} alt="" />
+            {local.data.poster === '' && (
               <Button style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)' }}>
                 <Icon type="arrow-up-line" /> 编辑
               </Button>
@@ -243,12 +240,12 @@ export default function ResourceEdit() {
         </Form.Item>
         <Form.Item label="内容" labelCol={lb} wrapperCol={rb}>
           <div style={{ lineHeight: 'initial', height: '100%' }}>
-            <Ueditor ref={ref => ueditor.current = ref} initData={store.content} />
+            <Ueditor ref={ref => ueditor.current = ref} initData={local.data.content} />
           </div>
         </Form.Item>
       </div>
       <Form.Item label="" style={{ textAlign: 'center', backgroundColor: '#b5cbde', height: 50, lineHeight: '50px', margin: 0, }}>
-        <Button loading={store.loading} disabled={store.loading} type="primary" onClick={edit}>保存</Button>
+        <Button loading={local.data.loading} disabled={local.data.loading} type="primary" onClick={edit}>保存</Button>
       </Form.Item>
     </div>
   </Fragment>)}</Observer>

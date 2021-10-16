@@ -188,7 +188,7 @@ export default function ResourceManagePage() {
                   local.temp.source_type = value
                   local.temp.type = ""
                 }}>
-                  {store.types.map(type => <Select.Option value={type.name} key={type.name}>{type.title}</Select.Option>)}
+                  {store.resource_types.map(type => <Select.Option value={type.name} key={type.name}>{type.title}</Select.Option>)}
                 </Select>
               </Form.Item>
               <Form.Item label="类别" labelCol={lb} wrapperCol={rb}>

@@ -10,18 +10,30 @@ const store = {
   config: models.config.create(),
   channels: [],
   groups: [],
-  types: [
+  resource_types: [
     { name: '', title: '无' },
     { name: 'file', title: '文件' },
     { name: 'image', title: '图片' },
-    { name: 'music', title: '音频' },
+
+    { name: 'audio', title: '音频' },
+    { name: 'music', title: '音乐' },
+
     { name: 'video', title: '视频' },
+    { name: 'shortVideo', title: '短视频' },
+    { name: 'movie', title: '电影' },
+    { name: 'program', title: '节目' },
+    { name: 'series', title: '电视剧' },
+    { name: 'animate', title: '动漫' },
+
     { name: 'novel', title: '小说' },
     { name: 'article', title: '文章' },
     { name: 'news', title: '资讯' },
     { name: 'private', title: '私人' },
   ],
-  city: [
+  medias: [
+    // audip:mp3, video:mp4, image:jpg,png, txt: html,js, binary: zip,torrent, doc,pdf
+  ],
+  regions: [
     { name: '', title: '无' },
     { name: 'China', title: '中国' },
     { name: 'English', title: '英国' },

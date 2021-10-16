@@ -53,6 +53,9 @@ export default function ResourceEdit({ data, cancel, save, }) {
           <Form.Item label="标题" labelCol={lb} wrapperCol={rb}>
             <Input value={local.data.title} autoFocus onChange={e => local.data.title = e.target.value} />
           </Form.Item>
+          <Form.Item label="封面" labelCol={lb} wrapperCol={rb}>
+            <Input value={local.data.poster} onChange={e => local.data.poster = e.target.value} />
+          </Form.Item>
           <Form.Item label="描述" labelCol={lb} wrapperCol={rb}>
             <Input.TextArea rows={4} value={local.data.desc} onChange={e => local.data.desc = e.target.value} />
           </Form.Item>
@@ -61,7 +64,7 @@ export default function ResourceEdit({ data, cancel, save, }) {
               local.data.source_type = value
               local.data.type = ""
             }}>
-              {store.types.map(type => <Select.Option value={type.name} key={type.name}>{type.title}</Select.Option>)}
+              {store.resource_types.map(type => <Select.Option value={type.name} key={type.name}>{type.title}</Select.Option>)}
             </Select>
           </Form.Item>
           <Form.Item label="系列" labelCol={lb} wrapperCol={rb}>
@@ -143,7 +146,7 @@ export default function ResourceEdit({ data, cancel, save, }) {
           </Form.Item>
           <Form.Item label="country" labelCol={lb} wrapperCol={rb}>
             <Select value={local.data.country || ''} onChange={value => local.data.country = value}>
-              {store.city.map(city => <Select.Option value={city.name} key={city.name}>{city.title}</Select.Option>)}
+              {store.regions.map(city => <Select.Option value={city.name} key={city.name}>{city.title}</Select.Option>)}
             </Select>
           </Form.Item>
           <Form.Item label="open" labelCol={lb} wrapperCol={rb}>
