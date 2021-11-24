@@ -3,7 +3,7 @@ import { useEffectOnce } from 'react-use'
 import { Observer, useLocalStore } from 'mobx-react-lite'
 import Ueditor from '../../../component/Ueditor'
 import apis from '../../../api'
-import { Button, notification, Input, Form, Tag, Upload, Select, Divider } from 'antd';
+import { Button, notification, Input, Form, Tag, Upload, Select, Divider, DatePicker } from 'antd';
 import Icon from '../../../component/Icon'
 import qs from 'qs'
 import * as _ from 'lodash'
@@ -57,7 +57,6 @@ export default function ResourceEdit() {
       data.content = content
       data.publishedAt = new Date(local.data.publishedAt)
       const api = data.id ? apis.updateResource : apis.createResource
-      local.data.loading = true
       api(data).then(res => {
         if (res.code === 0) {
           notification.info({ message: '操作成功' })
@@ -66,7 +65,6 @@ export default function ResourceEdit() {
         } else {
           notification.error({ message: '操作失败' })
         }
-        local.data.loading = false
       })
     } else {
       notification.error({ message: '获取ueditor失败' })
@@ -90,7 +88,7 @@ export default function ResourceEdit() {
   }, [])
   useEffect(() => {
     if (local.data.id) {
-      local.data.loading = true
+      local.data.fetching = true
       apis.getResource({ id: local.data.id }).then(res => {
         if (res && res.status === 'success' && res.code === 0) {
           const data = res.data
@@ -100,7 +98,7 @@ export default function ResourceEdit() {
         } else {
           notification.error({ message: '请求失败' })
         }
-        local.data.loading = false
+        local.data.fetching = false
       })
     }
   })
@@ -112,7 +110,14 @@ export default function ResourceEdit() {
           <Input style={{ width: '50%' }} value={local.data.title} autoFocus onChange={e => local.data.title = e.target.value} />
         </Form.Item>
         <Form.Item label="发布时间" labelCol={lb} wrapperCol={rb}>
-          <Input style={{ width: '50%' }} value={local.data.publishedAt} onChange={e => local.data.publishedAt = e.target.value} />
+          <Input
+            addonAfter={<Icon type="sync-horizon" onClick={() => {
+              local.data.publishedAt = new Date().toISOString();
+            }} />}
+            style={{ width: '50%' }}
+            value={local.data.publishedAt}
+            onChange={e => local.data.publishedAt = e.target.value}
+          />
         </Form.Item>
         <Form.Item label="来源" labelCol={lb} wrapperCol={rb}>
           <Input style={{ width: '50%' }} value={local.data.origin} onChange={e => local.data.origin = e.target.value} />
@@ -127,7 +132,7 @@ export default function ResourceEdit() {
             local.data.source_type = value
           }}>
             {store.resource_types.map(type => (
-              <Select.Option value={type.name}>{type.title}</Select.Option>
+              <Select.Option key={type.name} value={type.name}>{type.title}</Select.Option>
             ))}
           </Select>
         </Form.Item>
@@ -136,7 +141,7 @@ export default function ResourceEdit() {
             local.data.country = value
           }}>
             {store.regions.map(region => (
-              <Select.Option value={region.name}>{region.title}</Select.Option>
+              <Select.Option key={region.name} value={region.name}>{region.title}</Select.Option>
             ))}
           </Select>
         </Form.Item>
@@ -245,7 +250,7 @@ export default function ResourceEdit() {
         </Form.Item>
       </div>
       <Form.Item label="" style={{ textAlign: 'center', backgroundColor: '#b5cbde', height: 50, lineHeight: '50px', margin: 0, }}>
-        <Button loading={local.data.loading} disabled={local.data.loading} type="primary" onClick={edit}>保存</Button>
+        <Button loading={local.data.fetching} disabled={local.data.fetching} type="primary" onClick={edit}>保存</Button>
       </Form.Item>
     </div>
   </Fragment>)}</Observer>

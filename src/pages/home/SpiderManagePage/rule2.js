@@ -213,10 +213,12 @@ export default function SpiderPage() {
       </FullHeightFix>
       <FullHeightAuto>
         <Table dataSource={local.rules} rowKey="id" scroll={{ y: 600 }} loading={local.isLoading} pagination={false}>
-          <Column title="域名" dataIndex="host" key="host" render={(text) => (
-            <a href={text} rel="noopener noreferrer" target="_blank">{text}</a>
+          <Column title="域名" dataIndex="host" key="host" render={(text, record) => (
+            <a href={text} rel="noopener noreferrer" title={record.route} target="_blank">{text}</a>
           )} />
-          <Column title="名称" dataIndex="name" key="name" />
+          <Column title="名称" dataIndex="name" key="name" render={(text, record) => {
+            return <span title={record.id}>{text}</span>
+          }} />
           <Column title="类型" dataIndex="type" key="type" />
           <Column title="操作" width={200} dataIndex="action" key="action" align="center" render={(text, record) => (
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
@@ -274,6 +276,9 @@ export default function SpiderPage() {
                 local.rule.host = url
               }} value={local.rule.host} autoFocus onChange={e => local.rule.host = e.target.value} />
             </Form.Item>
+            <Form.Item label="路由规则" labelCol={lb} wrapperCol={rb}>
+              <Input placeholder="/:id" value={local.rule.route} onChange={e => local.rule.route = e.target.value} />
+            </Form.Item>
             <Form.Item label="规则名称" labelCol={lb} wrapperCol={rb}>
               <Input placeholder="pixiv插画" value={local.rule.name} autoFocus onChange={e => local.rule.name = e.target.value} />
             </Form.Item>
@@ -281,7 +286,7 @@ export default function SpiderPage() {
               <Input placeholder="novel/pixiv/article/news" value={local.rule.type} autoFocus onChange={e => local.rule.type = e.target.value} />
             </Form.Item>
             <Form.Item label="描述" labelCol={lb} wrapperCol={rb}>
-              <Input placeholder="h1" value={local.rule.desc} autoFocus onChange={e => local.rule.desc = e.target.value} />
+              <Input placeholder="" value={local.rule.desc} autoFocus onChange={e => local.rule.desc = e.target.value} />
             </Form.Item>
             <Form.Item label="状态" labelCol={lb} wrapperCol={rb}>
               <Switch checked={local.rule.enable ? true : false} onClick={e => { local.rule.enable = !local.rule.enable }} /> {local.rule.enable ? '使用中' : '已关闭'}

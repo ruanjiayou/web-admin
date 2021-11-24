@@ -3,8 +3,8 @@ import { Observer, useLocalStore, } from 'mobx-react-lite'
 import { Link } from 'react-router-dom'
 // import LoadingView from '../HolderView/LoadingView'
 import apis from '../../../api';
-import { Table, Popconfirm, Switch, notification, Select, Tag, Input, Popover, Divider, } from 'antd';
-import { FormOutlined, DeleteOutlined, WarningOutlined, CloudServerOutlined, SyncOutlined, PlusCircleOutlined, UploadOutlined } from '@ant-design/icons'
+import { Table, Popconfirm, Switch, notification, Select, Tag, Popover, Divider, } from 'antd';
+import { FormOutlined, DeleteOutlined, WarningOutlined, CloudServerOutlined, SyncOutlined, UploadOutlined } from '@ant-design/icons'
 import { Icon, VisualBox, EditTag } from '../../../component'
 import { AlignAround } from '../../../component/style'
 import store from '../../../store'
@@ -28,19 +28,27 @@ export default function ResourceList({ items, children, categories, search, loca
 			<Column title="封面" width={70} dataIndex="poster" key="id" align="center" render={(text, record) => (
 				<Observer>{() => (
 					<div style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
-						<img src={record.poster.startsWith('http') || record.thumbnail.startsWith('http') ? record.poster || record.thumbnail:store.app.imageLine + (record.poster || record.thumbnail || '/images/poster/nocover.jpg')}
+						<img src={record.poster.startsWith('http') || record.thumbnail.startsWith('http') ? record.poster || record.thumbnail : store.app.imageLine + (record.poster || record.thumbnail || '/images/poster/nocover.jpg')}
 							style={{ width: 60, height: 60, borderRadius: '50%', marginRight: 10, }}
 							alt=""
 						/>
-						<Icon type={'download'} style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)' }} onClick={async (e) => {
-							try {
-								await apis.downloadResourceCover({ id: record.id, })
-								search()
-								notification.info({ message: '修改成功' })
-							} catch (e) {
-								notification.info({ message: '修改失败' })
-							} finally {
-
+						<Icon type={'download'} style={{ position: 'absolute', display: record.poster.startsWith('/') ? 'none' : 'block', left: '50%', top: '50%', transform: 'translate(-50%,-50%)' }} onClick={async (e) => {
+							if (record.poster === '') {
+								const poster = prompt('请输入封面地址');
+								if (poster) {
+									await apis.updateResource({ id: record.id, poster })
+									await apis.downloadResourceCover({ id: record.id, })
+									search()
+									notification.info({ message: '下载成功' })
+								}
+							} else if (record.poster.startsWith('http')) {
+								try {
+									await apis.downloadResourceCover({ id: record.id, })
+									search()
+									notification.info({ message: '下载成功' })
+								} catch (e) {
+									notification.info({ message: '下载失败' })
+								}
 							}
 						}} />
 					</div>
@@ -129,7 +137,7 @@ export default function ResourceList({ items, children, categories, search, loca
 			<Column title="标签" dataIndex="types" key="types" width={150} render={(text, record) => (
 				<Observer>{() => (
 					<Fragment>
-						{record.tags.map(tag => <Tag key={tag} style={{ marginBottom: 5 }} closable={!state.updating} onClose={async () => {
+						{record.tags.map((tag, i) => <Tag key={i} style={{ marginBottom: 5 }} closable={!state.updating} onClose={async () => {
 							try {
 								state.updating = true
 								const tags = record.tags.filter(item => item !== tag)
@@ -241,7 +249,7 @@ export default function ResourceList({ items, children, categories, search, loca
 							<Divider type="vertical" />
 							<CloudServerOutlined title="保存小说" onClick={() => props.store(record)} />
 						</VisualBox>
-						<VisualBox visible={record.source_type === 'article' || record.source_type === 'news'}>
+						<VisualBox visible={record.source_type === 'article' || record.source_type === 'news' || record.source_type === 'image'}>
 							<SyncOutlined title="抓取image" onClick={() => {
 								apis.grabImages({ id: record.id }).then(res => {
 									notification.info({ message: `success:${res.data.success} fail:${res.data.fail}` })
