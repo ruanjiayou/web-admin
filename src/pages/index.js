@@ -41,6 +41,49 @@ import {
   FolderOutlined,
 } from '@ant-design/icons'
 
+const page_map = {
+  'SignInPage': SignInPage,
+  'DashboardPage': DashboardPage,
+  'ChannelManagePage': ChannelManagePage,
+  'GroupManagePage': GroupManagePage,
+  'ResourceManagePage': ResourceManagePage,
+  'BackupPage': BackupPage,
+  'FilePage': FilePage,
+  'SyncPage': SyncPage,
+  'RulePage': RulePage,
+  'Rule2Page': Rule2Page,
+  'TaskPage': TaskPage,
+  'SchedulePage': SchedulePage,
+  'ResourceEdit': ResourceEdit,
+  'TradePage': TradePage,
+  'ExamineListPage': ExamineListPage,
+  'ExamineDetailPage': ExamineDetailPage,
+  'LinkManagePage': LinkManagePage,
+  'ConfigPage': ConfigPage,
+  'RobotManage': RobotManage,
+  'BackupTablePage': BackupTablePage,
+  'MuiltiEdit': MuiltiEdit,
+}
+export const icon_map = {
+  LinkOutlined,
+  DashboardOutlined,
+  SettingOutlined,
+  FieldTimeOutlined,
+  UnorderedListOutlined,
+  AppstoreAddOutlined,
+  HddOutlined,
+  RadarChartOutlined,
+  UsbOutlined,
+  OrderedListOutlined,
+  CloudSyncOutlined,
+  CloudServerOutlined,
+  StockOutlined,
+  TransactionOutlined,
+  AndroidOutlined,
+  QuestionCircleOutlined,
+  FolderOutlined,
+};
+
 const pages = [
   {
     pathname: '/admin/home/dashboard',
@@ -200,4 +243,46 @@ const pages = [
     single: true,
   },
 ];
-export default pages
+// export default pages
+
+export function pagination(menus) {
+  return menus.map(menu => ({
+    pathname: menu.pathname,
+    Page: page_map[menu.Page] || null,
+    icon: menu.icon,// icon_map[menu.icon] || '',
+    hide: menu.hide || false,
+    title: menu.title,
+    single: menu.single || false
+  }));
+}
+
+export function adjustMenu(pages) {
+  const data = [];
+  pages.forEach(page => {
+    let curr = data;
+    if (!page.pathname.startsWith('/admin/home') || page.hide === true) {
+      return;
+    }
+    if (data.length === 0) {
+      data.push({
+        title: page.title,
+        path: page.pathname,
+        name: page.pathname,
+        icon: page.icon,
+        sub: [],
+      })
+    } else {
+      if (page.pathname.startsWith(data[data.length - 1].path)) {
+        curr = data[data.length - 1].sub
+      }
+      curr.push({
+        title: page.title,
+        path: page.pathname,
+        name: page.pathname,
+        icon: page.icon,
+        sub: [],
+      })
+    }
+  });
+  return data;
+}

@@ -1,9 +1,9 @@
 import shttp from '../utils/shttp'
 
-export function getMenu({ query, param, data }) {
+export function getMenus(options = {}) {
   return shttp({
     method: 'GET',
-    url: '/v1/public/menu'
+    url: '/v1/public/menus'
   })
 }
 

@@ -10,6 +10,8 @@ const store = {
   config: models.config.create(),
   channels: [],
   groups: [],
+  pages: [],
+  menus: [],
   resource_types: [
     { name: '', title: '无' },
     { name: 'file', title: '文件' },
@@ -18,6 +20,7 @@ const store = {
     { name: 'audio', title: '音频' },
     { name: 'music', title: '音乐' },
 
+    { name: 'comic', title: '漫画' },
     { name: 'video', title: '视频' },
     { name: 'shortVideo', title: '短视频' },
     { name: 'movie', title: '电影' },

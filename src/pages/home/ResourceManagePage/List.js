@@ -89,16 +89,9 @@ export default function ResourceList({ items, children, categories, search, loca
 							state.updating = false
 						}
 					}}>
-						<Select.Option value="">全部</Select.Option>
-						<Select.Option value="file">文件</Select.Option>
-						<Select.Option value="image">图片</Select.Option>
-						<Select.Option value="animation">动漫</Select.Option>
-						<Select.Option value="music">音频</Select.Option>
-						<Select.Option value="video">视频</Select.Option>
-						<Select.Option value="novel">小说</Select.Option>
-						<Select.Option value="article">文章</Select.Option>
-						<Select.Option value="news">资讯</Select.Option>
-						<Select.Option value="private">私人</Select.Option>
+						{store.resource_types.map(resource_type => (
+							<Select.Option value={resource_type.name} key={resource_type.name}>{resource_type.title}</Select.Option>
+						))}
 					</Select>
 				)}
 				</Observer>

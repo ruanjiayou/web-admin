@@ -3,7 +3,6 @@ import { Observer, useLocalStore } from 'mobx-react-lite'
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom'
 import { createRouter } from './contexts'
 
-import pages from './pages'
 import Layout from './layout'
 import { useStore } from './contexts'
 import { Icon } from './component';
@@ -40,7 +39,7 @@ function Poster(props) {
       </div>
       <RouterContext.Provider value={router}>
         <Switch>
-          {pages.filter(page => !!page.Page).map(({ pathname, Page, single = false }) => (
+          {store.pages.filter(page => !!page.Page).map(({ pathname, Page, single = false }) => (
             <Route key={pathname} path={pathname} render={props => (
               <Layout {...props} single={single}>
                 <Page />
