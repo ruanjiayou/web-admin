@@ -7,6 +7,7 @@ import FilterRow from '../FilterRow'
 import { Icon, VisualBox, SortListView } from '../../component'
 import { AlignAside } from '../../component/style'
 import { EditWrap } from '../style'
+import ItemView from '../BookItem/Normal'
 
 export default function Filter({ self, ...props }) {
   return <Observer>{() => <div>
@@ -38,5 +39,8 @@ export default function Filter({ self, ...props }) {
       </VisualBox>}
       renderItem={({ item }) => <FilterRow self={item} {...props} />}
     />
+    <div>
+      {self.data.map(item => <ItemView key={item.id} style={{ width: 250 }} item={item} />)}
+    </div>
   </div>}</Observer>
 }
