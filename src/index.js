@@ -50,6 +50,10 @@ function App() {
   const state = useAsync(async () => {
     try {
       const resp = await apis.getMenus()
+      const appResp = await apis.getApps();
+      if (appResp.code === 0) {
+        store.apps = appResp.data;
+      }
       store.pages = pagination(resp.data);
       store.menus = adjustMenu(store.pages);
     } catch (e) {

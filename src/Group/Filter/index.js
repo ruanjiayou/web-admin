@@ -12,7 +12,7 @@ import ItemView from '../BookItem/Normal'
 export default function Filter({ self, ...props }) {
   return <Observer>{() => <div>
     <VisualBox visible={props.mode === 'edit'}>
-      <AlignAside style={{ border: '1px dashed grey', padding: '2px 5px' }}>
+      <AlignAside style={{ border: '1px dashed grey', padding: '2px 0' }}>
         <span>编辑过滤组</span>
         <span onClick={(e) => {
           e.preventDefault();
@@ -39,8 +39,8 @@ export default function Filter({ self, ...props }) {
       </VisualBox>}
       renderItem={({ item }) => <FilterRow self={item} {...props} />}
     />
-    <div>
-      {self.data.map(item => <ItemView key={item.id} style={{ width: 250 }} item={item} />)}
+    <div style={{ maxHeight: 400, overflowY: 'auto', overflowX: 'hidden', }}>
+      {self.data.map(item => <ItemView key={item.id} item={item} />)}
     </div>
   </div>}</Observer>
 }

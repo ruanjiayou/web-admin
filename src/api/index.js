@@ -15,6 +15,7 @@ import * as pub from './public'
 import * as config from './config'
 import * as robot from './robot'
 import * as file from './file'
+import * as app from './app'
 
 const boot = function () {
   return shttp({
@@ -41,6 +42,7 @@ export default {
   boot,
   analyise,
   getTradeBalance,
+  ...app,
   ...backup,
   ...channel,
   ...group,

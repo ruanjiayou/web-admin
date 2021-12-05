@@ -4,6 +4,7 @@ import { ws } from '../utils/ws'
 
 const store = {
   app: models.app.create(),
+  apps: [],
   user: models.user.create(),
   logger: models.logger.create({ status: 'close', progress: {}, logs: [], keys: [], }),
   ws,

@@ -12,6 +12,7 @@ export default function Layout({ children, single }) {
   const router = useRouter()
   const local = useLocalStore(() => ({
     avatarVisible: false,
+    appsVisible: false,
     collapsed: false,
     toggleCollapsed: () => {
       local.collapsed = !local.collapsed
@@ -29,7 +30,19 @@ export default function Layout({ children, single }) {
           <Sider style={{ flexBasis: local.collapsed ? 80 : store.config.siderWidth }}>
             <Header style={hs}>
               <Avatar size={store.config.logoSize} src={logo} style={{ margin: '0 10px' }} alt="logo" />
-              {!local.collapsed && store.config.name}
+              <Dropdown
+                visible={local.appsVisible}
+                onVisibleChange={flag => local.appsVisible = flag}
+                overlay={
+                  <AMenu style={{ minWidth: 100 }}>
+                    {store.apps.map(app => (<AMenu.Item key={app.id}>{app.title}</AMenu.Item>))}
+                  </AMenu>
+                }
+              >
+                <div style={{ display: 'inline-block' }}>
+                  {store.app.title}
+                </div>
+              </Dropdown>
             </Header>
             <Menu collapsed={local.collapsed} />
           </Sider>

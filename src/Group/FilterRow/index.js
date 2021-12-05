@@ -10,7 +10,7 @@ import { EditWrap, ScrollWrap } from '../style'
 export default function FilterRow({ self, ...props }) {
   const store = useStore()
   return <Observer>{() => (
-    <EditWrap className={store.app.currentEditGroupId === self.id ? 'focus' : ''} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', overflowX: 'auto', padding: 5, flex: 1 }}>
+    <EditWrap className={store.app.currentEditGroupId === self.id ? 'focus' : ''} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', overflowX: 'auto', flex: 1 }}>
       <ScrollWrap>
         <SortListView
           isLoading={false}
@@ -20,7 +20,7 @@ export default function FilterRow({ self, ...props }) {
           droppableId={self.id}
           mode={props.mode}
           listStyle={{ flexWrap: 'nowrap', display: 'flex', boxSizing: 'border-box' }}
-          itemStyle={{ display: 'inline-block', lineHeight: 1, margin: '0 5px' }}
+          itemStyle={{ display: 'inline-block', lineHeight: 1, }}
           renderItem={({ item, index }) => <FilterTag key={item.id} self={item} remove={()=>self.removeChild(item.id)} selectMe={(id) => self.selectMe(id)} {...props} />}
         />
       </ScrollWrap>

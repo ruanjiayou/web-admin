@@ -154,25 +154,25 @@ export default function GroupManagePage() {
           <Switch title="编辑" checked={store.app.groupMode === 'edit'} onChange={() => {
             if (store.app.groupMode === 'edit') {
               local.showGroupEdit = false
-            } else {
+              store.app.setEditGroupId('')
             }
             store.app.toggleGroupMode()
           }} />
         </AlignAside>
       </Padding>
       <FullWidth style={{ height: '100%', }}>
+        <FullWidthFix style={{ height: '100%', backgroundColor: 'cornsilk', alignItems: 'flex-start' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', padding: '0 10px', width: 150, alignItems: 'center' }}>
+            <CompImg src={ImgFilter} title="过滤组件" onDragStart={() => { store.app.setCurrentDragType('filter') }} />
+            <CompImg src={ImgPicker} title="卡片组件" onDragStart={() => { store.app.setCurrentDragType('picker') }} />
+            <CompImg src={ImgTab} title="tab组件" onDragStart={() => { store.app.setCurrentDragType('tab') }} />
+            <CompImg src={ImgTabbar} title="tabbar组件" />
+            <CompImg src={ImgGrid} title="grid组件" onDragStart={() => { store.app.setCurrentDragType('menu-grid') }} />
+            <CompImg src={ImgGrid} alt="NodeTree" title="NodeTree组件" onDragStart={() => { store.app.setCurrentDragType('tree-node') }} />
+          </div>
+        </FullWidthFix>
         <FullWidthAuto style={{ height: '100%' }}>
           <FullHeight style={{ overflow: 'auto', alignItems: 'center' }}>
-            <FullHeightFix>
-              <div style={{ display: 'flex' }}>
-                <CompImg src={ImgFilter} title="过滤组件" onDragStart={() => { store.app.setCurrentDragType('filter') }} />
-                <CompImg src={ImgPicker} title="卡片组件" onDragStart={() => { store.app.setCurrentDragType('picker') }} />
-                <CompImg src={ImgTab} title="tab组件" onDragStart={() => { store.app.setCurrentDragType('tab') }} />
-                <CompImg src={ImgTabbar} title="tabbar组件" />
-                <CompImg src={ImgGrid} title="grid组件" onDragStart={() => { store.app.setCurrentDragType('menu-grid') }} />
-                <CompImg src={ImgGrid} alt="NodeTree" title="NodeTree组件" onDragStart={() => { store.app.setCurrentDragType('tree-node') }} />
-              </div>
-            </FullHeightFix>
             <FullHeightAuto style={{ display: 'flex', alignItems: 'center' }}>
               <Mobile style={{ boxShadow: 'rgb(119, 182, 228) 5px 5px 4px 0px', marginRight: 10, border: '1px solid #77b6e4' }}>
                 {local.refreshing === false && local.tree && (
@@ -221,9 +221,11 @@ export default function GroupManagePage() {
             </FullHeightFix>
           </FullHeight>
         </FullWidthAuto>
-        {local.showGroupEdit && <GroupEdit group={local.temp} openPick={() => {
-          local.showPick = true
-        }} onClose={() => { local.showGroupEdit = false; local.temp = null; store.app.setEditGroupId('') }} />}
+        <FullWidthFix style={{ width: 300 }}>
+          {local.showGroupEdit && <GroupEdit group={local.temp} key={local.temp.id} openPick={() => {
+            local.showPick = true
+          }} onClose={() => { local.showGroupEdit = false; local.temp = null; store.app.setEditGroupId('') }} />}
+        </FullWidthFix>
       </FullWidth>
       {local.showGroupAdd && <GroupAdd
         data={local.temp}

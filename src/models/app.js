@@ -6,6 +6,7 @@ const app = types.model('app', {
   groupMode: types.optional(types.string, 'edit'),
   imageLine: types.optional(types.string, ''),
   baseUrl: types.optional(types.string, ''),
+  title: types.optional(types.string, '默认应用'),
   currentEditGroupId: types.optional(types.string, ''),
   currentDragType: types.optional(types.string, ''),
 }).actions(self => ({
