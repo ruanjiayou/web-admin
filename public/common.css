@@ -1,0 +1,5 @@
+.custom .ant-input-group-addon,
+.custom .ant-input-wrapper,
+.custom .ant-input {
+  background-color: transparent;
+}

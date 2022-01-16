@@ -23,6 +23,13 @@ justify-content: space-around;
 align-items: center;
 `;
 
+export const AlignVertical = styled.div`
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-direction: column;
+`;
+
 export const FullHeight = styled.div`
 display: flex;
 flex-direction: column;

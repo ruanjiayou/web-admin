@@ -219,6 +219,7 @@ export default function SpiderPage() {
           <Column title="名称" dataIndex="name" key="name" render={(text, record) => {
             return <span title={record.id}>{text}</span>
           }} />
+          <Column title="id" dataIndex="id" key="id" />
           <Column title="类型" dataIndex="type" key="type" />
           <Column title="操作" width={200} dataIndex="action" key="action" align="center" render={(text, record) => (
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>

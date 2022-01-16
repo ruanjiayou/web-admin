@@ -1,17 +1,18 @@
-import React, { useEffect, useCallback, Fragment, useRef } from 'react';
+import React, { useCallback, Fragment, useRef } from 'react';
 import { useEffectOnce } from 'react-use'
 import { Observer, useLocalStore } from 'mobx-react-lite'
 import apis from '../../../api'
-import { Button, notification, Input, Form, Radio, Tag, Upload, Select, Divider } from 'antd';
+import { Button, notification, Input, Form, Tag, Upload, Select, Divider, Switch } from 'antd';
 import { SortListView } from '../../../component'
 import Icon from '../../../component/Icon'
 import qs from 'qs'
 import * as _ from 'lodash'
 import store from '../../../store'
 import { toJS } from 'mobx';
-import { useRouter } from '../../../contexts'
-import { UploadOutlined, PlusCircleOutlined, CloudDownloadOutlined, CloseOutlined } from '@ant-design/icons'
+import { PlusCircleOutlined, CloseOutlined } from '@ant-design/icons'
 import api from '../../../api';
+import { AlignAside, FullWidth, FullHeightAuto, FullHeightFix, AlignVertical, FullWidthFix, FullHeight } from '../../../component/style';
+import TextArea from 'antd/lib/input/TextArea';
 
 
 function deepEqual(a, b) {
@@ -37,30 +38,41 @@ export default function ResourceEdit() {
   const inp = useRef(null)
   const inputType = useRef(null)
   const inputUrl = useRef(null)
+  const inputImage = useRef(null)
   const lb = { span: 3 }, rb = { span: 18 }
   const query = qs.parse(window.location.search.substr(1))
   const local = useLocalStore(() => ({
     id: query.id,
-    data: { tags: [], types: [], children: [], urls: [] },
+    data: { tags: [], types: [], children: [], urls: [], images: [] },
     origin: {},
     // 临时
     tempImg: '',
     tempTag: '',
     tempStatus: 'init',
     tagAddVisible: false,
-    tempType: 'normal',
+    tempUrlType: 'normal',
+    tempImageType: 'gallery',
     tempTypes: '',
     typeAddVisible: false,
     tempUrl: '',
+    tempImage: '',
     urlAddVisible: false,
+    imageAddVisible: false,
     loading: false,
+    fullEditVideo: false,
   }))
   const onEdit = useCallback(async () => {
-    const changed = !deepEqual(toJS(local.origin), toJS(local.data))
+    const changed = !deepEqual(toJS(local.origin), toJS(local.data));
+    if (!changed) {
+      notification.info({ message: '数据未改动' })
+      return;
+    }
+    local.loading = true
     const resp = local.data.id ? await apis.updateResource(local.data) : await api.createResource(local.data);
     if (resp && resp.data.code === 0) {
       notification.info('编辑成功')
     }
+    local.loading = false;
   }, [])
   useEffectOnce(() => {
     if (local.id) {
@@ -70,6 +82,9 @@ export default function ResourceEdit() {
           const data = res.data
           local.data = data
           local.origin = data
+          if (!local.data.images) {
+            local.data.images = [];
+          }
         } else {
           notification.error({ message: '请求失败' })
         }
@@ -87,6 +102,9 @@ export default function ResourceEdit() {
         <Form.Item label="别名" labelCol={lb} wrapperCol={rb}>
           <Input style={{ width: '50%' }} value={local.data.alias} onChange={e => local.data.alias = e.target.value} />
         </Form.Item>
+        <Form.Item label="描述" labelCol={lb} wrapperCol={rb}>
+          <TextArea style={{ width: '50%' }} value={local.data.desc} onChange={e => local.data.desc = e.target.value} />
+        </Form.Item>
         <Form.Item label="系列" labelCol={lb} wrapperCol={rb}>
           <Input style={{ width: '50%' }} value={local.data.series} onChange={e => local.data.series = e.target.value} />
         </Form.Item>
@@ -101,6 +119,18 @@ export default function ResourceEdit() {
         </Form.Item>
         <Form.Item label="来源名称" labelCol={lb} wrapperCol={rb}>
           <Input style={{ width: '50%' }} value={local.data.source_name} onChange={e => local.data.source_name = e.target.value} />
+        </Form.Item>
+        <Form.Item label="状态" labelCol={lb} wrapperCol={rb}>
+          <Switch checked={local.data.status === 'finished'} onClick={e => {
+            local.data.status = local.data.status === 'finished' ? 'loading' : 'finished'
+            onEdit()
+          }} /> {local.data.status}
+        </Form.Item>
+        <Form.Item label="公开" labelCol={lb} wrapperCol={rb}>
+          <Switch checked={local.data.open} onClick={e => {
+            local.data.open = !local.data.open;
+            onEdit()
+          }} /> {local.data.open}
         </Form.Item>
         <Form.Item label="国家地区" labelCol={lb} wrapperCol={rb}>
           <Select value={local.data.country} onChange={value => {
@@ -217,7 +247,9 @@ export default function ResourceEdit() {
             )}
           </Upload>
         </Form.Item>
-        <Form.Item label="附件列表" labelCol={lb} wrapperCol={rb}>
+        <Form.Item label={<span>视频列表<br/><Switch checked={local.fullEditVideo} onClick={e => {
+          local.fullEditVideo = !local.fullEditVideo;
+        }} /></span>} labelCol={lb} wrapperCol={rb}>
           <SortListView
             isLoading={local.loading}
             direction="vertical"
@@ -246,63 +278,109 @@ export default function ResourceEdit() {
             listStyle={{ boxSizing: 'border-box' }}
             itemStyle={{ display: 'flex', alignItems: 'center', lineHeight: 1 }}
             renderItem={({ item, index }) => (
-              <Input
-                key={index}
-                value={item.nth + ' ' + item.url}
-                disabled
-                addonBefore={<Observer>{() => (
-                  <Fragment>
-                    <Select style={{ width: 90 }} value={item.status} onChange={async (status) => {
-                      item.loading = true
-                      try {
-                        await api.updateResourceVideo(local.id, { id: item.id, status })
-                        item.status = status
-                      } finally {
-                        item.loading = false
-                      }
-                    }}>
-                      <Select.Option value="init">初始化</Select.Option>
-                      <Select.Option value="loading">下载中</Select.Option>
-                      <Select.Option value="finished">已下载</Select.Option>
-                      <Select.Option value="fail">失败</Select.Option>
-                    </Select>
-                    <Divider type="vertical" />
-                    <Select style={{ width: 80 }} value={item.type} onChange={async (type) => {
-                      item.loading = true
-                      try {
-                        await api.updateResourceVideo(local.id, { id: item.id, type })
-                        item.type = type
-                      } finally {
-                        item.loading = false
-                      }
-                    }}>
-                      <Select.Option value="normal">正片</Select.Option>
-                      <Select.Option value="trailer">预告</Select.Option>
-                      <Select.Option value="tidbits">花絮</Select.Option>
-                    </Select>
-                  </Fragment>
-                )}</Observer>}
-                suffix={<CloseOutlined disabled={item.loading || item.status === 'loading'} onClick={async () => {
-                  item.loading = true
-                  try {
-                    await api.removeResourceVideo({ id: item.id, mid: local.id })
-                    local.data.urls = local.data.urls.filter(t => t.url !== item.url)
-                  } finally {
-                    item.loading = false
-                  }
-                }} />}
-                addonAfter={<Observer>{() => (
-                  <Icon type={item.loading || item.status === 'loading' ? 'loading' : 'download'} disabled={item.loading} onClick={async () => {
-                    item.loading = true
-                    try {
-                      await api.downloadResourceVideo(local.id, item.id)
-                      item.status = 'loading'
-                    } finally {
-                      item.loading = false
+              <FullWidth className="container" style={{ width: '100%' }}>
+                <FullHeightAuto>
+                  {local.fullEditVideo && (
+                    <Fragment>
+                      <Input className="title" addonBefore={'标题'} defaultValue={item.title} />
+                      <Input className="path" style={{ margin: '5px 0' }} addonBefore={'文件:' + item.nth} defaultValue={item.path} />
+                    </Fragment>
+                  )}
+                  <Input className="url"
+                    defaultValue={item.url}
+                    disabled
+                    addonBefore={
+                      <Observer>{() => (
+                        <Fragment>
+                          <Select style={{ width: 90 }} value={item.status} onChange={async (status) => {
+                            item.loading = true
+                            try {
+                              await api.updateResourceVideo(local.id, { id: item.id, status })
+                              item.status = status
+                            } finally {
+                              item.loading = false
+                            }
+                          }}>
+                            <Select.Option value="init">初始化</Select.Option>
+                            <Select.Option value="loading">下载中</Select.Option>
+                            <Select.Option value="finished">已下载</Select.Option>
+                            <Select.Option value="fail">失败</Select.Option>
+                          </Select>
+                          <Divider type="vertical" />
+                          <Select style={{ width: 80 }} value={item.type} onChange={async (type) => {
+                            item.loading = true
+                            try {
+                              await api.updateResourceVideo(local.id, { id: item.id, type })
+                              item.type = type
+                            } finally {
+                              item.loading = false
+                            }
+                          }}>
+                            <Select.Option value="normal">正片</Select.Option>
+                            <Select.Option value="trailer">预告</Select.Option>
+                            <Select.Option value="tidbits">花絮</Select.Option>
+                          </Select>
+                        </Fragment>
+                      )}</Observer>
                     }
-                  }} />
-                )}</Observer>}
-              />
+                    addonAfter={!local.fullEditVideo ? <Observer>{() => (
+                      <CloseOutlined disabled={item.loading || item.status === 'loading'} onClick={async () => {
+                        item.loading = true
+                        try {
+                          await api.removeResourceVideo({ id: item.id, mid: local.id })
+                          local.data.urls = local.data.urls.filter(t => t.url !== item.url)
+                        } finally {
+                          item.loading = false
+                        }
+                      }} />
+                    )}</Observer> : null}
+                  />
+                </FullHeightAuto>
+                <FullHeight>
+                  <AlignVertical style={{ padding: '0 10px', minHeight: 80 }}>
+                    {local.fullEditVideo && (
+                      <Fragment>
+                        <Icon type="check" onClick={async (e) => {
+                          const container = e.target.closest('.container');
+                          const otitle = container.querySelector('.title input');
+                          const opath = container.querySelector('.path input');
+                          const ourl = container.querySelectorAll('.url input')[2];
+                          item.loading = true
+                          try {
+                            await api.updateResourceVideo(local.id, { id: item.id, url: ourl.value, path: opath.value, title: otitle.value });
+                          } finally {
+                            item.loading = false
+                          }
+                        }} />
+                        <Observer>{() => (
+                          <CloseOutlined disabled={item.loading || item.status === 'loading'} onClick={async () => {
+                            item.loading = true
+                            try {
+                              await api.removeResourceVideo({ id: item.id, mid: local.id })
+                              local.data.urls = local.data.urls.filter(t => t.url !== item.url)
+                            } finally {
+                              item.loading = false
+                            }
+                          }} />
+                        )}</Observer>
+                      </Fragment>
+
+                    )}
+                    <Observer>{() => (
+                      <Icon type={item.loading || item.status === 'loading' ? 'loading' : 'download'} disabled={item.loading} onClick={async () => {
+                        item.loading = true
+                        try {
+                          await api.downloadResourceVideo(local.id, item.id)
+                          item.status = 'loading'
+                        } finally {
+                          item.loading = false
+                        }
+                      }}
+                      />
+                    )}</Observer>
+                  </AlignVertical>
+                </FullHeight>
+              </FullWidth>
             )}
           />
           {local.urlAddVisible && (
@@ -325,8 +403,8 @@ export default function ResourceEdit() {
                   <Select.Option value="fail">失败</Select.Option>
                 </Select>
                 <Divider type="vertical" />
-                <Select style={{ width: 80 }} disabled={local.isDealUrl} value={local.tempType} onChange={async (type) => {
-                  local.tempType = type;
+                <Select style={{ width: 80 }} disabled={local.isDealUrl} value={local.tempUrlType} onChange={async (type) => {
+                  local.tempUrlType = type;
                 }}>
                   <Select.Option value="normal">正片</Select.Option>
                   <Select.Option value="trailer">预告</Select.Option>
@@ -347,9 +425,9 @@ export default function ResourceEdit() {
                 }
                 local.isDealUrl = true
                 try {
-                  const res = await api.addResourceVideo({ id: local.id, title: local.data.title, url, type: local.tempType, status: local.tempStatus })
+                  const res = await api.addResourceVideo({ id: local.id, title: local.data.title, url, type: local.tempUrlType, status: local.tempStatus })
                   if (res && res.code === 0) {
-                    local.data.urls.push({ url: res.data.url, id: res.data.id, status: local.tempStatus, type: local.tempType, nth: local.data.urls.length })
+                    local.data.urls.push({ url: res.data.url, path: res.data.path, id: res.data.id, status: local.tempStatus, type: local.tempUrlType, nth: local.data.urls.length })
                     local.urlAddVisible = false
                   } else {
                     notification.info('fail')
@@ -358,7 +436,7 @@ export default function ResourceEdit() {
                   local.tempUrl = '';
                   local.isDealUrl = false;
                   local.tempStatus = 'init';
-                  local.tempType = 'normal';
+                  local.tempUrlType = 'normal';
                 }
               }} />}
             />
@@ -369,6 +447,192 @@ export default function ResourceEdit() {
             </Tag>
           )}
         </Form.Item>
+        <Form.Item label="图片列表" labelCol={lb} wrapperCol={rb}>
+          <SortListView
+            isLoading={local.loading}
+            direction="vertical"
+            mode="edit"
+            handler={<Icon type="drag" style={{ marginRight: 10 }} />}
+            sort={async (oldIndex, newIndex) => {
+              const data = local.data.images.map(item => ({ id: item.id, url: item.url }))
+              const id = data.splice(oldIndex, 1)
+              data.splice(newIndex, 0, ...id)
+              data.forEach((d, i) => {
+                d.nth = i + 1
+              })
+              local.loading = false
+              try {
+                await api.sortResourceImage({ id: local.id, data })
+                const items = local.data.images.map(item => item)
+                const item = items.splice(oldIndex, 1);
+                items.splice(newIndex, 0, ...item)
+                local.data.images = items
+              } finally {
+                local.loading = false
+              }
+            }}
+            items={local.data.images}
+            droppableId={local.id}
+            listStyle={{ boxSizing: 'border-box' }}
+            itemStyle={{ display: 'flex', alignItems: 'center', lineHeight: 1, marginBottom: 5, backgroundColor: 'transparent' }}
+            renderItem={({ item, index }) => (
+              <Observer>{() => (
+                <Input
+                  key={index}
+                  value={item.nth + ' ' + item.url}
+                  disabled
+                  className="custom"
+                  style={item.status === 'finished' ? { backgroundColor: '#00b578', color: 'white' } : { backgroundColor: '#ff8f1f' }}
+                  addonBefore={<Observer>{() => (
+                    <Fragment>
+                      <Select style={{ width: 90 }} value={item.status} onChange={async (status) => {
+                        item.loading = true
+                        try {
+                          await api.updateResourceImage(local.id, { id: item.id, status })
+                          item.status = status
+                        } finally {
+                          item.loading = false
+                        }
+                      }}>
+                        <Select.Option value="init">初始化</Select.Option>
+                        <Select.Option value="loading">下载中</Select.Option>
+                        <Select.Option value="finished">已下载</Select.Option>
+                        <Select.Option value="fail">失败</Select.Option>
+                      </Select>
+                      <Divider type="vertical" />
+                      <Select style={{ width: 80 }} value={item.type} onChange={async (type) => {
+                        item.loading = true
+                        try {
+                          await api.updateResourceImage(local.id, { id: item.id, type })
+                          item.type = type
+                        } finally {
+                          item.loading = false
+                        }
+                      }}>
+                        <Select.Option value="poster">封面</Select.Option>
+                        <Select.Option value="content">正文图片</Select.Option>
+                        <Select.Option value="thumbnail">缩略图</Select.Option>
+                        <Select.Option value="gallery">图集</Select.Option>
+                      </Select>
+                    </Fragment>
+                  )}</Observer>}
+                  suffix={<CloseOutlined disabled={item.loading || item.status === 'loading'} onClick={async () => {
+                    item.loading = true
+                    try {
+                      await api.removeResourceImage({ id: item.id, mid: local.id })
+                      local.data.images = local.data.images.filter(t => t.url !== item.url)
+                    } finally {
+                      item.loading = false
+                    }
+                  }} />}
+                  addonAfter={<Observer>{() => (
+                    <Icon type={item.loading || item.status === 'loading' ? 'loading' : 'download'} disabled={item.loading} onClick={async () => {
+                      if (item.status === 'finished') {
+                        return notification.error({ message: '已下载' })
+                      }
+                      item.status = 'loading'
+                      item.loading = true
+                      try {
+                        await api.downloadResourceImage(local.id, item.id)
+                        item.status = 'finished'
+                      } finally {
+                        item.loading = false
+                      }
+                    }} />
+                  )}</Observer>}
+                />
+              )}</Observer>
+            )}
+          />
+          {local.imageAddVisible && (
+            <Input
+              ref={inputImage}
+              type="text"
+              size="small"
+              style={{ margin: '10px 5px' }}
+              value={local.tempImage}
+              autoFocus
+              disabled={local.isDealUrl}
+              onChange={e => local.tempImage = e.target.value}
+              addonBefore={<Fragment>
+                <Select style={{ width: 90 }} disabled={local.isDealUrl} value={local.tempStatus} onChange={async (status) => {
+                  local.tempStatus = status;
+                }}>
+                  <Select.Option value="init">初始化</Select.Option>
+                  <Select.Option value="loading">下载中</Select.Option>
+                  <Select.Option value="finished">已下载</Select.Option>
+                  <Select.Option value="fail">失败</Select.Option>
+                </Select>
+                <Divider type="vertical" />
+                <Select style={{ width: 80 }} disabled={local.isDealUrl} value={local.tempImageType} onChange={async (type) => {
+                  local.tempImageType = type;
+                }}>
+                  <Select.Option value="poster">封面</Select.Option>
+                  <Select.Option value="content">正文图片</Select.Option>
+                  <Select.Option value="thumbnail">缩略图</Select.Option>
+                  <Select.Option value="gallery">图集</Select.Option>
+                </Select>
+              </Fragment>}
+              addonAfter={<Icon type="check" onClick={async () => {
+                if (local.isDealUrl) {
+                  return;
+                }
+                let image = local.tempImage.trim()
+                if ('' === image) {
+                  local.imageAddVisible = false
+                  return;
+                }
+                local.isDealUrl = true
+                try {
+                  if (image.includes(',')) {
+                    const images = image.split(',');
+                    for (let i = 0; i < images.length; i++) {
+                      let url = images[i];
+                      if (-1 !== local.data.images.findIndex(t => t.url === url)) {
+                        return notification.info('exists')
+                      }
+                      if (url) {
+                        const res = await api.addResourceImage({ id: local.id, title: '', url, type: local.tempImageType, status: local.tempStatus })
+                        if (res && res.code === 0) {
+                          local.data.images.push({ url: res.data.url, id: res.data.id, status: res.data.status, type: res.data.type, nth: local.data.images.length + 1 })
+                        } else {
+                          notification.info('fail')
+                        }
+                      }
+                    }
+                    local.imageAddVisible = false
+                  } else {
+                    if (-1 !== local.data.images.findIndex(t => t.url === image)) {
+                      return notification.info('exists')
+                    }
+                    const res = await api.addResourceImage({ id: local.id, title: local.data.title, url: image, type: local.tempImageType, status: local.tempStatus })
+                    if (res && res.code === 0) {
+                      local.data.images.push({ url: res.data.url, id: res.data.id, status: local.tempStatus, type: local.tempImageType, nth: local.data.images.length + 1 })
+                      local.imageAddVisible = false
+                    } else {
+                      notification.info('fail')
+                    }
+                  }
+
+                } finally {
+                  local.tempImage = '';
+                  local.isDealUrl = false;
+                  local.tempStatus = 'init';
+                  local.tempImageType = 'poster';
+                }
+              }} />}
+            />
+          )}
+          {!local.imageAddVisible && (
+            <Fragment>
+              <Tag style={{ margin: '10px 5px', background: '#fff', borderStyle: 'dashed' }}>
+                <PlusCircleOutlined onClick={() => local.imageAddVisible = true} />
+              </Tag>
+              可输入多个图片(,分隔)
+            </Fragment>
+          )}
+        </Form.Item>
+
       </div>
       <Form.Item label="" style={{ textAlign: 'center', backgroundColor: '#b5cbde', height: 50, lineHeight: '50px', margin: 0, }}>
         <Button loading={local.loading} disabled={local.loading} type="primary" onClick={onEdit}>保存</Button>

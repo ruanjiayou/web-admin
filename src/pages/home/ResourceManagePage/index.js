@@ -32,6 +32,7 @@ export default function ResourceManagePage() {
     search_name: '',
     search_type: '',
     search_status: '',
+    search_key: 'name',
     search_page: 1,
     categories: {},
     resources: [],
@@ -65,14 +66,21 @@ export default function ResourceManagePage() {
     return <div className={'box'}>
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         <div style={{ padding: 10 }}>
-          名称<Divider type="vertical" />
-          <Input style={{ width: 250 }} value={local.search_name} onChange={e => {
-            local.search_name = e.target.value
-          }} onKeyDown={e => {
-            if (e.keyCode === 13) {
-              search()
-            }
-          }} />
+          <Input
+            style={{ width: 250 }}
+            value={local.search_name}
+            addonBefore={<Select value={local.search_key} onChange={value => {
+              local.search_key = value;
+            }}>
+              <Select.Option value="name">名称</Select.Option>
+              <Select.Option value="id">id</Select.Option>
+            </Select>} onChange={e => {
+              local.search_name = e.target.value
+            }} onKeyDown={e => {
+              if (e.keyCode === 13) {
+                search()
+              }
+            }} />
           <Divider type="vertical" />
           状态
           <Divider type="vertical" />

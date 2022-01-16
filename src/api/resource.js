@@ -112,6 +112,47 @@ export function sortResourceVideo({ id, data }) {
   })
 }
 
+
+export function addResourceImage({ id, ...data }) {
+  return shttp({
+    url: `/v1/admin/resource/${id}/image`,
+    method: 'POST',
+    data,
+  })
+}
+
+export function updateResourceImage(id, data) {
+  return shttp({
+    url: `/v1/admin/resource/${id}/image/${data.id}`,
+    method: 'PUT',
+    data,
+  })
+}
+
+export function downloadResourceImage(mid, id) {
+  return shttp({
+    url: `/v1/admin/resource/${mid}/image/${id}`,
+    method: 'PATCH',
+  })
+}
+
+export function removeResourceImage({ id, mid }) {
+  return shttp({
+    url: `/v1/admin/resource/${mid}/image`,
+    method: 'DELETE',
+    data: { id }
+  })
+}
+
+export function sortResourceImage({ id, data }) {
+  return shttp({
+    url: `/v1/admin/resource/${id}/image`,
+    method: 'PUT',
+    data,
+  })
+}
+
+
 export function grabImages(params) {
   return shttp({
     url: `/v1/admin/resource-grab-images/${params.id}`,

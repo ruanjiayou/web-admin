@@ -32,8 +32,8 @@ export default function ResourceList({ items, children, categories, search, loca
 							style={{ width: 60, height: 60, borderRadius: '50%', marginRight: 10, }}
 							alt=""
 						/>
-						<Icon type={'download'} style={{ position: 'absolute', display: record.poster.startsWith('/') ? 'none' : 'block', left: '50%', top: '50%', transform: 'translate(-50%,-50%)' }} onClick={async (e) => {
-							if (record.poster === '') {
+						<Icon type={'download'} style={{ position: 'absolute', display: record.poster.startsWith('/') || record.thumbnail.startsWith('/') ? 'none' : 'block', left: '50%', top: '50%', transform: 'translate(-50%,-50%)' }} onClick={async (e) => {
+							if (record.poster === '' && record.thumbnail === '') {
 								const poster = prompt('请输入封面地址');
 								if (poster) {
 									await apis.updateResource({ id: record.id, poster })
@@ -41,7 +41,7 @@ export default function ResourceList({ items, children, categories, search, loca
 									search()
 									notification.info({ message: '下载成功' })
 								}
-							} else if (record.poster.startsWith('http')) {
+							} else if (record.poster.startsWith('http') || record.thumbnail.startsWith('http')) {
 								try {
 									await apis.downloadResourceCover({ id: record.id, })
 									search()
@@ -56,15 +56,16 @@ export default function ResourceList({ items, children, categories, search, loca
 				</Observer>
 			)} />
 			<Column title="标题" width={200} dataIndex="title" key="title" render={(text, record) => {
-				let url = ''
+				let isDev = window.origin.includes('localhost:3000') ? true : false;
+				let url = isDev ? 'http://localhost:8097' : window.origin;
 				if (record.source_type === 'video') {
-					url = (window.origin + '/novel/groups/GroupTree/VideoInfo?GroupTree.name=video&VideoInfo.id=' + record.id)
+					url += ('/novel/groups/GroupTree/VideoInfo?GroupTree.name=video&VideoInfo.id=' + record.id)
 				} else if (record.source_type === 'novel') {
-					url = (window.origin + '/novel/home/BookInfo?home.tab=&BookInfo.id=' + record.id)
+					url += ('/novel/home/BookInfo?home.tab=&BookInfo.id=' + record.id)
 				} else if (['news', 'article', 'private'].includes(record.source_type)) {
-					url = (window.origin + '/novel/home/Article?home.tab=QD7vNfJCU&Article.id=' + record.id)
+					url += ('/novel/home/Article?home.tab=QD7vNfJCU&Article.id=' + record.id)
 				} else if (['image'].includes(record.source_type)) {
-					url = (window.origin + '/novel/groups/GroupTree/Image?GroupTree.name=image&Image.id=' + record.id)
+					url += ('/novel/groups/GroupTree/Image?GroupTree.name=image&Image.id=' + record.id)
 				}
 				return <a style={{ color: '#1890ff', cursor: 'pointer' }} title={url} href={url} onClick={(e) => {
 					e.preventDefault()
