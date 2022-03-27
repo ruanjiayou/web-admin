@@ -10,6 +10,7 @@ import IconCode from '../../../images/code.svg'
 import { UnControlled as CodeMirror } from 'react-codemirror2'
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/material.css';
+import path2regexp from 'path-to-regexp'
 require('codemirror/mode/xml/xml');
 require('codemirror/mode/javascript/javascript');
 
@@ -96,8 +97,11 @@ export default function SpiderPage() {
               </Row>
               <Input ref={ref => originRef.current = ref} onPaste={e => {
                 const url = e.clipboardData.getData('text/plain');
+                const u = new URL(url);
                 local.rules.forEach(rule => {
-                  if (url.startsWith(rule.host)) {
+                  const reg = path2regexp(rule.route);
+                  const m = reg.exec(u.pathname)
+                  if (url.startsWith(rule.host) && ((rule.route && m) || !rule.route)) {
                     local.tempId = rule.id
                     local.tempRule = rule
                   }
@@ -172,8 +176,11 @@ export default function SpiderPage() {
               </Select>
               <Input style={{ marginTop: 10 }} ref={ref => urlRef.current = ref} onPaste={e => {
                 const url = e.clipboardData.getData('text/plain');
+                const u = new URL(url);
                 local.rules.forEach(rule => {
-                  if (url.startsWith(rule.host)) {
+                  const reg = path2regexp(rule.route);
+                  const m = reg.exec(u.pathname)
+                  if (url.startsWith(rule.host) && ((rule.route && m) || !rule.route)) {
                     local.tempId = rule.id
                     local.tempRule = rule
                   }
@@ -217,7 +224,7 @@ export default function SpiderPage() {
             <a href={text} rel="noopener noreferrer" title={record.route} target="_blank">{text}</a>
           )} />
           <Column title="名称" dataIndex="name" key="name" render={(text, record) => {
-            return <span title={record.id}>{text}</span>
+            return <span title={record.id} style={{ backgroundColor: record.enable ? '' : 'grey' }}>{text}</span>
           }} />
           <Column title="id" dataIndex="id" key="id" />
           <Column title="类型" dataIndex="type" key="type" />

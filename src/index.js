@@ -52,6 +52,8 @@ function App() {
       const resp = await apis.getMenus()
       store.pages = pagination(resp.data);
       store.menus = adjustMenu(store.pages);
+      const resp2 = await apis.getComponents()
+      store.components = resp2.data;
       const appResp = await apis.getApps();
       if (appResp.code === 0) {
         store.apps = appResp.data;

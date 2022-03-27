@@ -21,6 +21,7 @@ import RobotManage from './home/RobotManage'
 import BackupTablePage from './home/DataManagePage/table'
 import MuiltiEdit from './home/ResourceManagePage/multi'
 import AppManagePage from './home/AppManagePage'
+import ComponentManagePage from './home/ComponentManagePage'
 
 import {
   LinkOutlined,
@@ -65,6 +66,7 @@ const page_map = {
   'BackupTablePage': BackupTablePage,
   'MuiltiEdit': MuiltiEdit,
   'AppManagePage': AppManagePage,
+  'ComponentManagePage':ComponentManagePage,
 }
 export const icon_map = {
   LinkOutlined,

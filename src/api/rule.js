@@ -57,20 +57,13 @@ export function v2destroyRule(params) {
 }
 
 export function v2updateRule(data) {
-  const form = new FormData()
-  for (let k in data) {
-    let v = data[k]
-    if (((k === 'subScript' || k === 'mainScript') && !v) || v) {
-      form.append(k, v)
-    }
-  }
   return shttp({
     url: `/v2/admin/rule/${data.id}`,
     method: 'PUT',
     headers: {
-      'Content-Type': 'multipart/form-data;charset=UTF-8'
+      'Content-Type': 'application/json'
     },
-    data: form,
+    data,
   })
 }
 

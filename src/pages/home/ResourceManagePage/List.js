@@ -128,22 +128,24 @@ export default function ResourceList({ items, children, categories, search, loca
 				)}
 				</Observer>
 			)} />
-			<Column title="标签" dataIndex="types" key="types" width={150} render={(text, record) => (
+			{/* <Column title="标签" dataIndex="types" key="types" width={150} render={(text, record) => (
 				<Observer>{() => (
 					<Fragment>
-						{record.tags.map((tag, i) => <Tag key={i} style={{ marginBottom: 5 }} closable={!state.updating} onClose={async () => {
-							try {
-								state.updating = true
-								const tags = record.tags.filter(item => item !== tag)
-								await apis.updateResource({ id: record.id, tags })
-								record.tags = tags
-								notification.info({ message: '修改成功' })
-							} catch (e) {
-								notification.info({ message: '修改失败' })
-							} finally {
-								state.updating = false
-							}
-						}}>{tag}</Tag>)}
+						<div style={{ maxHeight: 150, overflow: 'auto' }}>
+							{record.tags.map((tag, i) => <Tag key={i} style={{ marginBottom: 5 }} closable={!state.updating} onClose={async () => {
+								try {
+									state.updating = true
+									const tags = record.tags.filter(item => item !== tag)
+									await apis.updateResource({ id: record.id, tags })
+									record.tags = tags
+									notification.info({ message: '修改成功' })
+								} catch (e) {
+									notification.info({ message: '修改失败' })
+								} finally {
+									state.updating = false
+								}
+							}}>{tag}</Tag>)}
+						</div>
 						<EditTag save={async (tag) => {
 							tag = tag.trim();
 							const tags = record.tags.map(item => item)
@@ -161,7 +163,7 @@ export default function ResourceList({ items, children, categories, search, loca
 					</Fragment>
 				)}
 				</Observer>
-			)} />
+			)} /> */}
 			<Column title="系列" width={100} dataIndex="series" key="series" render={(text, record) => (
 				<Observer>{() => (<span style={{ backgroundColor: '#eee', border: '1px solid #eee', borderRadius: 4, padding: '3px 5px' }} onClick={async () => {
 					const res = prompt('请输入系列名')

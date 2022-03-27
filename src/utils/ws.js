@@ -4,7 +4,7 @@ import Message from '../models/message'
 import { notification, Modal } from 'antd'
 import { events } from './events'
 
-export const ws = io('/', {
+export const ws = io('http://localhost:8097', {
   path: '/ws',
   reconnectionAttempts: 3
 });
@@ -20,6 +20,21 @@ ws.on('disconnect', () => {
 ws.on('message', (data) => {
   const key = `${data.module}-${data.name}`;
   console.log(data, 'ws')
+  if (data.action === 'download') {
+    const links = data.data;
+    let timer = setInterval(() => {
+    if (links.length) {
+      let a = document.createElement('a');
+      let url = links.pop();
+      console.log(url);
+      a.href = url; a.download = new URL(url).pathname.split('/').pop();
+      a.target = '_self'; a.click();
+    } else {
+      clearTimeout(timer);
+    }
+  }, 2100)
+    return;
+  }
   if (data.type === 'notify') {
     // module robot name uin action chat
     notification.info({ message: data.data.message, description: `from ${data.name}` })

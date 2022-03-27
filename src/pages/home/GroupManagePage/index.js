@@ -163,12 +163,7 @@ export default function GroupManagePage() {
       <FullWidth style={{ height: '100%', }}>
         <FullWidthFix style={{ height: '100%', backgroundColor: 'cornsilk', alignItems: 'flex-start' }}>
           <div style={{ display: 'flex', flexDirection: 'column', padding: '0 10px', width: 150, alignItems: 'center' }}>
-            <CompImg src={ImgFilter} title="过滤组件" onDragStart={() => { store.app.setCurrentDragType('filter') }} />
-            <CompImg src={ImgPicker} title="卡片组件" onDragStart={() => { store.app.setCurrentDragType('picker') }} />
-            <CompImg src={ImgTab} title="tab组件" onDragStart={() => { store.app.setCurrentDragType('tab') }} />
-            <CompImg src={ImgTabbar} title="tabbar组件" />
-            <CompImg src={ImgGrid} title="grid组件" onDragStart={() => { store.app.setCurrentDragType('menu-grid') }} />
-            <CompImg src={ImgGrid} alt="NodeTree" title="NodeTree组件" onDragStart={() => { store.app.setCurrentDragType('tree-node') }} />
+            {store.components.map(component => (<CompImg src={component.image || ''} key={component.id} title={component.title} alt={component.title} onDragStart={() => { store.app.setCurrentDragType(component.name || '') }} />))}
           </div>
         </FullWidthFix>
         <FullWidthAuto style={{ height: '100%' }}>

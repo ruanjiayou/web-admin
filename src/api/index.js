@@ -16,6 +16,7 @@ import * as config from './config'
 import * as robot from './robot'
 import * as file from './file'
 import * as app from './app'
+import * as component from './component'
 
 const boot = function () {
   return shttp({
@@ -59,4 +60,5 @@ export default {
   ...config,
   ...robot,
   ...file,
+  ...component,
 }

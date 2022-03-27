@@ -2,7 +2,7 @@ import React, { useCallback, Fragment, useRef } from 'react';
 import { useEffectOnce } from 'react-use'
 import { Observer, useLocalStore } from 'mobx-react-lite'
 import apis from '../../../api'
-import { Button, notification, Input, Form, Tag, Upload, Select, Divider, Switch } from 'antd';
+import { Button, notification, Input, Form, Tag, Upload, Select, Divider, Switch, message, Modal, Radio } from 'antd';
 import { SortListView } from '../../../component'
 import Icon from '../../../component/Icon'
 import qs from 'qs'
@@ -11,12 +11,15 @@ import store from '../../../store'
 import { toJS } from 'mobx';
 import { PlusCircleOutlined, CloseOutlined } from '@ant-design/icons'
 import api from '../../../api';
+import { formatNumber } from '../../../utils/helper'
 import { AlignAside, FullWidth, FullHeightAuto, FullHeightFix, AlignVertical, FullWidthFix, FullHeight } from '../../../component/style';
 import TextArea from 'antd/lib/input/TextArea';
 
 
 function deepEqual(a, b) {
-  for (let k in a) {
+  const keys = Array.from(new Set([...Object.keys(a), ...Object.keys(b)]));
+  for (let i = 0; i < keys.length; i++) {
+    const k = keys[i]
     let equal = true;
     if (_.isPlainObject(a[k])) {
       if (_.isEmpty(a[k]) && !_.isEmpty(b[k])) {
@@ -60,6 +63,13 @@ export default function ResourceEdit() {
     imageAddVisible: false,
     loading: false,
     fullEditVideo: false,
+    showFormat: false,
+    formats: [],
+    formatUrl: '',
+    cancelFormat() {
+      local.showFormat = false;
+      local.formats = [];
+    },
   }))
   const onEdit = useCallback(async () => {
     const changed = !deepEqual(toJS(local.origin), toJS(local.data));
@@ -247,7 +257,24 @@ export default function ResourceEdit() {
             )}
           </Upload>
         </Form.Item>
-        <Form.Item label={<span>视频列表<br/><Switch checked={local.fullEditVideo} onClick={e => {
+        <Form.Item label="选择下载清晰度">
+          <Button onClick={e => {
+            if (local.data.source_name !== 'youtube' && local.data.source_name !== 'youtube_shorts') {
+              return message.warn('来源不是youtube!', 1);
+            }
+            local.formats = local.data.original.formats.filter(item => item.filesize && item.resolution !== 'audio only').sort((a, b) => b.height - a.height).map(item => ({
+              ext: item.ext,
+              url: item.url,
+              quality: item.format_note,
+              height: item.height,
+              width: item.width,
+              size: `${item.width}*${item.height}`,
+              filesize: formatNumber(item.filesize),
+            }));
+            local.showFormat = true;
+          }}>选择youtube</Button>
+        </Form.Item>
+        <Form.Item label={<span>视频列表<br /><Switch checked={local.fullEditVideo} onClick={e => {
           local.fullEditVideo = !local.fullEditVideo;
         }} /></span>} labelCol={lb} wrapperCol={rb}>
           <SortListView
@@ -638,5 +665,58 @@ export default function ResourceEdit() {
         <Button loading={local.loading} disabled={local.loading} type="primary" onClick={onEdit}>保存</Button>
       </Form.Item>
     </div>
+    <Observer>{() => <Modal visible={local.showFormat}
+      style={{ overflow: 'auto', padding: 0 }}
+      width={700}
+      bodyStyle={{ height: 500, overflow: 'auto' }}
+      onCancel={local.cancelFormat}
+      onOk={async () => {
+        const item = local.formats.find(item => item.url === local.formatUrl)
+        if (item) {
+          if (local.isDealUrl) {
+            return;
+          }
+          let url = item.url.trim()
+          if ('' === url) {
+            local.urlAddVisible = false
+            return;
+          }
+          if (-1 !== local.data.urls.findIndex(t => t.url === url)) {
+            return notification.info('exists')
+          }
+          local.isDealUrl = true
+          try {
+            const res = await api.addResourceVideo({ id: local.id, title: '', url, type: 'normal', status: 'init', ext: item.ext, more: item })
+            if (res && res.code === 0) {
+              local.data.urls.push({ url: res.data.url, path: res.data.path, id: res.data.id, status: 'init', type: 'normal', nth: local.data.urls.length })
+              local.urlAddVisible = false
+            } else {
+              notification.info('fail')
+            }
+          } finally {
+            local.tempUrl = '';
+            local.isDealUrl = false;
+            local.tempStatus = 'init';
+            local.tempUrlType = 'normal';
+          }
+        }
+        local.cancelFormat();
+      }}
+      cancelText="取消"
+      okText="确定"
+    >
+      <Radio.Group style={{ width: '100%' }} name="quality" defaultValue="" onChange={e => {
+        local.formatUrl = e.target.value
+      }}>
+        {local.formats.map(item => (<FullWidth key={item.url}>
+          <FullWidthFix style={{ width: '20%' }}><Radio name="quality" value={item.url} /></FullWidthFix>
+          <FullWidthFix style={{ width: '20%' }}>{item.ext}</FullWidthFix>
+          <FullWidthFix style={{ width: '20%' }}>{item.quality}</FullWidthFix>
+          <FullWidthFix style={{ width: '20%' }}>{item.size}</FullWidthFix>
+          <FullWidthFix style={{ width: '20%' }}>{item.filesize}</FullWidthFix>
+        </FullWidth>))}
+      </Radio.Group>
+    </Modal>}</Observer>
+
   </Fragment>)}</Observer>
 }

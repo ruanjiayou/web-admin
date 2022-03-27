@@ -45,7 +45,8 @@ const store = {
     { name: 'Korea', title: '韩国' },
     { name: 'Amarican', title: '美国' },
     { name: 'gat', title: '港澳台' },
-  ]
+  ],
+  components: []
 }
 
 storage.prefix = store.app.storagePrefix
