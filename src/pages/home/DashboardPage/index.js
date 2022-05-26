@@ -1,11 +1,13 @@
-import React, { Fragment, useRef } from 'react'
+import React, { Fragment, useRef, useCallback } from 'react'
 import { Observer, useLocalStore } from 'mobx-react-lite'
 import { useStore } from '../../../contexts'
 import shttp from '../../../utils/shttp'
-import { Padding } from '../../../component/style'
+import { Padding, AlignAside } from '../../../component/style'
+import { VisualBox, Icon } from '../../../component'
 import ReactECharts from 'echarts-for-react';
 import { useEffectOnce } from 'react-use'
 import api from '../../../api'
+import { notification } from 'antd';
 
 // function testUpload(data) {
 //   const form = new FormData()
@@ -24,11 +26,67 @@ import api from '../../../api'
 export default function SignInPage() {
   // const store = useStore()
   // const file = useRef(null)
-  // const local = useLocalStore(() => ({
-  //   loading: false
-  // }))
+  const store = useLocalStore(() => ({
+    showKline: false,
+    klineY: 0
+  }))
   const echartRef = useRef(null)
   const stockRef = useRef(null)
+  const klineRef = useRef(null)
+  const loadKline = useCallback(async (stock, event) => {
+    store.showKline = true
+    if (klineRef.current) {
+      store.klineY = event.offsetY
+      const intance = klineRef.current.getEchartsInstance()
+      const option = {
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'cross',
+            crossStyle: {
+              color: '#999'
+            }
+          },
+          formatter: function (params) {
+            const name = params[0].axisValue
+            const item = { total: 1000, amount: 1222, price: 11 };
+            return `价值: ${item.total}元<br>手数: ${item.amount / 100}<br>价格: ${item.price}元`
+          }
+        },
+        legend: {
+          data: ['持有情况'],
+        },
+        xAxis: {
+          type: 'category',
+          name: '股票名称',
+          axisPointer: {
+            type: 'shadow'
+          },
+          data: ["森马"]
+        },
+        yAxis: {
+          type: 'value',
+          name: '持有情况',
+          axisLabel: {
+            formatter: '{value}￥'
+          }
+        },
+        series: [{
+          data: [{ total: 1000 }].map(item => {
+            const total = parseFloat(item.total)
+            return {
+              value: total,
+              itemStyle: {
+                color: total >= 0 ? '#d93025' : '#34a853'
+              }
+            }
+          }),
+          type: 'bar'
+        }]
+      }
+      intance.setOption(option, true);
+    }
+  })
   useEffectOnce(() => {
     api.getTradeBalance().then((res) => {
       if (res.code === 0) {
@@ -150,13 +208,22 @@ export default function SignInPage() {
             }]
           }
           const intance = stockRef.current.getEchartsInstance()
+          intance.on('click', function (params) {
+            const stockName = params.name;
+            const stock = data.find(item => item._id === stockName)
+            if (stock) {
+              loadKline(stock, params.event)
+            } else {
+              notification.warn({ message: stockName + '' })
+            }
+          })
           intance.setOption(option, { notMerge: true })
         }
       }
     });
   })
   return <Observer>{() => (
-    <Padding>
+    <Padding style={{ position: 'relative' }}>
       <ReactECharts
         ref={e => echartRef.current = e}
         option={{
@@ -183,32 +250,71 @@ export default function SignInPage() {
         style={{ height: '400px', width: '100%' }}
         className='echarts-for-echarts'
         theme='my_theme' />
-      <ReactECharts
-        ref={e => stockRef.current = e}
-        option={{
-          xAxis: {
-            type: 'category',
-            data: []
-          },
-          yAxis: {
-            type: 'value'
-          },
-          dataZoom: [
-            {
-              type: 'inside',
-              xAxisIndex: [0],
-              start: 1,
-              end: 50
-            }
-          ],
-          series: [{
-            data: [],
-            type: 'bar'
-          }]
-        }}
-        style={{ height: '400px', width: '100%' }}
-        className='echarts-for-echarts'
-        theme='my_theme' />
+      <div style={{ position: 'relative' }}>
+        <ReactECharts
+          ref={e => stockRef.current = e}
+          option={{
+            xAxis: {
+              type: 'category',
+              data: []
+            },
+            yAxis: {
+              type: 'value'
+            },
+            dataZoom: [
+              {
+                type: 'inside',
+                xAxisIndex: [0],
+                start: 1,
+                end: 50
+              }
+            ],
+            series: [{
+              data: [],
+              type: 'bar'
+            }]
+          }}
+          style={{ height: '400px', width: '100%' }}
+          className='echarts-for-echarts'
+          theme='my_theme' />
+        <VisualBox visible={store.showKline}>
+          <div style={{ width: '100%', backgroundColor: 'wheat', position: 'absolute', left: 0, top: 0 }}>
+            <AlignAside>
+              <span>k线图</span>
+              <Icon type="delete" onClick={() => {
+                store.klineY = 0;
+                store.showKline = false
+              }} />
+            </AlignAside>
+            <ReactECharts
+              ref={e => klineRef.current = e}
+              option={{
+                xAxis: {
+                  type: 'category',
+                  data: []
+                },
+                yAxis: {
+                  type: 'value'
+                },
+                dataZoom: [
+                  {
+                    type: 'inside',
+                    xAxisIndex: [0],
+                    start: 1,
+                    end: 50
+                  }
+                ],
+                series: [{
+                  data: [],
+                  type: 'bar'
+                }]
+              }}
+              style={{ height: '400px', width: '100%' }}
+              className='echarts-for-echarts'
+              theme='my_theme' />
+          </div>
+        </VisualBox>
+      </div>
     </Padding>
   )}</Observer>
 }

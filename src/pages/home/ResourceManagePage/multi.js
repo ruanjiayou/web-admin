@@ -262,13 +262,13 @@ export default function ResourceEdit() {
             if (local.data.source_name !== 'youtube' && local.data.source_name !== 'youtube_shorts') {
               return message.warn('来源不是youtube!', 1);
             }
-            local.formats = local.data.original.formats.filter(item => item.filesize && item.resolution !== 'audio only').sort((a, b) => b.height - a.height).map(item => ({
+            local.formats = local.data.original.formats.filter(item => item.filesize && item.resolution !== 'audio only').sort((a, b) => b.filesize - a.filesize).map(item => ({
               ext: item.ext,
               url: item.url,
               quality: item.format_note,
               height: item.height,
               width: item.width,
-              size: `${item.width}*${item.height}`,
+              resolution: item.resolution,
               filesize: formatNumber(item.filesize),
             }));
             local.showFormat = true;
@@ -709,10 +709,10 @@ export default function ResourceEdit() {
         local.formatUrl = e.target.value
       }}>
         {local.formats.map(item => (<FullWidth key={item.url}>
-          <FullWidthFix style={{ width: '20%' }}><Radio name="quality" value={item.url} /></FullWidthFix>
-          <FullWidthFix style={{ width: '20%' }}>{item.ext}</FullWidthFix>
+          <FullWidthFix><Radio name="quality" value={item.url} /></FullWidthFix>
+          <FullWidthFix style={{ width: '15%' }}>{item.ext}</FullWidthFix>
           <FullWidthFix style={{ width: '20%' }}>{item.quality}</FullWidthFix>
-          <FullWidthFix style={{ width: '20%' }}>{item.size}</FullWidthFix>
+          <FullWidthFix style={{ width: '20%' }}>{item.resolution}</FullWidthFix>
           <FullWidthFix style={{ width: '20%' }}>{item.filesize}</FullWidthFix>
         </FullWidth>))}
       </Radio.Group>
