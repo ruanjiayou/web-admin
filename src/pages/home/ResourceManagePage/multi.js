@@ -49,7 +49,8 @@ export default function ResourceEdit() {
     data: { tags: [], types: [], children: [], urls: [], images: [] },
     origin: {},
     // 临时
-    tempImg: '',
+    tempThumbnailImg: '',
+    tempPosterImg: '',
     tempTag: '',
     tempStatus: 'init',
     tagAddVisible: false,
@@ -135,30 +136,36 @@ export default function ResourceEdit() {
             local.data.status = local.data.status === 'finished' ? 'loading' : 'finished'
             onEdit()
           }} /> {local.data.status}
-        </Form.Item>
-        <Form.Item label="公开" labelCol={lb} wrapperCol={rb}>
+          <Divider type="vertical" />
+          <span>公开:</span>
           <Switch checked={local.data.open} onClick={e => {
             local.data.open = !local.data.open;
             onEdit()
           }} /> {local.data.open}
         </Form.Item>
-        <Form.Item label="国家地区" labelCol={lb} wrapperCol={rb}>
-          <Select value={local.data.country} onChange={value => {
-            local.data.country = value
-          }}>
-            {store.regions.map(region => (
-              <Select.Option key={region.name} value={region.name}>{region.title}</Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
         <Form.Item label="资源类型" labelCol={lb} wrapperCol={rb}>
-          <Select value={local.data.source_type} onChange={value => {
-            local.data.source_type = value
-          }}>
-            {store.resource_types.map(type => (
-              <Select.Option key={type.name} value={type.name}>{type.title}</Select.Option>
-            ))}
-          </Select>
+          <FullWidth>
+            <FullWidthFix style={{ width: '25%' }}>
+              <Select value={local.data.source_type} onChange={value => {
+                local.data.source_type = value
+              }}>
+                {store.resource_types.map(type => (
+                  <Select.Option key={type.name} value={type.name}>{type.title}</Select.Option>
+                ))}
+              </Select>
+            </FullWidthFix>
+            <Divider type="vertical" />
+            <div>国家地区: </div>
+            <FullWidthFix style={{ width: '25%' }}>
+              <Select value={local.data.country} onChange={value => {
+                local.data.country = value
+              }}>
+                {store.regions.map(region => (
+                  <Select.Option key={region.name} value={region.name}>{region.title}</Select.Option>
+                ))}
+              </Select>
+            </FullWidthFix>
+          </FullWidth>
         </Form.Item>
         <Form.Item label="分类" labelCol={lb} wrapperCol={rb}>
           {local.data.types.map((type, index) => <Tag key={index} closable onClose={() => { local.data.types.filter(t => t !== type) }}>{type}</Tag>)}
@@ -235,27 +242,49 @@ export default function ResourceEdit() {
           )}
         </Form.Item>
         <Form.Item label="封面" labelCol={lb} wrapperCol={rb}>
-          <Upload
-            style={{ position: 'relative' }}
-            listType="picture-card"
-            className="avatar-uploader"
-            showUploadList={false} ref={picture} name="poster" onChange={e => {
-              local.data.poster = e.file
-              const reader = new FileReader();
-              reader.addEventListener('load', () => {
-                local.tempImg = reader.result
-              });
-              reader.readAsDataURL(e.file);
-            }} beforeUpload={(f) => {
-              return false
-            }}>
-            <img width="100%" src={local.tempImg || (store.app.imageLine + (local.data.poster || local.data.thumbnail || '/images/poster/nocover.jpg'))} alt="" />
-            {local.data.poster === '' && (
-              <Button style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)' }}>
+          <FullWidth>
+            <span>thumbnail</span>
+            <Divider type="vertical" />
+            <Upload
+              listType="picture-card"
+              className="avatar-uploader"
+              showUploadList={false} ref={picture} name="thumbnail" onChange={e => {
+                local.data.thumbnail = e.file
+                const reader = new FileReader();
+                reader.addEventListener('load', () => {
+                  local.tempThumbnailImg = reader.result
+                });
+                reader.readAsDataURL(e.file);
+              }} beforeUpload={(f) => {
+                return false
+              }}>
+              <img width="100%" src={local.tempThumbnailImg || (store.app.imageLine + (local.data.thumbnail || '/images/poster/nocover.jpg'))} alt="" />
+              <Button style={{ marginTop: 10 }}>
                 <Icon type="arrow-up-line" /> 编辑
-                            </Button>
-            )}
-          </Upload>
+              </Button>
+            </Upload>
+            <span>poster</span>
+            <Divider type="vertical" />
+            <Upload
+              style={{ position: 'relative', minWidth: 300, minHeight: 60 }}
+              listType="picture-card"
+              className="avatar-uploader"
+              showUploadList={false} ref={picture} name="poster" onChange={e => {
+                local.data.poster = e.file
+                const reader = new FileReader();
+                reader.addEventListener('load', () => {
+                  local.tempPosterImg = reader.result
+                });
+                reader.readAsDataURL(e.file);
+              }} beforeUpload={(f) => {
+                return false
+              }}>
+              <img width="100%" src={local.tempPosterImg || (store.app.imageLine + (local.data.poster || '/images/poster/nocover.jpg'))} alt="" />
+              <Button style={{ marginTop: 10 }}>
+                <Icon type="arrow-up-line" /> 编辑
+              </Button>
+            </Upload>
+          </FullWidth>
         </Form.Item>
         <Form.Item label="选择下载清晰度">
           <Button onClick={e => {
@@ -659,7 +688,7 @@ export default function ResourceEdit() {
             </Fragment>
           )}
         </Form.Item>
-
+        
       </div>
       <Form.Item label="" style={{ textAlign: 'center', backgroundColor: '#b5cbde', height: 50, lineHeight: '50px', margin: 0, }}>
         <Button loading={local.loading} disabled={local.loading} type="primary" onClick={onEdit}>保存</Button>
