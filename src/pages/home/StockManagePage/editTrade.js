@@ -3,6 +3,7 @@ import { Observer, useLocalStore } from 'mobx-react-lite'
 import { Modal, Form, Input, Select, message, Col, Row, DatePicker } from 'antd';
 import * as math from 'mathjs'
 import moment from 'moment'
+import RemoteSelect from './remoteSelect'
 
 const lb = { span: 4, offset: 2 }, rb = { span: 15 }
 export default function ({ data, save, cancel }) {
@@ -89,6 +90,17 @@ export default function ({ data, save, cancel }) {
         </Col>
         <Col offset={1} span={7}>
           <Input placeholder="证券名称" addonBefore="名称" value={local.data.name} onChange={e => local.data.name = e.target.value} />
+        </Col>
+      </Row>
+      <Row gutter={8} style={{ marginBottom: 5 }} >
+        <Col offset={6} span={7}>
+          <RemoteSelect placeholder={"查询"} onChoose={d => {
+            if (d) {
+              local.data.se = d.se
+              local.data.code = d.code
+              local.data.name = d.name
+            }
+          }} />
         </Col>
       </Row>
       <Row gutter={8} style={{ marginBottom: 5 }}>

@@ -27,3 +27,10 @@ export function getGroupResources(id) {
     url: `/v1/public/group/${id}/resources`,
   })
 }
+
+export function getStocks({ query }) {
+  return shttp({
+    url: `/v1/public/stocks?q=${query.q || ''}`,
+  })
+
+}
