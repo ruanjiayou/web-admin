@@ -144,10 +144,10 @@ export default function SignInPage() {
                   itemStyle: { color: total >= 0 ? '#d93025' : '#34a853' }
                 }
               }),
-              barMaxWidth: 20,
-              barCategoryGap: 0,
-              barGap: 0,
-              barWidth: 1,
+              // barMaxWidth: 20,
+              // barCategoryGap: 0,
+              // barGap: 0,
+              // barWidth: 1,
               type: 'bar'
             }]
           }

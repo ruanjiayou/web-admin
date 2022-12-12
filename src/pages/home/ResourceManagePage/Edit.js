@@ -119,19 +119,25 @@ export default function ResourceEdit({ data, cancel, save, }) {
                 autoFocus
                 onChange={e => local.tempTag = e.target.value}
                 onBlur={() => {
-                  let tag = local.tempTag.trim()
+                  let tagArr = local.tempTag.trim().replace(/,/g, ' ').split(' ');
                   const tags = local.data.tags.toJSON()
-                  if (tag !== '' && -1 === tags.findIndex(t => t === tag)) {
-                    local.data.tags.push(tag)
+                  for (let i = 0; i < tagArr.length; i++) {
+                    const tag = tagArr[i];
+                    if (tag !== '' && -1 === tags.findIndex(t => t === tag)) {
+                      local.data.tags.push(tag)
+                    }
                   }
                   local.tagAddVisible = false
                   local.tempTag = ''
                 }}
                 onPressEnter={() => {
-                  let tag = local.tempTag.trim()
+                  let tagArr = local.tempTag.trim().replace(/,/g, ' ').split(' ');
                   const tags = local.data.tags.toJSON()
-                  if (tag !== '' && -1 === tags.findIndex(t => t === tag)) {
-                    local.data.tags.push(tag)
+                  for (let i = 0; i < tagArr.length; i++) {
+                    const tag = tagArr[i];
+                    if (tag !== '' && -1 === tags.findIndex(t => t === tag)) {
+                      local.data.tags.push(tag)
+                    }
                   }
                   local.tagAddVisible = false
                   local.tempTag = ''

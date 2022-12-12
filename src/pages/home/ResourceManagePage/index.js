@@ -35,7 +35,7 @@ export default function ResourceManagePage() {
     search_name: '',
     search_type: '',
     search_status: '',
-    search_key: 'name',
+    search_key: 'search',
     search_page: 1,
     categories: {},
     resources: [],
@@ -47,8 +47,8 @@ export default function ResourceManagePage() {
   const search = useCallback(() => {
     local.isLoading = true
     const query = {
-      search: local.search_name,
-      source_type: local.search_type,
+      value: local.search_name,
+      key: local.search_key,
       status: local.search_status,
       page: local.search_page,
     }
@@ -90,8 +90,10 @@ export default function ResourceManagePage() {
             addonBefore={<Select value={local.search_key} onChange={value => {
               local.search_key = value;
             }}>
-              <Select.Option value="name">名称</Select.Option>
+              <Select.Option value="search">名称</Select.Option>
               <Select.Option value="id">id</Select.Option>
+              <Select.Option value="source_id">source_id</Select.Option>
+              <Select.Option value="source_name">source_name</Select.Option>
             </Select>} onChange={e => {
               local.search_name = e.target.value
             }} onKeyDown={e => {
