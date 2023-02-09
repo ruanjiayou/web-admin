@@ -164,15 +164,19 @@ export default function ResourceManagePage() {
                 </Row>
                 <Input ref={ref => originRef.current = ref} onPaste={e => {
                   const url = e.clipboardData.getData('text/plain');
-                  const u = new URL(url);
-                  local.rules.forEach(rule => {
-                    const reg = path2regexp(rule.route, { strict: true });
-                    const m = reg.exec(u.pathname)
-                    if (url.startsWith(rule.host) && ((rule.route && m) || !rule.route)) {
-                      local.tempId = rule.id
-                      local.tempRule = rule
-                    }
-                  })
+                  try {
+                    const u = new URL(url);
+                    local.rules.forEach(rule => {
+                      const reg = path2regexp(rule.route, { strict: true });
+                      const m = reg.exec(u.pathname)
+                      if (url.startsWith(rule.host) && ((rule.route && m) || !rule.route)) {
+                        local.tempId = rule.id
+                        local.tempRule = rule
+                      }
+                    })
+                  } catch (e) {
+                    notification.warn({ message: e.message });
+                  }
                 }} />
               </Fragment>}</Observer>,
               okText: '预览',
@@ -243,15 +247,19 @@ export default function ResourceManagePage() {
                 </Select>
                 <Input style={{ marginTop: 10 }} ref={ref => urlRef.current = ref} onPaste={e => {
                   const url = e.clipboardData.getData('text/plain');
-                  const u = new URL(url);
-                  local.rules.forEach(rule => {
-                    const reg = path2regexp(rule.route, { strict: true });
-                    const m = reg.exec(u.pathname)
-                    if (url.startsWith(rule.host) && ((rule.route && m) || !rule.route)) {
-                      local.tempId = rule.id
-                      local.tempRule = rule
-                    }
-                  })
+                  try {
+                    const u = new URL(url);
+                    local.rules.forEach(rule => {
+                      const reg = path2regexp(rule.route, { strict: true });
+                      const m = reg.exec(u.pathname)
+                      if (url.startsWith(rule.host) && ((rule.route && m) || !rule.route)) {
+                        local.tempId = rule.id
+                        local.tempRule = rule
+                      }
+                    })
+                  } catch (e) {
+                    notification.warn({ message: e.message });
+                  }
                 }} />
               </Fragment>)}</Observer>,
               okText: '确定',
