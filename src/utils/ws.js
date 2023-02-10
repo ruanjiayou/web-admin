@@ -4,7 +4,7 @@ import Message from '../models/message'
 import { notification, Modal } from 'antd'
 import { events } from './events'
 
-export const ws = io('http://localhost:8097', {
+export const ws = io('ws://' + window.location.host, {
   path: '/ws',
   reconnectionAttempts: 3
 });
@@ -23,16 +23,16 @@ ws.on('message', (data) => {
   if (data.action === 'download') {
     const links = data.data;
     let timer = setInterval(() => {
-    if (links.length) {
-      let a = document.createElement('a');
-      let url = links.pop();
-      console.log(url);
-      a.href = url; a.download = new URL(url).pathname.split('/').pop();
-      a.target = '_self'; a.click();
-    } else {
-      clearTimeout(timer);
-    }
-  }, 2100)
+      if (links.length) {
+        let a = document.createElement('a');
+        let url = links.pop();
+        console.log(url);
+        a.href = url; a.download = new URL(url).pathname.split('/').pop();
+        a.target = '_self'; a.click();
+      } else {
+        clearTimeout(timer);
+      }
+    }, 2100)
     return;
   }
   if (data.type === 'notify') {
