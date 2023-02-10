@@ -166,15 +166,19 @@ export default function ResourceManagePage() {
                 </Row>
                 <Input ref={ref => originRef.current = ref} onPaste={e => {
                   const url = e.clipboardData.getData('text/plain');
-                  const u = new URL(url);
-                  local.rules.forEach(rule => {
-                    const reg = path2regexp(rule.route);
-                    const m = reg.exec(u.pathname)
-                    if (url.startsWith(rule.host) && ((rule.route && m) || !rule.route)) {
-                      local.tempId = rule.id
-                      local.tempRule = rule
-                    }
-                  })
+                  try {
+                    const u = new URL(url);
+                    local.rules.forEach(rule => {
+                      const reg = path2regexp(rule.route, { strict: true });
+                      const m = reg.exec(u.pathname)
+                      if (url.startsWith(rule.host) && ((rule.route && m) || !rule.route)) {
+                        local.tempId = rule.id
+                        local.tempRule = rule
+                      }
+                    })
+                  } catch (e) {
+                    notification.warn({ message: e.message });
+                  }
                 }} />
               </Fragment>}</Observer>,
               okText: '预览',
@@ -245,15 +249,19 @@ export default function ResourceManagePage() {
                 </Select>
                 <Input style={{ marginTop: 10 }} ref={ref => urlRef.current = ref} onPaste={e => {
                   const url = e.clipboardData.getData('text/plain');
-                  const u = new URL(url);
-                  local.rules.forEach(rule => {
-                    const reg = path2regexp(rule.route);
-                    const m = reg.exec(u.pathname)
-                    if (url.startsWith(rule.host) && ((rule.route && m) || !rule.route)) {
-                      local.tempId = rule.id
-                      local.tempRule = rule
-                    }
-                  })
+                  try {
+                    const u = new URL(url);
+                    local.rules.forEach(rule => {
+                      const reg = path2regexp(rule.route, { strict: true });
+                      const m = reg.exec(u.pathname)
+                      if (url.startsWith(rule.host) && ((rule.route && m) || !rule.route)) {
+                        local.tempId = rule.id
+                        local.tempRule = rule
+                      }
+                    })
+                  } catch (e) {
+                    notification.warn({ message: e.message });
+                  }
                 }} />
               </Fragment>)}</Observer>,
               okText: '确定',
@@ -282,7 +290,7 @@ export default function ResourceManagePage() {
             }, 100)
           }}>
             添加任务
-          <Icon type="circle-plus" />
+            <Icon type="circle-plus" />
           </Button>
           <Divider type="vertical" />
         </div>
@@ -355,7 +363,7 @@ export default function ResourceManagePage() {
                   <img width="100%" src={(local.thumbnail.startsWith('data') ? local.thumbnail : store.app.imageLine + (local.temp.thumbnail || '/images/poster/nocover.jpg'))} alt="" />
                   <Button style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)' }}>
                     <UploadOutlined /> 上传
-              </Button>
+                  </Button>
                 </Upload>
               </Form.Item>
               <Form.Item label="资源类型" labelCol={lb} wrapperCol={rb}>
