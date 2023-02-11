@@ -9,7 +9,7 @@ import qs from 'qs'
 import * as _ from 'lodash'
 import store from '../../../store'
 import { toJS } from 'mobx';
-import { PlusCircleOutlined, CloseOutlined } from '@ant-design/icons'
+import { PlusCircleOutlined, CloseOutlined, UploadOutlined } from '@ant-design/icons'
 import api from '../../../api';
 import { formatNumber } from '../../../utils/helper'
 import { AlignAside, FullWidth, FullHeightAuto, FullHeightFix, AlignVertical, FullWidthFix, FullHeight } from '../../../component/style';
@@ -399,7 +399,7 @@ export default function ResourceEdit() {
                   />
                 </FullHeightAuto>
                 <FullHeight>
-                  <AlignVertical style={{ padding: '0 10px', minHeight: 80 }}>
+                  <AlignVertical style={{ padding: '0 10px' }}>
                     {local.fullEditVideo && (
                       <Fragment>
                         <Icon type="check" onClick={async (e) => {
@@ -429,7 +429,7 @@ export default function ResourceEdit() {
 
                     )}
                     <Observer>{() => (
-                      <Icon type={item.loading || item.status === 'loading' ? 'loading' : 'download'} disabled={item.loading} onClick={async () => {
+                      <Icon type={item.loading && item.status === 'loading' ? 'loading' : 'download'} disabled={item.loading} onClick={async () => {
                         item.loading = true
                         try {
                           await api.downloadResourceVideo(local.id, item.id)
@@ -439,6 +439,38 @@ export default function ResourceEdit() {
                         }
                       }}
                       />
+                    )}</Observer>
+                    <Observer>{() => (
+                      <Upload
+                        showUploadList={false}
+                        name="file"
+                        disabled={item.loading && item.status === 'upload'}
+                        onChange={async (e) => {
+                          item.loading = true
+                          const segs = item.path.split('/');
+                          const name = segs.pop()
+                          const dirs = segs.join('/')
+                          try {
+                            const res = await apis.createFile({
+                              isdir: 0,
+                              param: dirs,
+                              name: name,
+                              upfile: e.file
+                            })
+                            if (res.code === 0) {
+                              message.info('上传成功')
+                            } else {
+                              message.info(res.message || '上传失败')
+                            }
+                          } catch (e) {
+                            message.error(e.message)
+                          } finally {
+                            item.loading = false
+                          }
+                        }}
+                        beforeUpload={() => false}>
+                        <UploadOutlined />
+                      </Upload>
                     )}</Observer>
                   </AlignVertical>
                 </FullHeight>
@@ -694,7 +726,7 @@ export default function ResourceEdit() {
             </Fragment>
           )}
         </Form.Item>
-        
+
       </div>
       <Form.Item label="" style={{ textAlign: 'center', backgroundColor: '#b5cbde', height: 50, lineHeight: '50px', margin: 0, }}>
         <Button loading={local.loading} disabled={local.loading} type="primary" onClick={onEdit}>保存</Button>

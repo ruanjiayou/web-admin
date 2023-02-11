@@ -270,7 +270,7 @@ export default function ResourceManagePage() {
                 if (urlRef.current) {
                   v2GetResourceByRule(local.tempId, urlRef.current.state.value).then(res => {
                     if (res.code === 0) {
-                      notification.success({ message: 'success' })
+                      notification.success({ message: 'success', placement: 'bottomRight' })
                     } else {
                       notification.error({ message: res.message })
                     }
