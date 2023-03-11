@@ -4,12 +4,20 @@ import { Modal, Form, Input, Select, message, Col, Row, DatePicker } from 'antd'
 import * as math from 'mathjs'
 import moment from 'moment'
 import RemoteSelect from './remoteSelect'
+import _ from 'lodash'
 
+function toNum(n) {
+  return Math.round((parseFloat(n) || 0) * 1000) / 1000
+}
 const lb = { span: 4, offset: 2 }, rb = { span: 15 }
 export default function ({ data, save, cancel }) {
   const iref = useRef(null)
   const local = useLocalStore(() => ({
     data: data,
+    auto: () => {
+      local.data.fee = _.sum(local.data.fees.map(fee => fee.value));
+      local.data.trade = math.multiply(math.bignumber(local.data.amount), math.bignumber(local.data.price)).toNumber()
+    },
     isLoading: false,
   }))
   return <Observer>{() => <Modal
@@ -60,7 +68,7 @@ export default function ({ data, save, cancel }) {
       <Form.Item style={{ marginBottom: 5 }} label="交割日期" labelCol={lb} wrapperCol={rb}>
         <Row gutter={16}>
           <Col span={8}>
-            <DatePicker style={{ width: '100%' }} defaultValue={moment(new Date(), 'YYYYMMDD')} format="YYYYMMDD" onChange={(d, s) => {
+            <DatePicker style={{ width: '100%' }} value={moment(local.data.settlement || new Date(), 'YYYYMMDD')} format="YYYYMMDD" onChange={(d, s) => {
               local.data.settlement = s;
             }} />
           </Col>
@@ -105,40 +113,39 @@ export default function ({ data, save, cancel }) {
       </Row>
       <Row gutter={8} style={{ marginBottom: 5 }}>
         <Col offset={6} span={7}>
-          <Input addonBefore="数量" placeholder="成交数量" disabled={data.type === 5} type='number' value={local.data.amount} onChange={e => local.data.amount = parseFloat(e.target.value)} />
+          <Input addonBefore="数量" placeholder="成交数量" disabled={data.type === 5} type='number' value={local.data.amount} onChange={e => {
+            local.data.amount = toNum(e.target.value);
+            local.auto();
+          }} />
         </Col>
         <Col offset={1} span={7}>
           <Input addonBefore="价格" placeholder="成交价格" disabled={data.type === 5} type='number' value={local.data.price} onChange={e => {
-            local.data.price = parseFloat(e.target.value) || 0
-            local.data.trade = math.multiply(math.bignumber(local.data.amount), math.bignumber(local.data.price)).toNumber()
+            local.data.price = toNum(e.target.value)
+            local.auto();
           }} />
         </Col>
       </Row>
       <Row gutter={8} style={{ marginBottom: 5 }} >
         <Col offset={6} span={15}>
-          <Input addonBefore="费用合计" placeholder="0" disabled={data.type === 5} value={local.data.fee} onChange={e => {
-            local.data.fee = e.target.value
-            const k = [1, 4, 7].includes(local.data.type) ? -1 : 1
-            local.data.total = math.subtract(math.multiply(math.bignumber(local.data.trade), k), math.bignumber(local.data.fee)).toNumber()
-          }} />
+          <Input addonBefore="费用合计" placeholder="0" disabled value={local.data.fee} />
         </Col>
       </Row>
       <Row gutter={8} style={{ marginBottom: 5 }}>
         <Col offset={6} span={7}>
-          <Input placeholder="成交金额" addonBefore="成交金额" value={local.data.trade} type='number' onChange={e => {
-            local.data.trade = e.target.value
-            if (local.data.type === 3) {
-              local.data.total = e.target.value
-            }
-          }} />
+          <Input placeholder="成交金额" addonBefore="成交金额" value={local.data.trade} type='number' onChange={e => local.data.trade = toNum(e.target.value)} />
         </Col>
         <Col offset={1} span={7}>
-          <Input placeholder="发生金额" addonBefore="发生金额" value={local.data.total} type='number' onChange={e => local.data.total = e.target.value} />
+          <Input placeholder="发生金额" addonBefore="发生金额" value={local.data.total} type='number' onChange={e => local.data.total = toNum(e.target.value)} />
         </Col>
       </Row>
       <Form.Item style={{ marginBottom: 5 }} label="费用明细" labelCol={lb} wrapperCol={rb}>
         {local.data.fees.map((fee, i) => (
-          <Input key={i} addonBefore={fee.key} placeholder="费用" type='number' style={{ marginBottom: 2 }} value={fee.value} onChange={e => fee.value = e.target.value} />
+          <Input key={i} addonBefore={fee.key} placeholder="费用" type='number' style={{ marginBottom: 2 }} value={fee.value} onChange={
+            e => {
+              fee.value = toNum(e.target.value);
+              local.auto();
+            }
+          } />
         ))}
       </Form.Item>
       <Form.Item style={{ marginBottom: 5 }} label="币种" labelCol={lb} wrapperCol={rb}>

@@ -459,6 +459,8 @@ export default function ResourceEdit() {
                             })
                             if (res.code === 0) {
                               message.info('上传成功')
+                              await api.updateResourceVideo(local.id, { id: item.id, status: 'finished' })
+                              item.status = 'finished'
                             } else {
                               message.info(res.message || '上传失败')
                             }
