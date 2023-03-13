@@ -55,7 +55,7 @@ async function fetchStockList(q) {
   }))
 }
 
-const App = ({ onChoose, placeholder }) => {
+const App = ({ onChoose, placeholder, fetch }) => {
   const [value, setValue] = useState([]);
   return <Observer>{() => (
     <DebounceSelect
@@ -64,7 +64,7 @@ const App = ({ onChoose, placeholder }) => {
       onChoose={onChoose}
       value={value}
       placeholder={placeholder || "请输入"}
-      fetchOptions={fetchStockList}
+      fetchOptions={fetch || fetchStockList}
       onChange={(newValue) => {
         setValue(newValue);
       }}

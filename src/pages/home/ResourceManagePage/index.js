@@ -35,7 +35,7 @@ export default function ResourceManagePage() {
     search_name: '',
     search_type: '',
     search_status: '',
-    search_key: 'search',
+    search_key: 'q',
     search_page: 1,
     categories: {},
     resources: [],
@@ -50,6 +50,7 @@ export default function ResourceManagePage() {
       value: local.search_name,
       key: local.search_key,
       status: local.search_status,
+      type: local.search_type,
       page: local.search_page,
     }
     getResources(query).then(res => {
@@ -90,7 +91,7 @@ export default function ResourceManagePage() {
             addonBefore={<Select value={local.search_key} onChange={value => {
               local.search_key = value;
             }}>
-              <Select.Option value="search">名称</Select.Option>
+              <Select.Option value="q">搜索</Select.Option>
               <Select.Option value="id">id</Select.Option>
               <Select.Option value="source_id">source_id</Select.Option>
               <Select.Option value="source_name">source_name</Select.Option>

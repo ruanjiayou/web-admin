@@ -4,7 +4,7 @@ import Message from '../models/message'
 import { notification, Modal } from 'antd'
 import { events } from './events'
 
-export const ws = io('ws://' + `${window.location.protocol === 'https:' ? 'wss://' : 'ws://'}${window.location.host}`, {
+export const ws = io(`${window.location.protocol}//${window.location.host}`, {
   path: '/ws',
   reconnectionAttempts: 3
 });

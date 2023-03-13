@@ -15,7 +15,6 @@ import { formatNumber } from '../../../utils/helper'
 import { AlignAside, FullWidth, FullHeightAuto, FullHeightFix, AlignVertical, FullWidthFix, FullHeight } from '../../../component/style';
 import TextArea from 'antd/lib/input/TextArea';
 
-
 function deepEqual(a, b) {
   const keys = Array.from(new Set([...Object.keys(a), ...Object.keys(b)]));
   for (let i = 0; i < keys.length; i++) {
