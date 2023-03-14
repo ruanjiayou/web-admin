@@ -12,7 +12,7 @@ import { Right } from '../../../component/style';
 import { UnControlled as CodeMirror } from 'react-codemirror2'
 import path2regexp from 'path-to-regexp'
 
-const { getResources, createResource, updateResource, destroyResource, getGroupTypes, v2getRules, v2GetResourceByRule, v2previewRule } = apis
+const { getResources, search, createResource, updateResource, destroyResource, getGroupTypes, v2getRules, v2GetResourceByRule, v2previewRule } = apis
 
 async function destroy(data) {
   return await destroyResource(data)
@@ -44,7 +44,7 @@ export default function ResourceManagePage() {
   }))
   const urlRef = useRef(null)
   const originRef = useRef(null)
-  const search = useCallback(() => {
+  const onSearch = useCallback(() => {
     local.isLoading = true
     const query = {
       value: local.search_name,
@@ -53,7 +53,9 @@ export default function ResourceManagePage() {
       type: local.search_type,
       page: local.search_page,
     }
-    getResources(query).then(res => {
+    const fn = local.search_key === 'q' && local.search_name ? search : getResources;
+    fn(query).then(res => {
+      console.log(res)
       local.isLoading = false
       local.count = res.count
       local.resources = res.data
@@ -70,7 +72,7 @@ export default function ResourceManagePage() {
     store.rules = result.data
   }, [])
   useEffect(() => {
-    search()
+    onSearch()
   }, [])
   useEffectOnce(() => {
     if (local.rules.length === 0) {
@@ -84,14 +86,14 @@ export default function ResourceManagePage() {
   return (<Observer>{() => {
     return <div className={'box'}>
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-        <div style={{ padding: 10 }}>
+        <div style={{ margin: 10 }}>
           <Input
             style={{ width: 250 }}
             value={local.search_name}
             addonBefore={<Select value={local.search_key} onChange={value => {
               local.search_key = value;
             }}>
-              <Select.Option value="q">搜索</Select.Option>
+              <Select.Option value="q">es搜索</Select.Option>
               <Select.Option value="id">id</Select.Option>
               <Select.Option value="source_id">source_id</Select.Option>
               <Select.Option value="source_name">source_name</Select.Option>
@@ -99,7 +101,7 @@ export default function ResourceManagePage() {
               local.search_name = e.target.value
             }} onKeyDown={e => {
               if (e.keyCode === 13) {
-                search()
+                onSearch()
               }
             }} />
           <Divider type="vertical" />
@@ -108,7 +110,7 @@ export default function ResourceManagePage() {
           <Select style={{ width: 150 }} value={local.search_status} onChange={value => {
             local.search_status = value
             local.search_page = 1
-            search()
+            onSearch()
           }}>
             <Select.Option value="">全部</Select.Option>
             <Select.Option value="init">初始化</Select.Option>
@@ -122,7 +124,7 @@ export default function ResourceManagePage() {
           <Select style={{ width: 150 }} value={local.search_type} onChange={value => {
             local.search_type = value
             local.search_page = 1
-            search()
+            onSearch()
           }}>
             <Select.Option value="">全部</Select.Option>
             <Select.Option value="file">文件</Select.Option>
@@ -135,8 +137,10 @@ export default function ResourceManagePage() {
             <Select.Option value="private">私人</Select.Option>
           </Select>
           <Divider type="vertical" />
+        </div>
+        <div style={{ margin: '0 10px' }}>
           <Button type="primary" onClick={() => {
-            search()
+            onSearch()
           }}>查询</Button>
           <Divider type="vertical" />
           <Button type="primary" onClick={() => { local.temp = {}; local.showEdit = true }}>添加资源</Button>
@@ -302,10 +306,10 @@ export default function ResourceManagePage() {
             fastEdit={(data) => { local.temp = data; local.showFastEdit = true; }}
             destroy={async function (data) {
               await destroy(data)
-              search()
+              onSearch()
             }}
             categories={local.categories}
-            search={search}
+            search={onSearch}
             store={save}
             local={local}
           />

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 // import LoadingView from '../HolderView/LoadingView'
 import apis from '../../../api';
 import { Table, Popconfirm, Switch, notification, Select, Tag, Popover, Divider, } from 'antd';
-import { FormOutlined, DeleteOutlined, WarningOutlined, CloudServerOutlined, SyncOutlined, UploadOutlined } from '@ant-design/icons'
+import { FormOutlined, DeleteOutlined, WarningOutlined, CloudServerOutlined, SyncOutlined, UploadOutlined, } from '@ant-design/icons'
 import { Icon, VisualBox, EditTag } from '../../../component'
 import { AlignAround } from '../../../component/style'
 import store from '../../../store'
@@ -164,7 +164,7 @@ export default function ResourceList({ items, children, categories, search, loca
 				)}
 				</Observer>
 			)} /> */}
-			<Column title="系列" width={100} dataIndex="series" key="series" render={(text, record) => (
+			{/* <Column title="系列" width={100} dataIndex="series" key="series" render={(text, record) => (
 				<Observer>{() => (<span style={{ backgroundColor: '#eee', border: '1px solid #eee', borderRadius: 4, padding: '3px 5px' }} onClick={async () => {
 					const res = prompt('请输入系列名')
 					try {
@@ -183,8 +183,8 @@ export default function ResourceList({ items, children, categories, search, loca
 				}}>{record.series || '无'}</span>
 				)}
 				</Observer>
-			)} />
-			<Column title="连载" width={100} dataIndex="status" key="status" render={(text, record) => (
+			)} /> */}
+			{/* <Column title="连载" width={100} dataIndex="status" key="status" render={(text, record) => (
 				<Observer>{() => (
 					<Switch checked={record.status === 'loading'} onClick={async (e) => {
 						try {
@@ -216,50 +216,46 @@ export default function ResourceList({ items, children, categories, search, loca
 						}
 					}} />)}
 				</Observer>
-			)} />
+			)} /> */}
 			<Column title="操作" width={100} dataIndex="action" key="action" align="center" render={(text, record) => (
 				<div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly' }}>
 					<FormOutlined title="快速编辑" onClick={() => { props.fastEdit(record) }} />
-					<Popover trigger="hover" title="操作" placement="topRight" content={<AlignAround>
-						<Popconfirm title="确定同步到线上?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={async () => {
-							if (state.syncItems[record.id]) {
-								alert('正在同步中...')
-							} else {
-								state.syncItems[record.id] = true
-								apis.syncOne(record).catch(() => {
-									alert('同步失败')
-								}).finally(() => {
-									state.syncItems[record.id] = false
-								})
-							}
-						}}>
-							<UploadOutlined spin={state.syncItems[record.id] ? true : false} />
-						</Popconfirm>
-						<VisualBox visible={['article', 'news'].includes(record.source_type)}>
-							<Link title="编辑" style={{ display: 'inherit' }} to={'/admin/home/resource-manage/edit?id=' + record.id} ><FormOutlined /></Link>
-						</VisualBox>
-						<VisualBox visible={record.source_type === 'video' || record.source_type === 'image'}>
-							<Link title="编辑" style={{ display: 'inherit' }} to={'/admin/home/resource-manage/edit-multi?id=' + record.id} ><FormOutlined /></Link>
-						</VisualBox>
-						<VisualBox visible={record.source_type === 'novel'}>
-							<Divider type="vertical" />
-							<CloudServerOutlined title="保存小说" onClick={() => props.store(record)} />
-						</VisualBox>
-						<VisualBox visible={record.source_type === 'article' || record.source_type === 'news' || record.source_type === 'image'}>
-							<SyncOutlined title="抓取image" onClick={() => {
-								apis.grabImages({ id: record.id }).then(res => {
-									notification.info({ message: `success:${res.data.success} fail:${res.data.fail}` })
-								})
-							}} />
-						</VisualBox>
-						<Popconfirm title="确定?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={() => {
-							props.destroy(record)
-						}}>
-							<DeleteOutlined title="删除" />
-						</Popconfirm>
-					</AlignAround>}>
-						<Icon type="more" style={{ padding: '4px 8px' }} />
-					</Popover>
+					<Popconfirm title="确定同步到es?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={async () => {
+						if (state.syncItems[record.id]) {
+							alert('正在同步中...')
+						} else {
+							state.syncItems[record.id] = true
+							apis.sync2es([record.id]).catch(() => {
+								alert('同步失败')
+							}).finally(() => {
+								state.syncItems[record.id] = false
+							})
+						}
+					}}>
+						<SyncOutlined title='同步es' spin={state.syncItems[record.id] ? true : false} />
+					</Popconfirm>
+					<VisualBox visible={['article', 'news'].includes(record.source_type)}>
+						<Link title="编辑" style={{ display: 'inherit' }} to={'/admin/home/resource-manage/edit?id=' + record.id} ><FormOutlined /></Link>
+					</VisualBox>
+					<VisualBox visible={record.source_type === 'video' || record.source_type === 'image'}>
+						<Link title="编辑" style={{ display: 'inherit' }} to={'/admin/home/resource-manage/edit-multi?id=' + record.id} ><FormOutlined /></Link>
+					</VisualBox>
+					<VisualBox visible={record.source_type === 'novel'}>
+						<Divider type="vertical" />
+						<CloudServerOutlined title="保存小说" onClick={() => props.store(record)} />
+					</VisualBox>
+					<VisualBox visible={record.source_type === 'article' || record.source_type === 'news' || record.source_type === 'image'}>
+						<SyncOutlined title="抓取image" onClick={() => {
+							apis.grabImages({ id: record.id }).then(res => {
+								notification.info({ message: `success:${res.data.success} fail:${res.data.fail}` })
+							})
+						}} />
+					</VisualBox>
+					<Popconfirm title="确定?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={() => {
+						props.destroy(record)
+					}}>
+						<DeleteOutlined title="删除" />
+					</Popconfirm>
 				</div>
 			)} />
 		</Table>

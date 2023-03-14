@@ -55,3 +55,11 @@ export function sync2dev(params) {
     method: 'PUT',
   })
 }
+
+export function sync2es(params) {
+  return shttp({
+    url: '/v1/admin/resources/sync',
+    method: 'post',
+    data: params
+  })
+}

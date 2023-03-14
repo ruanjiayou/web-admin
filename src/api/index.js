@@ -16,6 +16,7 @@ import * as config from './config'
 import * as robot from './robot'
 import * as file from './file'
 import * as app from './app'
+import * as search from './search'
 import * as component from './component'
 
 const boot = function () {
@@ -60,5 +61,6 @@ export default {
   ...config,
   ...robot,
   ...file,
+  ...search,
   ...component,
 }
