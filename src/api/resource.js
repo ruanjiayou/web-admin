@@ -90,6 +90,14 @@ export function downloadResourceVideo(mid, id) {
   })
 }
 
+export function downloadVideoSubtitles({ id, mid, subtitles }) {
+  return shttp({
+    url: `/v1/admin/resource/${mid}/video/${id}/subtitles`,
+    data: { subtitles },
+    method: 'PATCH',
+  })
+}
+
 export function downloadResourceCover({ id }) {
   return shttp({
     url: `/v1/admin/resource/${id}/cover`,

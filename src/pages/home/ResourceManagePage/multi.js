@@ -64,11 +64,15 @@ export default function ResourceEdit() {
     loading: false,
     fullEditVideo: false,
     showFormat: false,
-    formats: [],
+    video_formats: [],
+    audio_formats: [],
+    subtitles_langs: [],
+    subtitle_url: '',
     formatUrl: '',
     cancelFormat() {
       local.showFormat = false;
-      local.formats = [];
+      local.video_formats = [];
+      local.audio_formats = [];
     },
   }))
   const onEdit = useCallback(async () => {
@@ -92,6 +96,7 @@ export default function ResourceEdit() {
           const data = res.data
           local.data = data
           local.origin = data
+          local.subtitles_langs = data.original.subtitles ? Object.keys(data.original.subtitles) : [];
           if (!local.data.images) {
             local.data.images = [];
           }
@@ -291,12 +296,12 @@ export default function ResourceEdit() {
             </Upload>
           </FullWidth>
         </Form.Item>
-        <Form.Item label="选择下载清晰度">
+        <Form.Item label="youtube下载设置">
           <Button onClick={e => {
             if (local.data.source_name !== 'youtube' && local.data.source_name !== 'youtube_shorts') {
               return message.warn('来源不是youtube!', 1);
             }
-            local.formats = local.data.original.formats.filter(item => item.filesize && item.resolution !== 'audio only').sort((a, b) => b.filesize - a.filesize).map(item => ({
+            local.video_formats = local.data.original.formats.filter(item => item.video_ext !== 'none').sort((a, b) => b.filesize - a.filesize).map(item => ({
               ext: item.ext,
               url: item.url,
               quality: item.format_note,
@@ -304,7 +309,28 @@ export default function ResourceEdit() {
               width: item.width,
               resolution: item.resolution,
               filesize: formatNumber(item.filesize),
+              id: item.format_id
             }));
+
+            local.audio_formats = local.data.original.formats.filter(item => item.audio_ext !== 'none').sort((a, b) => b.filesize - a.filesize).map(item => ({
+              ext: item.ext,
+              url: item.url,
+              quality: item.format_note,
+              height: item.height,
+              width: item.width,
+              resolution: item.resolution,
+              filesize: formatNumber(item.filesize),
+              id: item.format_id
+            }));
+            // local.formats = local.data.original.formats.filter(item => item.filesize && item.resolution !== 'audio only').sort((a, b) => b.filesize - a.filesize).map(item => ({
+            //   ext: item.ext,
+            //   url: item.url,
+            //   quality: item.format_note,
+            //   height: item.height,
+            //   width: item.width,
+            //   resolution: item.resolution,
+            //   filesize: formatNumber(item.filesize),
+            // }));
             local.showFormat = true;
           }}>选择youtube</Button>
         </Form.Item>
@@ -344,6 +370,20 @@ export default function ResourceEdit() {
                   {local.fullEditVideo && (
                     <Fragment>
                       <Input className="title" addonBefore={'标题'} defaultValue={item.title} />
+                      <Input
+                        addonBefore={'字幕'}
+                        defaultValue={item.subtitles}
+                        onChange={e => {
+                          local.subtitle_url = e.target.value
+                        }}
+                        addonAfter={<Icon type="check" disabled={item.loading || !(item.subtitles || '').startsWith('http')} onClick={async () => {
+                          item.loading = true
+                          try {
+                            await api.downloadVideoSubtitles({ mid: item.mid, id: item.id, subtitles: local.subtitle_url })
+                          } finally {
+                            item.loading = false
+                          }
+                        }} />} />
                       <Input className="path" style={{ margin: '5px 0' }} addonBefore={'文件:' + item.nth} defaultValue={item.path} />
                     </Fragment>
                   )}
@@ -739,24 +779,18 @@ export default function ResourceEdit() {
       bodyStyle={{ height: 500, overflow: 'auto' }}
       onCancel={local.cancelFormat}
       onOk={async () => {
-        const item = local.formats.find(item => item.url === local.formatUrl)
-        if (item) {
+        const videoItem = local.video_formats.find(item => item.id === local.video_format_id)
+        const audioItem = local.audio_formats.find(item => item.id === local.audio_format_id)
+        if (videoItem && audioItem) {
           if (local.isDealUrl) {
             return;
           }
-          let url = item.url.trim()
-          if ('' === url) {
-            local.urlAddVisible = false
-            return;
-          }
-          if (-1 !== local.data.urls.findIndex(t => t.url === url)) {
-            return notification.info('exists')
-          }
+          let url = 'https://googlevideo.com/' + videoItem.id + '+' + audioItem.id + '.' + videoItem.ext
           local.isDealUrl = true
           try {
-            const res = await api.addResourceVideo({ id: local.id, title: '', url, type: 'normal', status: 'init', ext: item.ext, more: item })
+            const res = await api.addResourceVideo({ id: local.id, title: '', url, type: 'normal', status: 'init', ext: videoItem.ext, more: videoItem, subtitles: local.subtitle_url })
             if (res && res.code === 0) {
-              local.data.urls.push({ url: res.data.url, path: res.data.path, id: res.data.id, status: 'init', type: 'normal', nth: local.data.urls.length })
+              local.data.urls.push({ url: res.data.url, path: res.data.path, id: res.data.id, status: 'init', type: 'normal', nth: local.data.urls.length, subtitles: res.data.subtitlesf })
               local.urlAddVisible = false
             } else {
               notification.info('fail')
@@ -767,22 +801,50 @@ export default function ResourceEdit() {
             local.tempStatus = 'init';
             local.tempUrlType = 'normal';
           }
+        } else {
+          console.log('select emptyp!')
         }
         local.cancelFormat();
       }}
       cancelText="取消"
       okText="确定"
     >
-      <Radio.Group style={{ width: '100%' }} name="quality" defaultValue="" onChange={e => {
-        local.formatUrl = e.target.value
+      <span>video</span>
+      <Radio.Group style={{ width: '100%' }} name="video" defaultValue="" onChange={e => {
+        local.video_format_id = e.target.value
       }}>
-        {local.formats.map(item => (<FullWidth key={item.url}>
-          <FullWidthFix><Radio name="quality" value={item.url} /></FullWidthFix>
+        {local.video_formats.map(item => (<FullWidth key={item.id}>
+          <FullWidthFix><Radio name="video" value={item.id} /></FullWidthFix>
           <FullWidthFix style={{ width: '15%' }}>{item.ext}</FullWidthFix>
           <FullWidthFix style={{ width: '20%' }}>{item.quality}</FullWidthFix>
           <FullWidthFix style={{ width: '20%' }}>{item.resolution}</FullWidthFix>
           <FullWidthFix style={{ width: '20%' }}>{item.filesize}</FullWidthFix>
         </FullWidth>))}
+      </Radio.Group>
+      <span>audio</span>
+      <Radio.Group style={{ width: '100%' }} name="audio" defaultValue="" onChange={e => {
+        local.audio_format_id = e.target.value
+      }}>
+        {local.audio_formats.map(item => (<FullWidth key={item.id}>
+          <FullWidthFix><Radio name="audio" value={item.id} /></FullWidthFix>
+          <FullWidthFix style={{ width: '15%' }}>{item.ext}</FullWidthFix>
+          <FullWidthFix style={{ width: '20%' }}>{item.quality}</FullWidthFix>
+          <FullWidthFix style={{ width: '20%' }}>{item.resolution}</FullWidthFix>
+          <FullWidthFix style={{ width: '20%' }}>{item.filesize}</FullWidthFix>
+        </FullWidth>))}
+      </Radio.Group>
+      <span>subtitle</span>
+      <Radio.Group style={{ width: '100%' }} name="subtitles" defaultValue="" onChange={e => {
+        local.subtitle_url = e.target.value
+      }}>
+        {local.subtitles_langs.map(lang => {
+          return local.data.original.subtitles[lang].map(item => (<FullWidth key={item.id}>
+            <FullWidthFix><Radio name="subtitles" value={item.url} /></FullWidthFix>
+            <FullWidthFix style={{ width: '15%' }}>{item.name}</FullWidthFix>
+            <FullWidthFix style={{ width: '20%' }}>{item.ext}</FullWidthFix>
+            <FullWidthFix style={{ width: '60%', overflow: 'hidden' }}>{item.url}</FullWidthFix>
+          </FullWidth>))
+        })}
       </Radio.Group>
     </Modal>}</Observer>
 
