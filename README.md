@@ -32,4 +32,3 @@
   - 菜单的数据库管理
   - cover修改可以选择图片列表
   - 
-  - just for test git hook 4
