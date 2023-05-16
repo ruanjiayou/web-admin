@@ -96,7 +96,7 @@ export default function ResourceEdit() {
           const data = res.data
           local.data = data
           local.origin = data
-          local.subtitles_langs = data.original.subtitles ? Object.keys(data.original.subtitles) : [];
+          local.subtitles_langs = data.original && data.original.subtitles ? Object.keys(data.original.subtitles) : [];
           if (!local.data.images) {
             local.data.images = [];
           }
@@ -623,7 +623,7 @@ export default function ResourceEdit() {
                       <Select style={{ width: 90 }} value={item.status} onChange={async (status) => {
                         item.loading = true
                         try {
-                          await api.updateResourceImage(local.id, { id: item.id, status })
+                          await api.updateResourceImage(local.id, { id: item.id, status, source_name: local.data.source_name })
                           item.status = status
                         } finally {
                           item.loading = false
@@ -668,7 +668,7 @@ export default function ResourceEdit() {
                       item.status = 'loading'
                       item.loading = true
                       try {
-                        await api.downloadResourceImage(local.id, item.id)
+                        await api.downloadResourceImage(local.id, item.id, { source_name: local.data.source_name })
                         item.status = 'finished'
                       } finally {
                         item.loading = false

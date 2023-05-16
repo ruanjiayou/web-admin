@@ -137,10 +137,11 @@ export function updateResourceImage(id, data) {
   })
 }
 
-export function downloadResourceImage(mid, id) {
+export function downloadResourceImage(mid, id, data) {
   return shttp({
     url: `/v1/admin/resource/${mid}/image/${id}`,
     method: 'PATCH',
+    data,
   })
 }
 
