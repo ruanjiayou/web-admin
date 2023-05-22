@@ -18,6 +18,7 @@ import * as file from './file'
 import * as app from './app'
 import * as search from './search'
 import * as component from './component'
+import * as feedback from './feedback'
 
 const boot = function () {
   return shttp({
@@ -63,4 +64,5 @@ export default {
   ...file,
   ...search,
   ...component,
+  ...feedback,
 }
