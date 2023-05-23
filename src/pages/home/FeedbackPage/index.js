@@ -68,14 +68,22 @@ export default function FeedbackPage() {
         </div>
       </FullHeightFix>
       <FullHeightAuto style={{ overflowY: 'hidden' }}>
-        <Table className="box" dataSource={local.items} rowKey="id" scroll={{ y: 'calc(100vh - 250px)' }} loading={local.isLoading} pagination={null} onChange={(page) => {
+        <Table className="box" dataSource={local.items} rowKey="_id" scroll={{ y: 'calc(100vh - 250px)' }} loading={local.isLoading} pagination={null} onChange={(page) => {
           local.search_page = page.current
           search()
         }}>
           <Column title="资源id" width={100} dataIndex="resource_id" key="resource_id" />
           <Column title="资源名称" width={100} dataIndex="resource_title" key="resource_title" />
           <Column title="创建日期" width={100} dataIndex="created_at" key="created_at" />
-          <Column title="状态" width={120} dataIndex="status" key="status" render={(text, record) => <Select value={record.status}>
+          <Column title="状态" width={120} dataIndex="status" key="status" render={(text, record) => <Select value={record.status} onChange={async (value) => {
+            try {
+              local.isLoading = true;
+              await apis.updateFeedback({ id: record._id, status: value })
+              record.status = value
+            } finally {
+              local.isLoading = false;
+            }
+          }}>
             <Select.Option value={1}>待处理</Select.Option>
             <Select.Option value={2}>处理中</Select.Option>
             <Select.Option value={3}>已处理</Select.Option>

@@ -16,9 +16,9 @@ export function createFeedback(data) {
   })
 }
 
-export function updateFeedback(data) {
+export function updateFeedback({id, ...data}) {
   return shttp({
-    url: `/v1/admin/feedback/${data.id}`,
+    url: `/v1/admin/feedback/${id}`,
     method: 'PUT',
     data
   })
