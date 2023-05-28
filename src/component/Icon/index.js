@@ -18,12 +18,14 @@ import {
   EllipsisOutlined,
   CloudDownloadOutlined,
   CheckOutlined,
+  CloseOutlined,
 } from '@ant-design/icons'
 
 const IconMap = {
   'loading': LoadingOutlined,
   'plus': PlusOutlined,
   'check': CheckOutlined,
+  'close': CloseOutlined,
   'circle-plus': PlusCircleOutlined,
   'circle-info': InfoCircleOutlined,
   'circle-minus': MinusCircleOutlined,

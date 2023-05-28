@@ -75,14 +75,14 @@ export default function ResourceEdit() {
       local.audio_formats = [];
     },
   }))
-  const onEdit = useCallback(async () => {
+  const onEdit = useCallback(async (sync = false) => {
     const changed = !deepEqual(toJS(local.origin), toJS(local.data));
     if (!changed) {
       notification.info({ message: '数据未改动' })
       return;
     }
     local.loading = true
-    const resp = local.data.id ? await apis.updateResource(local.data) : await api.createResource(local.data);
+    const resp = local.data.id ? await apis.updateResource(local.data, sync) : await api.createResource(local.data);
     if (resp && resp.data.code === 0) {
       notification.info('编辑成功')
     }
@@ -771,6 +771,8 @@ export default function ResourceEdit() {
       </div>
       <Form.Item label="" style={{ textAlign: 'center', backgroundColor: '#b5cbde', height: 50, lineHeight: '50px', margin: 0, }}>
         <Button loading={local.loading} disabled={local.loading} type="primary" onClick={onEdit}>保存</Button>
+        <Divider type="vertical" />
+        <Button loading={local.loading} disabled={local.loading} type="primary" onClick={() => onEdit(true)}>保存并同步</Button>
       </Form.Item>
     </div>
     <Observer>{() => <Modal visible={local.showFormat}
@@ -848,5 +850,6 @@ export default function ResourceEdit() {
       </Radio.Group>
     </Modal>}</Observer>
 
-  </Fragment>)}</Observer>
+  </Fragment>)
+  }</Observer >
 }

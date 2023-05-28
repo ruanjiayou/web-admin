@@ -10,14 +10,19 @@ import { AlignAround } from '../../../component/style'
 import store from '../../../store'
 
 const { Column } = Table;
-
+const StatusMap = {
+	init: 'plus',
+	loading: 'sync-horizon',
+	finished: 'check',
+	fail: 'close'
+}
 export default function ResourceList({ items, children, categories, search, local, ...props }) {
 	const state = useLocalStore(() => ({
 		updating: false,
 		syncItems: {},
 	}))
 	return <Observer>{() => (
-		<Table dataSource={items} rowKey="id" scroll={{ y: 'calc(100vh - 240px)' }} loading={local.isLoading} pagination={{
+		<Table dataSource={items} rowKey="id" scroll={{ y: 'calc(100vh - 273px)' }} loading={local.isLoading} pagination={{
 			pageSize: 20,
 			current: local.search_page,
 			total: local.count,
@@ -51,6 +56,7 @@ export default function ResourceList({ items, children, categories, search, loca
 								}
 							}
 						}} />
+						<Icon type={StatusMap[record.status] || 'plus'} style={{ position: 'absolute', bottom: 0, left: '50%', marginLeft: 20 }} />
 					</div>
 				)}
 				</Observer>

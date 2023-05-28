@@ -42,7 +42,7 @@ export function createResource(data) {
   })
 }
 
-export function updateResource(data) {
+export function updateResource(data, sync = false) {
   const form = new FormData()
   for (let k in data) {
     if (data[k] instanceof Array) {
@@ -54,7 +54,7 @@ export function updateResource(data) {
     }
   }
   return shttp({
-    url: `/v1/admin/resource/${data.id}`,
+    url: `/v1/admin/resource/${data.id}${sync ? '?sync=true' : ''}`,
     method: 'PUT',
     data: form
   })
