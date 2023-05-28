@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, Fragment, useRef } from 'react';
 import { Observer, useLocalStore } from 'mobx-react-lite'
-import { Button, Modal, Form, Input, Switch, Divider, notification, Table, Select, Upload, Row, Col } from 'antd';
+import { Button, Modal, Form, Input, Switch, Divider, notification, Table, Select, Upload, Row, Col, Tag } from 'antd';
 import { Icon } from '../../../component'
 import apis from '../../../api';
 import store from '../../../store'
@@ -23,6 +23,7 @@ export default function SpiderPage() {
   const originRef = useRef(null)
   const mainFile = useRef(null)
   const subFile = useRef(null)
+  const inp = useRef(null)
   const local = useLocalStore(() => ({
     isLoading: false,
     rule: {
@@ -34,8 +35,11 @@ export default function SpiderPage() {
       enable: false,
       mainScript: '',
       subFile: '',
+      queries: [],
     },
     rules: [],
+    tagAddVisible: false,
+    tempTag: '',
     // 预览
     tempId: '',
     tempRule: {},
@@ -53,7 +57,7 @@ export default function SpiderPage() {
       local.rule = data;
       local.inster = false
     } else {
-      local.rule = {}
+      local.rule = { queries: [] }
       local.inster = true
     }
     local.showEdit = true
@@ -62,6 +66,11 @@ export default function SpiderPage() {
     local.rule = {};
     local.isLoading = true
     const result = await v2getRules({ page: local.search_page })
+    result.data.forEach(rule => {
+      if (!rule.queries) {
+        rule.queries = []
+      }
+    })
     local.isLoading = false
     local.rules = result.data
   }, [])
@@ -217,6 +226,8 @@ export default function SpiderPage() {
         </Button>
         <Divider type="vertical" />
         <Button type="primary" onClick={e => { openEdit() }}>添加规则<Icon type="circle-plus" /></Button>
+        <Divider type="vertical" />
+        <Button type="primary" disabled={local.isLoading} onClick={() => init()}>刷新</Button>
       </FullHeightFix>
       <FullHeightAuto>
         <Table dataSource={local.rules} rowKey="id" scroll={{ y: 600 }} loading={local.isLoading} pagination={false}>
@@ -287,6 +298,37 @@ export default function SpiderPage() {
             <Form.Item label="路由规则" labelCol={lb} wrapperCol={rb}>
               <Input placeholder="/:id" value={local.rule.route} onChange={e => local.rule.route = e.target.value} />
             </Form.Item>
+            <Form.Item label="路由query" labelCol={lb} wrapperCol={rb}>
+              {(local.rule.queries || []).map((tag, index) => <Tag key={index} closable onClose={() => { local.rule.queries = local.rule.queries.filter(t => t !== tag) }}>{tag}</Tag>)}
+              {local.tagAddVisible && (
+                <Input
+                  ref={inp}
+                  type="text"
+                  size="small"
+                  style={{ width: 78 }}
+                  value={local.tempTag}
+                  autoFocus
+                  onChange={e => local.tempTag = e.target.value}
+                  onBlur={() => {
+                    let tagArr = local.tempTag.trim().replace(/,/g, ' ').split(' ');
+                    const tags = local.rule.queries
+                    for (let i = 0; i < tagArr.length; i++) {
+                      const tag = tagArr[i];
+                      if (tag !== '' && -1 === tags.findIndex(t => t === tag)) {
+                        local.rule.queries.push(tag)
+                      }
+                    }
+                    local.tagAddVisible = false
+                    local.tempTag = ''
+                  }}
+                />
+              )}
+              {!local.tagAddVisible && (
+                <Tag onClick={() => local.tagAddVisible = true} style={{ background: '#fff', borderStyle: 'dashed' }}>
+                  <Icon type="plus" />
+                </Tag>
+              )}
+            </Form.Item>
             <Form.Item label="规则名称" labelCol={lb} wrapperCol={rb}>
               <Input placeholder="pixiv插画" value={local.rule.name} autoFocus onChange={e => local.rule.name = e.target.value} />
             </Form.Item>
@@ -307,7 +349,7 @@ export default function SpiderPage() {
               }}>
                 <Button>
                   <UploadOutlined /> 上传
-              </Button>
+                </Button>
                 {local.rule.mainScript}
               </Upload>
             </Form.Item>
@@ -319,7 +361,7 @@ export default function SpiderPage() {
               }}>
                 <Button>
                   <UploadOutlined /> 上传
-              </Button>
+                </Button>
                 {local.rule.subScript}
               </Upload>
             </Form.Item>
