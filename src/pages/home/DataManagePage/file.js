@@ -39,6 +39,7 @@ export default function TaskList() {
     }))
     const nameRef = useRef(null)
     const outputRef = useRef(null)
+    const searchRef = useRef(null)
     const search = useCallback(() => {
         local.isLoading = true
         local.chosen_files = [];
@@ -68,10 +69,14 @@ export default function TaskList() {
             <FullHeightFix style={padding}>
                 <Right>
                     <Input.Search
+                        ref={ref => searchRef.current = ref}
                         placeholder='搜索'
                         style={{ width: 250 }}
                         enterButton
-                        suffix={<Icon type="close" onClick={() => local.q = ''} />}
+                        suffix={<Icon type="close" onClick={() => {
+                            local.q = '';
+                            searchRef.current.value = '';
+                        }} />}
                         onSearch={filter_by_q} />
                     <Divider type="vertical" />
                     <Upload
@@ -221,6 +226,10 @@ export default function TaskList() {
                                     e.stopPropagation()
                                     e.preventDefault()
                                     local.dirpath += text + '/';
+                                    local.q = '';
+                                    if (searchRef.current) {
+                                        searchRef.current.value = ''
+                                    }
                                     search()
                                 }}>{text}</Link>
                             } else if (record.editing) {
