@@ -20,8 +20,6 @@ const getItemStyle = (isDragging, draggableStyle) => ({
   ...draggableStyle
 });
 
-const getListStyle = isDraggingOver => ({});
-
 export default function SortList({ isLoading, handler, items, droppableId, mode, direction = 'vertical', sort, listStyle = {}, itemStyle = {}, renderItem, ...restProps }) {
   return <Observer>{() => {
     if (isLoading) {

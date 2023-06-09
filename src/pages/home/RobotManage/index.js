@@ -1,9 +1,9 @@
-import React, { useEffect, useCallback, Fragment } from 'react';
+import React, { useCallback, } from 'react';
 import { Observer, useLocalStore, } from 'mobx-react-lite'
-import { Table, Popconfirm, notification, Button, Divider, Input, Tabs, Form } from 'antd';
-import { DeleteOutlined, WarningOutlined, FormOutlined, CloudServerOutlined } from '@ant-design/icons'
+import { Table, Popconfirm, notification, Button, Divider, Tabs, } from 'antd';
+import { DeleteOutlined, WarningOutlined, FormOutlined, } from '@ant-design/icons'
 import apis from '../../../api'
-import { FullHeight, FullHeightFix, FullHeightAuto, Right, Padding } from '../../../component/style'
+import { Right, Padding } from '../../../component/style'
 import { useEffectOnce } from 'react-use';
 import md5 from 'js-md5'
 import { events } from '../../../utils/events'
@@ -11,7 +11,7 @@ import { events } from '../../../utils/events'
 const { TabPane } = Tabs;
 const { Column } = Table;
 export default function ConfigPage() {
-    const lb = { span: 3 }, rb = { span: 18 }
+    // const lb = { span: 3 }, rb = { span: 18 }
     const local = useLocalStore(() => ({
         robots: [],
         loading: false,

@@ -1,6 +1,6 @@
 import React, { useRef } from 'react'
 import { Observer, useLocalStore } from 'mobx-react-lite'
-import { Button, Modal, Form, Input, Card, Select, Upload, notification, message } from 'antd';
+import { Button, Modal, Form, Input, Select, Upload, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons'
 import store from '../../../store';
 import { Icon } from '../../../component'

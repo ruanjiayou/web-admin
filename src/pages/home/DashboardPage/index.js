@@ -1,7 +1,5 @@
-import React, { Fragment, useRef, useCallback } from 'react'
+import React, { useRef, useCallback } from 'react'
 import { Observer, useLocalStore } from 'mobx-react-lite'
-import { useStore } from '../../../contexts'
-import shttp from '../../../utils/shttp'
 import { Padding, AlignAside } from '../../../component/style'
 import { VisualBox, Icon } from '../../../component'
 import ReactECharts from 'echarts-for-react';

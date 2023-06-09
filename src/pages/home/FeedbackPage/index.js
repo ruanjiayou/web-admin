@@ -1,13 +1,12 @@
 import React, { useCallback } from 'react';
 import { Observer, useLocalStore } from 'mobx-react-lite'
-import { Table, Popconfirm, Button, Divider, DatePicker, Input, Select, } from 'antd';
-import { DeleteOutlined, WarningOutlined, FormOutlined } from '@ant-design/icons'
+import { Table, Button, Divider, Input, Select, } from 'antd';
 import apis from '../../../api'
-import { FullHeight, FullHeightFix, FullHeightAuto, FullWidthFix } from '../../../component/style'
+import { FullHeight, FullHeightFix, FullHeightAuto, } from '../../../component/style'
 import { useEffectOnce } from 'react-use';
 
 const { Column } = Table;
-const { getFeedbacks, createFeedback, updateFeedback, destroyFeedback } = apis
+const { getFeedbacks, } = apis
 
 export default function FeedbackPage() {
   const local = useLocalStore(() => ({

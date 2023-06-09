@@ -1,10 +1,9 @@
 import React, { useEffect, useCallback, Fragment } from 'react';
 import { Observer, useLocalStore } from 'mobx-react-lite'
-import { Table, Popconfirm, notification, Button, Divider, Input } from 'antd';
-import { DeleteOutlined, WarningOutlined, HddOutlined } from '@ant-design/icons'
+import { Table, Popconfirm, notification, Button, Divider, } from 'antd';
+import { DeleteOutlined, WarningOutlined, } from '@ant-design/icons'
 import apis from '../../../api'
 import { FullHeight, FullHeightFix, FullHeightAuto, Right, padding } from '../../../component/style'
-import Modal from 'antd/lib/modal/Modal';
 
 const { getTableBackups, createTableBackup, destroyTableBackup } = apis
 const { Column } = Table;

@@ -1,8 +1,8 @@
-import React, { Fragment } from 'react'
+import React from 'react'
 import { useLocalStore, Observer } from 'mobx-react-lite'
 import { Tabs } from 'antd';
 import TabPane from '../TabPane'
-import { Icon, VisualBox } from '../../component'
+import { Icon, } from '../../component'
 import { createEmptyGroup } from '../../utils/helper'
 
 export default function Tab({ self, children, ...props }) {

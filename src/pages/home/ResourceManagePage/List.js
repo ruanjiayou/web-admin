@@ -3,10 +3,9 @@ import { Observer, useLocalStore, } from 'mobx-react-lite'
 import { Link } from 'react-router-dom'
 // import LoadingView from '../HolderView/LoadingView'
 import apis from '../../../api';
-import { Table, Popconfirm, Switch, notification, Select, Tag, Popover, Divider, } from 'antd';
-import { FormOutlined, DeleteOutlined, WarningOutlined, CloudServerOutlined, SyncOutlined, UploadOutlined, } from '@ant-design/icons'
+import { Table, Popconfirm, notification, Select, Tag, Divider, } from 'antd';
+import { FormOutlined, DeleteOutlined, WarningOutlined, CloudServerOutlined, SyncOutlined, } from '@ant-design/icons'
 import { Icon, VisualBox, EditTag } from '../../../component'
-import { AlignAround } from '../../../component/style'
 import store from '../../../store'
 
 const { Column } = Table;

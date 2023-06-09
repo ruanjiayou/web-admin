@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { Observer, useLocalStore } from 'mobx-react-lite'
 import { useEffectOnce } from 'react-use';
 import apis from '../../../api';
@@ -22,7 +22,7 @@ export default function ComponentManagePage() {
     temp: null,
     sortComponents: (startIndex, endIndex) => {
       const data = store.components[startIndex]
-      const [removed] = store.components.splice(startIndex, 1)
+      store.components.splice(startIndex, 1)
       store.components.splice(endIndex, 0, data)
     }
   }))

@@ -1,6 +1,4 @@
 import io from 'socket.io-client';
-import store from '../store'
-import Message from '../models/message'
 import { notification, Modal } from 'antd'
 import { events } from './events'
 

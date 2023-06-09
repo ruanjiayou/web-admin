@@ -1,15 +1,12 @@
 import React from 'react'
 import { Observer } from 'mobx-react-lite'
 import { VisualBox, Icon, SortListView, } from '../../component'
-import ItemView from '../BookItem/Normal'
-import { AlignAside, FullWidth } from '../../component/style'
+import { AlignAside, } from '../../component/style'
 import { contextMenu } from 'react-contexify';
-import { useStore } from '../../contexts';
 import Menu from '../Menu'
 import { EditWrap, ScrollWrap } from '../style'
 
 export default function Picker({ self, ...props }) {
-  const store = useStore()
   return <Observer>{() => (
     <div>
       <VisualBox visible={props.mode === 'edit'}>

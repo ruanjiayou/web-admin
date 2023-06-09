@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import React, { useRef } from 'react'
 import { Observer, useLocalStore } from 'mobx-react-lite'
-import { Modal, Radio, Form, Input, Select, Upload, Button, } from 'antd';
+import { Modal, Radio, Form, Input, Upload, Button, } from 'antd';
 import { UploadOutlined } from '@ant-design/icons'
 import { useStore } from '../../../contexts'
 

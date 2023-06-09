@@ -14,7 +14,7 @@ export function createRouter(history) {
     },
     getQuery(uri) {
       const url = history.location.pathname + history.location.search;
-      const [pathname, querystring = ''] = (uri || url).split('?')
+      const [, querystring = ''] = (uri || url).split('?')
       return qs.parse(querystring, { allowDots: true })
     },
     goBack() {

@@ -12,7 +12,7 @@ import { toJS } from 'mobx';
 import { PlusCircleOutlined, CloseOutlined, UploadOutlined } from '@ant-design/icons'
 import api from '../../../api';
 import { formatNumber } from '../../../utils/helper'
-import { AlignAside, FullWidth, FullHeightAuto, FullHeightFix, AlignVertical, FullWidthFix, FullHeight } from '../../../component/style';
+import { FullWidth, FullHeightAuto, AlignVertical, FullWidthFix, FullHeight } from '../../../component/style';
 import TextArea from 'antd/lib/input/TextArea';
 
 function deepEqual(a, b) {

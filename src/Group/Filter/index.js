@@ -1,12 +1,9 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { contextMenu } from 'react-contexify';
-import { ReactSortable } from "react-sortablejs"
-import { Observer, useLocalStore } from 'mobx-react-lite'
-import { Divider } from 'antd';
+import { Observer, } from 'mobx-react-lite'
 import FilterRow from '../FilterRow'
 import { Icon, VisualBox, SortListView } from '../../component'
 import { AlignAside } from '../../component/style'
-import { EditWrap } from '../style'
 import ItemView from '../BookItem/Normal'
 
 export default function Filter({ self, ...props }) {

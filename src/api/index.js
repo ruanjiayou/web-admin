@@ -41,10 +41,19 @@ const getTradeBalance = function () {
   })
 }
 
+const excuteTemplate = async (data) => {
+  return shttp({
+    url: '/v1/admin/excute/' + data.id,
+    data,
+    method: 'POST'
+  })
+}
+
 export default {
   boot,
   analyise,
   getTradeBalance,
+  excuteTemplate,
   ...app,
   ...backup,
   ...channel,

@@ -1,10 +1,9 @@
 import React from 'react'
-import { Modal, Form, Input, notification, Radio, Select, Card, Row, Col, Divider } from 'antd'
+import { Modal, Form, Input, Radio, Select, Card, Row, Col, Divider } from 'antd'
 import { Observer, useLocalStore } from 'mobx-react-lite';
 import { toJS } from 'mobx'
 import * as _ from 'lodash';
 import { PlusCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
-import { VisualBox } from '../../../component'
 
 export default function GroupAdd({ cancel, save, data }) {
   const lb = { span: 6, offset: 3 }, rb = { span: 12 }

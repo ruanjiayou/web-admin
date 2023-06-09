@@ -7,7 +7,7 @@ export default function BookItemNormal({ item, style }) {
   return <Observer>{() => (
     <AlignAside style={{ ...style }}>
       <div>
-        <img style={{ width: 70, height: 90, margin: 10 }} src={item.cover} />
+        <img style={{ width: 70, height: 90, margin: 10 }} src={item.cover} alt=""/>
       </div>
       <div style={{ flex: 1, fontSize: 16 }}>
         <div style={{ color: 'black', fontWeight: 'bold' }}>{item.title}</div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { Observer, useLocalStore } from 'mobx-react-lite'
 import { useEffectOnce } from 'react-use';
 import apis from '../../../api';
@@ -23,7 +23,7 @@ export default function ChannelManagePage() {
     channels: [],
     sortChannels: (startIndex, endIndex) => {
       const data = local.channels[startIndex]
-      const [removed] = local.channels.splice(startIndex, 1)
+      local.channels.splice(startIndex, 1)
       local.channels.splice(endIndex, 0, data)
     }
   }))

@@ -1,8 +1,6 @@
 import React from 'react'
 import { Observer } from 'mobx-react-lite'
 import { Tag } from 'antd'
-import VisualBox from '../../component/VisualBox'
-import Icon from '../../component/Icon'
 import { contextMenu } from 'react-contexify';
 import { useStore } from '../../contexts';
 import { EditWrap } from '../style'

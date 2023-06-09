@@ -1,7 +1,7 @@
-import React, { useEffect, useCallback, Fragment } from 'react';
+import React, { useCallback, } from 'react';
 import { Observer, useLocalStore } from 'mobx-react-lite'
 import { Table, Popconfirm, Switch, notification, Button, Divider } from 'antd';
-import { DeleteOutlined, WarningOutlined, SyncOutlined, LoadingOutlined, FormOutlined } from '@ant-design/icons'
+import { DeleteOutlined, WarningOutlined, FormOutlined } from '@ant-design/icons'
 import apis from '../../../api'
 import { FullHeight, FullHeightFix, FullHeightAuto, Right } from '../../../component/style'
 import Edit from './edit'

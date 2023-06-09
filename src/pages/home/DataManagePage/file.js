@@ -1,11 +1,11 @@
 import React, { useEffect, useCallback, Fragment, useRef } from 'react';
 import { Observer, useLocalStore } from 'mobx-react-lite'
-import { Table, Popconfirm, notification, Button, Divider, Input, Upload, message, } from 'antd';
+import { Table, Popconfirm, notification, Button, Divider, Input, Upload, message, Checkbox, Select, } from 'antd';
 import { DeleteOutlined, WarningOutlined, ArrowLeftOutlined, ScanOutlined, UploadOutlined, CheckOutlined, FormOutlined, LoadingOutlined, CloseCircleOutlined } from '@ant-design/icons'
 import apis from '../../../api'
 import store from '../../../store'
 import { FullHeight, FullHeightFix, FullHeightAuto, Right, padding } from '../../../component/style'
-import { VisualBox } from '../../../component'
+import { Icon, VisualBox } from '../../../component'
 import Modal from 'antd/lib/modal/Modal';
 import { Link } from 'react-router-dom';
 import { QRCode } from 'react-qrcode'
@@ -23,10 +23,25 @@ export default function TaskList() {
         isDir: 0,
         uploading: false,
         files: [],
+        searched_files: [],
+        q: '',
+        chosen_files: [],
+        isExcuting: false,
+        show_cmd: false,
+        template_data: {
+            id: '',
+            filename: ''
+        },
+        cmd_templates: [
+            { name: 'merge_audio_video', title: '合并音视频' },
+            { name: 'transcode_mp4', title: '转码为mp4' },
+        ],
     }))
     const nameRef = useRef(null)
+    const outputRef = useRef(null)
     const search = useCallback(() => {
         local.isLoading = true
+        local.chosen_files = [];
         getFiles({ param: local.dirpath }).then(res => {
             local.isLoading = false
             local.files = res.data.sort((a, b) => {
@@ -36,6 +51,15 @@ export default function TaskList() {
             local.isLoading = false
         })
     }, [])
+    const filter_by_q = useCallback((str) => {
+        const q = str.trim();
+        if (q) {
+            local.searched_files = local.files.filter(file => {
+                return file.name.includes(q);
+            })
+            local.q = q;
+        }
+    }, [])
     useEffect(() => {
         search()
     })
@@ -43,6 +67,13 @@ export default function TaskList() {
         <FullHeight>
             <FullHeightFix style={padding}>
                 <Right>
+                    <Input.Search
+                        placeholder='搜索'
+                        style={{ width: 250 }}
+                        enterButton
+                        suffix={<Icon type="close" onClick={() => local.q = ''} />}
+                        onSearch={filter_by_q} />
+                    <Divider type="vertical" />
                     <Upload
                         showUploadList={false}
                         name="file"
@@ -71,7 +102,17 @@ export default function TaskList() {
                         <Button icon={<UploadOutlined />}>上传</Button>
                     </Upload>
                     <Divider type="vertical" />
+                    <Button disabled={local.chosen_files.length === 0} loading={local.isExcuting} onClick={() => {
+                        local.template_data.filename = '';
+                        local.template_data.id = ''
+                        if (outputRef.current) {
+                            outputRef.current.value = ''
+                        }
+                        local.show_cmd = true;
+                    }}>执行命令</Button>
+                    <Divider type="vertical" />
                     <Button onClick={() => {
+                        ;
                         local.showModal = true
                         setTimeout(() => {
                             nameRef.current && nameRef.current.input.focus()
@@ -116,8 +157,58 @@ export default function TaskList() {
             >
                 <Input defaultValue={''} disabled={local.isLoading} ref={ref => nameRef.current = ref} autoFocus />
             </Modal>
+            <Modal
+                visible={local.show_cmd}
+                okText="执行"
+                cancelText="取消"
+                closable={false}
+                onCancel={() => local.show_cmd = false}
+                onOk={async () => {
+                    local.template_data.filename = local.template_data.filename.trim()
+                    if (!local.template_data.id || !local.template_data.filename) {
+                        return notification.warn({ message: '缺少必要参数' })
+                    }
+                    local.isExcuting = true;
+                    try {
+                        await apis.excuteTemplate(local.template_data)
+                        local.show_cmd = false;
+                    } finally {
+                        local.isExcuting = false;
+                    }
+                }}
+            >
+                <Input
+                    addonBefore={<Select style={{ width: 150 }} defaultValue={""} onSelect={v => {
+                        local.template_data.id = v;
+                    }}>
+                        <Select.Option value="">请选择</Select.Option>
+                        {local.cmd_templates.map(tpl => (
+                            <Select.Option value={tpl.name} key={tpl.name}>{tpl.title}</Select.Option>
+                        ))}
+                    </Select>}
+                    defaultValue={''}
+                    disabled={local.isLoading}
+                    ref={ref => outputRef.current = ref}
+                    onChange={e => {
+                        local.template_data.filename = e.target.value;
+                    }}
+                    autoFocus />
+            </Modal>
             <FullHeightAuto>
-                <Table dataSource={local.files} rowKey="name" scroll={{ y: 'calc(100vh - 180px)' }} pagination={false} loading={local.isLoading}>
+                <Table dataSource={local.q ? local.searched_files : local.files} rowKey="name" scroll={{ y: 'calc(100vh - 180px)' }} pagination={false} loading={local.isLoading}>
+                    <Column key="name" dataIndex={"name"} width={35} render={(text, record) => {
+                        return record.dir ? null : <Checkbox onChange={(e) => {
+                            const filepath = local.dirpath + text;
+                            if (e.target.checked) {
+                                local.chosen_files.push(filepath);
+                            } else {
+                                const index = local.chosen_files.findIndex((file) => file === filepath);
+                                if (index !== -1) {
+                                    local.chosen_files.splice(index, 1);
+                                }
+                            }
+                        }} />
+                    }} />
                     <Column title={<span>{local.dirpath !== '/' && <ArrowLeftOutlined onClick={() => {
                         const sp = local.dirpath.substr(1, local.dirpath.length - 2).split('/')
                         sp.pop();
@@ -191,5 +282,6 @@ export default function TaskList() {
                 </Table>
             </FullHeightAuto>
         </FullHeight>
-    )}</Observer>
+    )
+    }</Observer >
 }

@@ -1,6 +1,6 @@
-import React, { useEffect, useCallback } from 'react';
+import React from 'react';
 import { Observer, useLocalStore } from 'mobx-react-lite'
-import { Table, Popconfirm, Switch, notification, Button, Divider } from 'antd';
+import { Table, Popconfirm, Switch, notification, Button, } from 'antd';
 import { DeleteOutlined, WarningOutlined, FormOutlined } from '@ant-design/icons'
 import apis from '../../../api'
 import store from '../../../store'
@@ -8,7 +8,7 @@ import { FullHeight, FullHeightFix, FullHeightAuto, Right } from '../../../compo
 import Edit from './edit'
 
 const { Column } = Table;
-const { getApps, createApp, updateApp, destroyApp } = apis
+const { createApp, updateApp, destroyApp } = apis
 
 export default function AppList() {
   const local = useLocalStore(() => ({

@@ -1,14 +1,13 @@
-import React, { useEffect, useCallback, Fragment } from 'react';
+import React, { useEffect, useCallback, } from 'react';
 import { Observer, useLocalStore } from 'mobx-react-lite'
-import { Table, Popconfirm, Switch, notification, Button, Divider, Select, Input } from 'antd';
-import { DeleteOutlined, WarningOutlined, SyncOutlined, LoadingOutlined } from '@ant-design/icons'
+import { Table, Switch, notification, Button, Divider, Select, Input } from 'antd';
+import { SyncOutlined, } from '@ant-design/icons'
 import apis from '../../../api'
-import { FullHeight, FullHeightFix, FullHeightAuto, Right, FullWidth } from '../../../component/style'
+import { FullHeight, FullHeightAuto, FullWidth } from '../../../component/style'
 import { Icon } from '../../../component';
-import Clipboard from 'react-clipboard.js';
 
 const { Column } = Table;
-const { getTasks, updateTask, updateTaskResource, destroyTask } = apis
+const { getTasks, updateTask, updateTaskResource, } = apis
 
 export default function TaskList() {
   const local = useLocalStore(() => ({

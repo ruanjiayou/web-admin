@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback } from 'react';
 import { Observer, useLocalStore } from 'mobx-react-lite'
 import apis from '../../../api';
-import { Button, Divider, Table, Popconfirm, Switch } from 'antd';
+import { Button, Table, Popconfirm, } from 'antd';
 import { RedoOutlined, WarningOutlined, PoweroffOutlined, PlayCircleOutlined } from '@ant-design/icons'
 import { FullHeight, FullHeightFix, FullHeightAuto, Right, padding } from '../../../component/style'
 
