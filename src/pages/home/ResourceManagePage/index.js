@@ -9,8 +9,8 @@ import { Icon } from '../../../component'
 import { UploadOutlined } from '@ant-design/icons'
 import store from '../../../store'
 import { Right } from '../../../component/style';
-import { UnControlled as CodeMirror } from 'react-codemirror2'
-import path2regexp from 'path-to-regexp'
+import CodeEditor from '../../../component/CodeEditor'
+import { match } from 'path-to-regexp'
 
 const { getResources, search, createResource, updateResource, destroyResource, getGroupTypes, v2getRules, v2GetResourceByRule, v2previewRule } = apis
 
@@ -174,9 +174,9 @@ export default function ResourceManagePage() {
                   try {
                     const u = new URL(url);
                     local.rules.forEach(rule => {
-                      const reg = path2regexp(rule.route, { strict: true });
-                      const m = reg.exec(u.pathname)
-                      if (url.startsWith(rule.host) && ((rule.route && m) || !rule.route)) {
+                      const fn = match(rule.route, { decode: decodeURIComponent });
+                      const m = fn(u.pathname)
+                      if (url.startsWith(rule.host) && ((rule.route && m.params) || !rule.route)) {
                         local.tempId = rule.id
                         local.tempRule = rule
                       }
@@ -211,14 +211,9 @@ export default function ResourceManagePage() {
                         okText: '确定',
                         cancelButtonProps: { hidden: true },
                         width: 700,
-                        content: <CodeMirror
+                        content: <CodeEditor
                           value={JSON.stringify(res.data, null, 2)}
-                          options={{
-                            mode: 'json',
-                            theme: 'material',
-                            lineNumbers: true
-                          }}
-                          onChange={(editor, data, value) => {
+                          onChange={value => {
                             local.code = value;
                           }}
                         />
@@ -257,9 +252,9 @@ export default function ResourceManagePage() {
                   try {
                     const u = new URL(url);
                     local.rules.forEach(rule => {
-                      const reg = path2regexp(rule.route, { strict: true });
-                      const m = reg.exec(u.pathname)
-                      if (url.startsWith(rule.host) && ((rule.route && m) || !rule.route)) {
+                      const fn = match(rule.route, { decode: decodeURIComponent });
+                      const m = fn(u.pathname)
+                      if (url.startsWith(rule.host) && ((rule.route && m.params) || !rule.route)) {
                         local.tempId = rule.id
                         local.tempRule = rule
                       }

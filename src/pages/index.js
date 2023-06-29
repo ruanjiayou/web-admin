@@ -22,6 +22,7 @@ import MuiltiEdit from './home/ResourceManagePage/multi'
 import AppManagePage from './home/AppManagePage'
 import ComponentManagePage from './home/ComponentManagePage'
 import FeedbackPage from './home/FeedbackPage'
+import SpiderPage from './home/SpiderManagePage/spider'
 
 import {
   LinkOutlined,
@@ -66,8 +67,9 @@ const page_map = {
   'BackupTablePage': BackupTablePage,
   'MuiltiEdit': MuiltiEdit,
   'AppManagePage': AppManagePage,
-  'ComponentManagePage':ComponentManagePage,
+  'ComponentManagePage': ComponentManagePage,
   'FeedbackPage': FeedbackPage,
+  'SpiderPage': SpiderPage,
 }
 export const icon_map = {
   LinkOutlined,

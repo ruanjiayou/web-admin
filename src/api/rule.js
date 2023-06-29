@@ -105,3 +105,19 @@ export function v2previewRule(ruleId, query) {
     method: 'GET',
   })
 }
+
+export function getSpiders(query) {
+  return shttp.get('/v1/admin/spider', query)
+}
+export function createSpider(data) {
+  return shttp.post('/v1/admin/spider', data)
+}
+export function destroySpider(data) {
+  return shttp.delete(`/v1/admin/spider/${data._id}`)
+}
+export function updateSpider(_id, data) {
+  return shttp.put(`/v1/admin/spider/${_id}`, data)
+}
+export function patchSpider(_id, data) {
+  return shttp.patch(`/v1/admin/spider/${_id}`, data)
+}

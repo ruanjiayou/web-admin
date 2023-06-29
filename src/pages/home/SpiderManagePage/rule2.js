@@ -7,12 +7,8 @@ import store from '../../../store'
 import { UploadOutlined, } from '@ant-design/icons'
 import { FullHeight, FullHeightFix, FullHeightAuto } from '../../../component/style'
 import IconCode from '../../../images/code.svg'
-import { UnControlled as CodeMirror } from 'react-codemirror2'
-import 'codemirror/lib/codemirror.css';
-import 'codemirror/theme/material.css';
-import path2regexp from 'path-to-regexp'
-require('codemirror/mode/xml/xml');
-require('codemirror/mode/javascript/javascript');
+import CodeEditor from '../../../component/CodeEditor'
+import { match } from 'path-to-regexp'
 
 const { Column } = Table;
 const { v2getRules, v2createRule, v2updateRule, v2GetResourceByRule, v2UpdateRuleCode, v2getRuleCode, v2previewRule } = apis
@@ -108,9 +104,9 @@ export default function SpiderPage() {
                 const url = e.clipboardData.getData('text/plain');
                 const u = new URL(url);
                 local.rules.forEach(rule => {
-                  const reg = path2regexp(rule.route);
-                  const m = reg.exec(u.pathname)
-                  if (url.startsWith(rule.host) && ((rule.route && m) || !rule.route)) {
+                  const fn = match(rule.route, { decode: decodeURIComponent });
+                  const m = fn(u.pathname)
+                  if (url.startsWith(rule.host) && ((rule.route && m.params) || !rule.route)) {
                     local.tempId = rule.id
                     local.tempRule = rule
                   }
@@ -142,14 +138,9 @@ export default function SpiderPage() {
                       okText: '确定',
                       cancelButtonProps: { hidden: true },
                       width: 700,
-                      content: <CodeMirror
+                      content: <CodeEditor
                         value={JSON.stringify(res.data, null, 2)}
-                        options={{
-                          mode: 'json',
-                          theme: 'material',
-                          lineNumbers: true
-                        }}
-                        onChange={(editor, data, value) => {
+                        onChange={value => {
                           local.code = value;
                         }}
                       />
@@ -187,9 +178,9 @@ export default function SpiderPage() {
                 const url = e.clipboardData.getData('text/plain');
                 const u = new URL(url);
                 local.rules.forEach(rule => {
-                  const reg = path2regexp(rule.route);
-                  const m = reg.exec(u.pathname)
-                  if (url.startsWith(rule.host) && ((rule.route && m) || !rule.route)) {
+                  const fn = match(rule.route, { decode: decodeURIComponent });
+                  const m = fn(u.pathname)
+                  if (url.startsWith(rule.host) && ((rule.route && m.params) || !rule.route)) {
                     local.tempId = rule.id
                     local.tempRule = rule
                   }
@@ -381,14 +372,9 @@ export default function SpiderPage() {
               local.showCodeId = ''
             });
           }} >
-          <CodeMirror
+          <CodeEditor
             value={local.code}
-            options={{
-              mode: 'javascript',
-              theme: 'material',
-              lineNumbers: true
-            }}
-            onChange={(editor, data, value) => {
+            onChange={(value) => {
               local.code = value;
             }}
           />
