@@ -10,7 +10,7 @@ const Item = Form.Item;
 export default function RuleEdit({ data, cancel, save }) {
   const local = useLocalStore(() => ({
     editORadd: data._id ? 'edit' : 'add',
-    data: data._id ? _.cloneDeep(data) : { config: { proxy: 0, html: 0 }, urls: [], script: '', name: '', desc: '', status: 0 },
+    data: data._id ? _.cloneDeep(data) : { config: { proxy: 0, from: 'url' }, urls: [], script: '', name: '', desc: '', header: {}, status: 0 },
     loading: false,
     ref: '',
     poster: data.poster || '',
@@ -53,13 +53,12 @@ export default function RuleEdit({ data, cancel, save }) {
           <Radio value={1}>有</Radio>
         </Radio.Group>
       </Item>
-      <Item label="html" labelCol={{ span: 4 }}>
-        <Radio.Group name="html" defaultValue={local.data.config.html} onChange={e => {
-          local.data.config.html = e.target.value;
+      <Item label="from" labelCol={{ span: 4 }}>
+        <Radio.Group name="from" defaultValue={local.data.config.from} onChange={e => {
+          local.data.config.from = e.target.value;
         }}>
-          <Radio value={0}>不需要</Radio>
-          <Radio value={1}>可选</Radio>
-          <Radio value={2}>必要</Radio>
+          <Radio value={'browser'}>浏览器html</Radio>
+          <Radio value={'url'}>url</Radio>
         </Radio.Group>
       </Item>
       <Item label="状态" labelCol={{ span: 4 }}>
