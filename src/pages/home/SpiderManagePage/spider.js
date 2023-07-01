@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import React, { useState, useCallback, } from 'react';
 import { useEffectOnce } from 'react-use';
-import { Button, Space, Table, notification, Popconfirm, Modal, Select, Input, Form, } from 'antd';
+import { Button, Space, Table, notification, Popconfirm, Modal, Select, Input, Form, Switch, Divider, } from 'antd';
 import { Observer, useLocalStore, } from 'mobx-react-lite';
 import styled from 'styled-components';
 import { Icon } from '../../../component'
@@ -33,14 +33,15 @@ export default function RulePage(props) {
     const [form] = Form.useForm()
     const local = useLocalStore(() => ({
         tempData: {},
-        rules: [],
+        spiders: [],
         page: 1,
         limit: 20,
+        preview: false,
         matchURL: {
             open: false,
             loading: false,
             url: '',
-            matched_rule_id: '',
+            matched_spider_id: '',
             params: null,
             isComposition: false,
         }
@@ -49,7 +50,7 @@ export default function RulePage(props) {
     useEffectOnce(() => {
         apis.getSpiders().then(result => {
             if (result.code === 0) {
-                local.rules = result.data;
+                local.spiders = result.data;
             }
         })
         return () => {
@@ -60,16 +61,16 @@ export default function RulePage(props) {
         local.tempData = data;
         setIsModalOpen(true);
     }
-    const getRules = async () => {
+    const getSpiders = async () => {
         const result = await apis.getSpiders({ page: local.page, limit: local.limit })
         if (result.code === 0) {
-            local.rules = result.data;
+            local.spiders = result.data;
         } else {
             notification.error({ message: '获取数据失败' })
         }
     }
     function openMatch() {
-        local.matchURL.matched_rule_id = '';
+        local.matchURL.matched_spider_id = '';
         local.matchURL.url = '';
         local.matchURL.open = true;
         local.matchURL.isComposition = false;
@@ -83,7 +84,7 @@ export default function RulePage(props) {
     const onCrawl = async () => {
         local.matchURL.loading = true
         try {
-            const result = await apis.patchRule(local.matchURL.matched_rule_id, { url: local.matchURL.url, params: local.matchURL.params })
+            const result = await apis.patchSpider(local.matchURL.matched_spider_id, { url: local.matchURL.url, params: local.matchURL.params }, local.preview)
             form.setFieldValue('url', '')
             local.matchURL.open = false
         } catch (e) {
@@ -98,9 +99,9 @@ export default function RulePage(props) {
         }
         const url1 = new window.URL(link)
         let found = null;
-        for (let i = 0; i < local.rules.length; i++) {
-            const rule = local.rules[i];
-            const url_pattern = rule.pattern;
+        for (let i = 0; i < local.spiders.length; i++) {
+            const spider = local.spiders[i];
+            const url_pattern = spider.pattern;
             const url2 = new window.URL(url_pattern);
             if (url_pattern.startsWith(url1.origin)) {
                 const fn = match(url2.pathname, { decode: decodeURIComponent })
@@ -114,7 +115,7 @@ export default function RulePage(props) {
                         }
                     })
                     local.matchURL.url = link;
-                    local.matchURL.matched_rule_id = rule._id;
+                    local.matchURL.matched_spider_id = spider._id;
                     local.matchURL.params = found
                     break;
                 }
@@ -190,7 +191,7 @@ export default function RulePage(props) {
             {isModalOpen && <EditPage cancel={() => setIsModalOpen(false)} data={local.tempData} save={async (data) => {
                 const result = local.tempData._id ? await apis.updateSpider(local.tempData._id, data) : await apis.createSpider(data)
                 if (result.code === 0) {
-                    await getRules()
+                    await getSpiders()
                     notification.info({ message: '保存成功' });
                     setIsModalOpen(false);
                 } else {
@@ -198,7 +199,7 @@ export default function RulePage(props) {
                 }
             }} />}
         </Wrap>
-        <Table columns={columns} dataSource={local.rules} rowKey="_id" />
+        <Table columns={columns} dataSource={local.spiders} rowKey="_id" />
         <Modal
             visible={local.matchURL.open}
             footer={<Space>
@@ -206,7 +207,7 @@ export default function RulePage(props) {
                 <Button
                     loading={local.matchURL.loading}
                     type="primary"
-                    disabled={local.matchURL.matched_rule_id === ''}
+                    disabled={local.matchURL.matched_spider_id === ''}
                     onClick={onCrawl}
                 >抓取</Button>
             </Space>}
@@ -214,10 +215,14 @@ export default function RulePage(props) {
         >
             <Form form={form}>
                 <Form.Item label="规则" labelCol={{ span: 2 }} style={{ marginTop: 32 }} >
-                    <Select disabled value={local.matchURL.matched_rule_id}>
-                        <Select.Option value="">无</Select.Option>
-                        {local.rules.map(rule => (<Select.Option key={rule._id} value={rule._id}>{rule.name}</Select.Option>))}
-                    </Select>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <Select disabled value={local.matchURL.matched_spider_id} style={{ flex: 1 }}>
+                            <Select.Option value="">无</Select.Option>
+                            {local.spiders.map(spider => (<Select.Option key={spider._id} value={spider._id}>{spider.name}</Select.Option>))}
+                        </Select>
+                        &nbsp;
+                        <Switch checked={local.preview} onChange={v => local.preview = v} />&nbsp;预览
+                    </div>
                 </Form.Item>
                 <Form.Item label="地址" labelCol={{ span: 2 }} name="url">
                     <Input

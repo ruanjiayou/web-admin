@@ -118,6 +118,6 @@ export function destroySpider(data) {
 export function updateSpider(_id, data) {
   return shttp.put(`/v1/admin/spider/${_id}`, data)
 }
-export function patchSpider(_id, data) {
-  return shttp.patch(`/v1/admin/spider/${_id}`, data)
+export function patchSpider(_id, data, preview) {
+  return shttp.patch(`/v1/admin/spider/${_id}?preview=${preview ? 1 : ''}`, data)
 }
