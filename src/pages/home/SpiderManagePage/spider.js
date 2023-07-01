@@ -163,7 +163,7 @@ export default function RulePage(props) {
                         onConfirm={async () => {
                             try {
                                 await apis.destroyRule(record)
-                                await getRules()
+                                await getSpiders()
                             } catch (e) {
                                 notification.error({ message: '删除失败' })
                             }
