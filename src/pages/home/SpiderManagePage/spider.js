@@ -185,7 +185,7 @@ export default function RulePage(props) {
                 <Button type="primary" onClick={() => { local.tempData = {}; setIsModalOpen(true) }}>添加</Button>
                 <Button type='primary' onClick={openMatch}>抓取</Button>
                 <Button type="primary">
-                    <Icon type="sync-horizon" onClick={() => getRules()} color="#blue" />
+                    <Icon type="sync-horizon" onClick={() => getSpiders()} color="#blue" />
                 </Button>
             </Space>
             {isModalOpen && <EditPage cancel={() => setIsModalOpen(false)} data={local.tempData} save={async (data) => {
