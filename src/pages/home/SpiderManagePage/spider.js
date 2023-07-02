@@ -78,14 +78,14 @@ export default function RulePage(props) {
     }
     function closeMatch() {
         local.matchURL.params = null;
-        form.setFieldValue('url', '')
+        form.setFieldsValue({ url: '' })
         local.matchURL.open = false;
     }
     const onCrawl = async () => {
         local.matchURL.loading = true
         try {
             const result = await apis.patchSpider(local.matchURL.matched_spider_id, { url: local.matchURL.url, params: local.matchURL.params }, local.preview)
-            form.setFieldValue('url', '')
+            form.setFieldsValue({ url: '' })
             local.matchURL.open = false
         } catch (e) {
 
