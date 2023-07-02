@@ -298,7 +298,7 @@ export default function ResourceEdit() {
         </Form.Item>
         <Form.Item label="youtube下载设置">
           <Button onClick={e => {
-            if ((local.data.source_name !== 'youtube' && local.data.source_name !== 'youtube_shorts') || !['youtube_short', 'youtube_video'].includes(local.data.spider_id)) {
+            if (!(local.data.source_name === 'youtube' || local.data.source_name === 'youtube_shorts' || ['youtube_short', 'youtube_video'].includes(local.data.spider_id))) {
               return message.warn('来源不是youtube!', 1);
             }
             local.video_formats = local.data.original.formats.filter(item => item.video_ext !== 'none').sort((a, b) => b.filesize - a.filesize).map(item => ({
