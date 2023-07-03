@@ -132,8 +132,11 @@ export default function ResourceEdit() {
         <Form.Item label="来源id" labelCol={lb} wrapperCol={rb}>
           <Input style={{ width: '50%' }} value={local.data.source_id} onChange={e => local.data.source_id = e.target.value} />
         </Form.Item>
-        <Form.Item label="来源名称" labelCol={lb} wrapperCol={rb}>
-          <Input style={{ width: '50%' }} value={local.data.source_name} onChange={e => local.data.source_name = e.target.value} />
+        <Form.Item label="规则id" labelCol={lb} wrapperCol={rb}>
+          <Input style={{ width: '50%' }} value={local.data.spider_id} onChange={e => local.data.spider_id = e.target.value} />
+        </Form.Item>
+        <Form.Item label="统一编号" labelCol={lb} wrapperCol={rb}>
+          <Input style={{ width: '50%' }} value={local.data.cspn} onChange={e => local.data.cspn = e.target.value} />
         </Form.Item>
         <Form.Item label="状态" labelCol={lb} wrapperCol={rb}>
           <Switch checked={local.data.status === 'finished'} onClick={e => {
@@ -770,8 +773,6 @@ export default function ResourceEdit() {
 
       </div>
       <Form.Item label="" style={{ textAlign: 'center', backgroundColor: '#b5cbde', height: 50, lineHeight: '50px', margin: 0, }}>
-        <Button loading={local.loading} disabled={local.loading} type="primary" onClick={onEdit}>保存</Button>
-        <Divider type="vertical" />
         <Button loading={local.loading} disabled={local.loading} type="primary" onClick={() => onEdit(true)}>保存并同步</Button>
       </Form.Item>
     </div>

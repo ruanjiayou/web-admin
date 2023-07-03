@@ -8,6 +8,7 @@ import { Icon } from '../../../component'
 import { match } from 'path-to-regexp'
 import apis from '../../../api';
 import EditPage from './spider-edit'
+import CodeEditor from '../../../component/CodeEditor';
 
 const Wrap = styled.div`
   margin: ${props => props.size === 'small' ? 5 : (props.size === 'large' ? 15 : 10)}px;
@@ -87,6 +88,19 @@ export default function RulePage(props) {
             const result = await apis.patchSpider(local.matchURL.matched_spider_id, { url: local.matchURL.url, params: local.matchURL.params }, local.preview)
             form.setFieldsValue({ url: '' })
             local.matchURL.open = false
+            console.log(result);
+            if (local.preview) {
+                Modal.confirm({
+                    title: '预览结果',
+                    okText: '确定',
+                    cancelButtonProps: { hidden: true },
+                    width: 700,
+                    content: <CodeEditor
+                        value={JSON.stringify(result.data, null, 2)}
+                        onChange={value => { }}
+                    />
+                })
+            }
         } catch (e) {
 
         } finally {
@@ -199,7 +213,7 @@ export default function RulePage(props) {
                 }
             }} />}
         </Wrap>
-        <Table columns={columns} dataSource={local.spiders} rowKey="_id" />
+        <Table columns={columns} dataSource={local.spiders} rowKey="_id" pagination={false} />
         <Modal
             visible={local.matchURL.open}
             footer={<Space>
