@@ -45,7 +45,7 @@ export default function ResourceEdit() {
   const query = qs.parse(window.location.search.substr(1))
   const local = useLocalStore(() => ({
     id: query.id,
-    data: { tags: [], types: [], children: [], urls: [], images: [] },
+    data: { tags: [], types: [], children: [], videos: [], images: [] },
     origin: {},
     // 临时
     tempThumbnailImg: '',
@@ -346,7 +346,7 @@ export default function ResourceEdit() {
             mode="edit"
             handler={<Icon type="drag" style={{ marginRight: 10 }} />}
             sort={async (oldIndex, newIndex) => {
-              const data = local.data.urls.map(item => ({ id: item.id, url: item.url }))
+              const data = local.data.videos.map(item => ({ id: item.id, url: item.url }))
               const id = data.splice(oldIndex, 1)
               data.splice(newIndex, 0, ...id)
               data.forEach((d, i) => {
@@ -355,15 +355,15 @@ export default function ResourceEdit() {
               local.loading = false
               try {
                 await api.sortResourceVideo({ id: local.id, data })
-                const items = local.data.urls.map(item => item)
+                const items = local.data.videos.map(item => item)
                 const item = items.splice(oldIndex, 1);
                 items.splice(newIndex, 0, ...item)
-                local.data.urls = items
+                local.data.videos = items
               } finally {
                 local.loading = false
               }
             }}
-            items={local.data.urls}
+            items={local.data.videos}
             droppableId={local.id}
             listStyle={{ boxSizing: 'border-box' }}
             itemStyle={{ display: 'flex', alignItems: 'center', lineHeight: 1 }}
@@ -432,7 +432,7 @@ export default function ResourceEdit() {
                         item.loading = true
                         try {
                           await api.removeResourceVideo({ id: item.id, mid: local.id })
-                          local.data.urls = local.data.urls.filter(t => t.url !== item.url)
+                          local.data.videos = local.data.videos.filter(t => t.url !== item.url)
                         } finally {
                           item.loading = false
                         }
@@ -461,7 +461,7 @@ export default function ResourceEdit() {
                             item.loading = true
                             try {
                               await api.removeResourceVideo({ id: item.id, mid: local.id })
-                              local.data.urls = local.data.urls.filter(t => t.url !== item.url)
+                              local.data.videos = local.data.videos.filter(t => t.url !== item.url)
                             } finally {
                               item.loading = false
                             }
@@ -558,14 +558,14 @@ export default function ResourceEdit() {
                   local.urlAddVisible = false
                   return;
                 }
-                if (-1 !== local.data.urls.findIndex(t => t.url === url)) {
+                if (-1 !== local.data.videos.findIndex(t => t.url === url)) {
                   return notification.info('exists')
                 }
                 local.isDealUrl = true
                 try {
                   const res = await api.addResourceVideo({ id: local.id, title: local.data.title, url, type: local.tempUrlType, status: local.tempStatus })
                   if (res && res.code === 0) {
-                    local.data.urls.push({ url: res.data.url, path: res.data.path, id: res.data.id, status: local.tempStatus, type: local.tempUrlType, nth: local.data.urls.length })
+                    local.data.videos.push({ url: res.data.url, path: res.data.path, id: res.data.id, status: local.tempStatus, type: local.tempUrlType, nth: local.data.videos.length })
                     local.urlAddVisible = false
                   } else {
                     notification.info('fail')
@@ -793,7 +793,7 @@ export default function ResourceEdit() {
           try {
             const res = await api.addResourceVideo({ id: local.id, title: '', url, type: 'normal', status: 'init', ext: videoItem.ext, more: videoItem, subtitles: local.subtitle_url })
             if (res && res.code === 0) {
-              local.data.urls.push({ url: res.data.url, path: res.data.path, id: res.data.id, status: 'init', type: 'normal', nth: local.data.urls.length, subtitles: res.data.subtitlesf })
+              local.data.videos.push({ url: res.data.url, path: res.data.path, id: res.data.id, status: 'init', type: 'normal', nth: local.data.videos.length, subtitles: res.data.subtitlesf })
               local.urlAddVisible = false
             } else {
               notification.info('fail')

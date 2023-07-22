@@ -8,7 +8,7 @@ import * as serviceWorker from './serviceWorker';
 import 'antd/dist/antd.css';
 import 'react-contexify/dist/ReactContexify.min.css';
 import apis from './api'
-import { pagination, adjustMenu } from './pages'
+import { pagination2, adjustMenu2 } from './pages'
 
 if (process.env.NODE_ENV === 'development') {
   // import('./mock').then(() => {
@@ -49,9 +49,9 @@ function App() {
   const [store, StoreContext] = createStore()
   const state = useAsync(async () => {
     try {
-      const resp = await apis.getMenus()
-      store.pages = pagination(resp.data);
-      store.menus = adjustMenu(store.pages);
+      const resp_new = await apis.getMenuTree();
+      store.pages = pagination2(resp_new.data);
+      store.menus = adjustMenu2(resp_new.data);
       const resp2 = await apis.getComponents()
       store.components = resp2.data;
       const appResp = await apis.getApps();

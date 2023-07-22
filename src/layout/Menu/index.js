@@ -49,11 +49,11 @@ export default function Menu({ collapsed }) {
       {
         store.menus.map(menu => {
           const Icon = icon_map[menu.icon]
-          if (menu.sub.length === 0) {
+          if (menu.children.length === 0) {
             return <Comp.Item key={menu.name} onClick={() => jump(menu.path, menu.name)} icon={Icon ? <Icon /> : ''}>{menu.title}</Comp.Item>
           } else {
             return <Comp.SubMenu title={menu.title} key={menu.name} icon={Icon ? <Icon /> : ''} onTitleClick={() => onToggle(menu.name)} >
-              {menu.sub.map(item => {
+              {menu.children.map(item => {
                 const SIcon = icon_map[item.icon]
                 return <Comp.Item key={item.name} onClick={() => jump(item.path, item.name)} icon={SIcon ? <SIcon /> : ''}>{item.title}</Comp.Item>
               })}

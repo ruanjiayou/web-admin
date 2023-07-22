@@ -132,3 +132,51 @@ export function adjustMenu(pages) {
   });
   return data;
 }
+export function pagination2(menus) {
+  const pages = [];
+  menus.forEach(menu => {
+    pages.push({
+      pathname: menu.pathname,
+      Page: page_map[menu.Page] || null,
+      icon: menu.icon,// icon_map[menu.icon] || '',
+      hide: menu.hide || false,
+      title: menu.title,
+      single: menu.single || false
+    });
+    menu.children.forEach(item => {
+      pages.push({
+        pathname: item.pathname,
+        Page: page_map[item.Page] || null,
+        icon: item.icon,// icon_map[menu.icon] || '',
+        hide: item.hide || false,
+        title: item.title,
+        single: item.single || false
+      })
+    })
+  });
+  return pages;
+}
+
+
+export function adjustMenu2(tree) {
+  const data = [];
+  tree.forEach(page => {
+    if (!page.pathname.startsWith('/admin/home') || page.hide === true) {
+      return;
+    }
+    page.children = page.children.map(child => ({
+      title: child.title,
+      path: child.pathname,
+      name: child.pathname,
+      icon: child.icon,
+    }))
+    data.push({
+      title: page.title,
+      path: page.pathname,
+      name: page.pathname,
+      icon: page.icon,
+      children: page.children,
+    })
+  })
+  return data;
+}

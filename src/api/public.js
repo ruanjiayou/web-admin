@@ -7,6 +7,13 @@ export function getMenus(options = {}) {
   })
 }
 
+export function getMenuTree(options = {}) {
+  return shttp({
+    method: 'GET',
+    url: '/v1/public/menu-tree'
+  })
+}
+
 export function getCatagories() {
   return shttp({
     url: '/v1/public/categories',
