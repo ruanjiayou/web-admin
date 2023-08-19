@@ -30,11 +30,13 @@ export default function TaskList() {
         show_cmd: false,
         template_data: {
             id: '',
-            filename: ''
+            filename: '',
+            placeholder: '',
+            limit: 0,
         },
         cmd_templates: [
-            { name: 'merge_audio_video', title: '合并音视频' },
-            { name: 'transcode_mp4', title: '转码为mp4' },
+            { name: 'merge_audio_video', title: '合并音视频', placeholder: '输入合并后的文件名(如 default.mp4)', limit: 2 },
+            { name: 'transcode_mp4', title: '转码为mp4', placeholder: '输入转码后的文件名(如 default.mp4)', limit: 1 },
         ],
     }))
     const nameRef = useRef(null)
@@ -110,6 +112,8 @@ export default function TaskList() {
                     <Button disabled={local.chosen_files.length === 0} loading={local.isExcuting} onClick={() => {
                         local.template_data.filename = '';
                         local.template_data.id = ''
+                        local.template_data.placeholder = '';
+                        local.template_data.files_limit = 0;
                         if (outputRef.current) {
                             outputRef.current.value = ''
                         }
@@ -173,9 +177,17 @@ export default function TaskList() {
                     if (!local.template_data.id || !local.template_data.filename) {
                         return notification.warn({ message: '缺少必要参数' })
                     }
+                    if (local.template_data.limit !== 0 && local.chosen_files !== local.template_data.limit) {
+                        return notification.warn({ message: '文件个数不符合要求' })
+                    }
                     local.isExcuting = true;
                     try {
-                        await apis.excuteTemplate(local.template_data)
+                        const id = local.template_data.id;
+                        const data = {
+                            filename: local.template_data.filename,
+                            files: local.files,
+                        }
+                        await apis.excuteTemplate(id, data)
                         local.show_cmd = false;
                     } finally {
                         local.isExcuting = false;
@@ -185,6 +197,11 @@ export default function TaskList() {
                 <Input
                     addonBefore={<Select style={{ width: 150 }} defaultValue={""} onSelect={v => {
                         local.template_data.id = v;
+                        const item = local.cmd_templates.find(item => item.name === v);
+                        if (item) {
+                            local.template_data.placeholder = item.placeholder;
+                            local.template_data.limit = item.limit;
+                        }
                     }}>
                         <Select.Option value="">请选择</Select.Option>
                         {local.cmd_templates.map(tpl => (
@@ -193,6 +210,7 @@ export default function TaskList() {
                     </Select>}
                     defaultValue={''}
                     disabled={local.isLoading}
+                    placeholder={local.template_data.placeholder}
                     ref={ref => outputRef.current = ref}
                     onChange={e => {
                         local.template_data.filename = e.target.value;

@@ -41,9 +41,9 @@ const getTradeBalance = function () {
   })
 }
 
-const excuteTemplate = async (data) => {
+const excuteTemplate = async (id, data) => {
   return shttp({
-    url: '/v1/admin/excute/' + data.id,
+    url: '/v1/admin/excute/' + id,
     data,
     method: 'POST'
   })
