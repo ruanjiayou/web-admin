@@ -177,7 +177,7 @@ export default function TaskList() {
                     if (!local.template_data.id || !local.template_data.filename) {
                         return notification.warn({ message: '缺少必要参数' })
                     }
-                    if (local.template_data.limit !== 0 && local.chosen_files !== local.template_data.limit) {
+                    if (local.template_data.limit !== 0 && local.chosen_files.length !== local.template_data.limit) {
                         return notification.warn({ message: '文件个数不符合要求' })
                     }
                     local.isExcuting = true;
@@ -185,7 +185,7 @@ export default function TaskList() {
                         const id = local.template_data.id;
                         const data = {
                             filename: local.template_data.filename,
-                            files: local.files,
+                            files: local.files.map(file => local.dirpath + file),
                         }
                         await apis.excuteTemplate(id, data)
                         local.show_cmd = false;
