@@ -35,6 +35,7 @@ export default function TaskList() {
             limit: 0,
         },
         cmd_templates: [
+            { name: 'move_to_video_dir', title: '移动到视频目录', placeholder: '输入资源id', limit: 1 },
             { name: 'merge_audio_video', title: '合并音视频', placeholder: '输入合并后的文件名(如 default.mp4)', limit: 2 },
             { name: 'transcode_mp4', title: '转码为mp4', placeholder: '输入转码后的文件名(如 default.mp4)', limit: 1 },
         ],
