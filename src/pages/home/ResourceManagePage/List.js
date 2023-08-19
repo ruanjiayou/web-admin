@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 // import LoadingView from '../HolderView/LoadingView'
 import apis from '../../../api';
 import { Table, Popconfirm, notification, Select, Tag, Divider, } from 'antd';
-import { FormOutlined, DeleteOutlined, WarningOutlined, CloudServerOutlined, SyncOutlined, } from '@ant-design/icons'
+import { FormOutlined, DeleteOutlined, WarningOutlined, CloudServerOutlined, SyncOutlined, CloudSyncOutlined } from '@ant-design/icons'
 import { Icon, VisualBox, EditTag } from '../../../component'
 import store from '../../../store'
 
@@ -250,7 +250,7 @@ export default function ResourceList({ items, children, categories, search, loca
 						<CloudServerOutlined title="保存小说" onClick={() => props.store(record)} />
 					</VisualBox>
 					<VisualBox visible={record.source_type === 'article' || record.source_type === 'news' || record.source_type === 'image'}>
-						<SyncOutlined title="抓取image" onClick={() => {
+						<CloudSyncOutlined title="抓取image" onClick={() => {
 							apis.grabImages({ id: record.id }).then(res => {
 								notification.info({ message: `success:${res.data.success} fail:${res.data.fail}` })
 							})

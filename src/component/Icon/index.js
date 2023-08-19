@@ -19,6 +19,7 @@ import {
   CloudDownloadOutlined,
   CheckOutlined,
   CloseOutlined,
+  CloudSyncOutlined,
 } from '@ant-design/icons'
 
 const IconMap = {
@@ -41,6 +42,7 @@ const IconMap = {
   'drag': DragOutlined,
   'more': EllipsisOutlined,
   'download': CloudDownloadOutlined,
+  'clound-sync': CloudSyncOutlined,
 };
 
 export default function Icon({ type, style = {}, ...props }) {

@@ -2,7 +2,7 @@ import React, { useEffect, useCallback, Fragment, useRef } from 'react';
 import { Observer, useLocalStore } from 'mobx-react-lite'
 import Ueditor from '../../../component/Ueditor'
 import apis from '../../../api'
-import { Button, notification, Input, Form, Tag, Upload, Select, Divider, } from 'antd';
+import { Button, notification, Input, Form, Tag, Upload, Select, Divider, Switch } from 'antd';
 import Icon from '../../../component/Icon'
 import qs from 'qs'
 import * as _ from 'lodash'
@@ -144,7 +144,13 @@ export default function ResourceEdit() {
             ))}
           </Select>
         </Form.Item>
-
+        <Form.Item label="状态" labelCol={lb} wrapperCol={rb}>
+          <Switch checked={local.data.status === 'finished'} onClick={e => {
+            apis.updateResource({ id: local.data.id, status: local.data.status === 'finished' ? 'loading' : 'finished' }).then(() => {
+              local.data.status = local.data.status === 'finished' ? 'loading' : 'finished'
+            })
+          }} /> {local.data.status}
+        </Form.Item>
         <Form.Item label="分类" labelCol={lb} wrapperCol={rb}>
           {local.data.types.map((type, index) => <Tag key={index} closable onClose={() => { local.data.types.filter(t => t !== type) }}>{type}</Tag>)}
           {local.data.typeAddVisible && (
