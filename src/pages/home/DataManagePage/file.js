@@ -185,7 +185,7 @@ export default function TaskList() {
                         const id = local.template_data.id;
                         const data = {
                             filename: local.template_data.filename,
-                            files: local.chosen_files.map(file => local.dirpath + file),
+                            files: local.chosen_files,
                         }
                         await apis.excuteTemplate(id, data)
                         local.show_cmd = false;
