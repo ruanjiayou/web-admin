@@ -111,10 +111,6 @@ export default function TaskList() {
                     </Upload>
                     <Divider type="vertical" />
                     <Button disabled={local.chosen_files.length === 0} loading={local.isExcuting} onClick={() => {
-                        local.template_data.filename = '';
-                        local.template_data.id = ''
-                        local.template_data.placeholder = '';
-                        local.template_data.files_limit = 0;
                         if (outputRef.current) {
                             outputRef.current.value = ''
                         }
@@ -196,7 +192,7 @@ export default function TaskList() {
                 }}
             >
                 <Input
-                    addonBefore={<Select style={{ width: 150 }} defaultValue={""} onSelect={v => {
+                    addonBefore={<Select style={{ width: 150 }} value={local.template_data.id} onSelect={v => {
                         local.template_data.id = v;
                         const item = local.cmd_templates.find(item => item.name === v);
                         if (item) {
