@@ -26,8 +26,8 @@ export function createRouter(history) {
     goPage(pathname, search, state) {
       history.push(pathname, search, state)
     },
-    replacePage() {
-
+    replacePage(pathname, search = {}) {
+      window.history.replaceState(null, '',pathname + '?home=' + search.home || '/')
     },
   }
   return [router, context]

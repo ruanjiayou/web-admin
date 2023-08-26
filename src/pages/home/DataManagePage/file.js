@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback, Fragment, useRef } from 'react';
 import { Observer, useLocalStore } from 'mobx-react-lite'
 import { Table, Popconfirm, notification, Button, Divider, Input, Upload, message, Checkbox, Select, } from 'antd';
-import { DeleteOutlined, WarningOutlined, ArrowLeftOutlined, ScanOutlined, UploadOutlined, CheckOutlined, FormOutlined, LoadingOutlined, CloseCircleOutlined } from '@ant-design/icons'
+import { DeleteOutlined, WarningOutlined, ArrowLeftOutlined, ScanOutlined, UploadOutlined, CheckOutlined, FormOutlined, LoadingOutlined, CloseCircleOutlined, HomeOutlined } from '@ant-design/icons'
 import apis from '../../../api'
 import store from '../../../store'
 import { FullHeight, FullHeightFix, FullHeightAuto, Right, padding } from '../../../component/style'
@@ -10,6 +10,7 @@ import Modal from 'antd/lib/modal/Modal';
 import { Link } from 'react-router-dom';
 import { QRCode } from 'react-qrcode'
 import { HoverTitle } from './file.style'
+import { useRouter } from '../../../contexts';
 
 const { getFiles, createFile, destroyFile, renameFile } = apis
 const { Column } = Table;
@@ -19,6 +20,9 @@ export default function TaskList() {
         isLoading: false,
         showModal: false,
         dirpath: '/',
+        get dirLevel() {
+            return this.dirpath.split('/').filter(n => !!n).length;
+        },
         tempname: '',
         isDir: 0,
         uploading: false,
@@ -40,17 +44,20 @@ export default function TaskList() {
             { name: 'transcode_mp4', title: '转码为mp4', placeholder: '输入转码后的文件名(如 default.mp4)', limit: 1 },
         ],
     }))
+    const router = useRouter();
     const nameRef = useRef(null)
     const outputRef = useRef(null)
     const searchRef = useRef(null)
-    const search = useCallback(() => {
+    const search = useCallback((dir) => {
         local.isLoading = true
         local.chosen_files = [];
-        getFiles({ param: local.dirpath }).then(res => {
+        getFiles({ param: dir }).then(res => {
+            local.dirpath = dir;
             local.isLoading = false
             local.files = res.data.sort((a, b) => {
                 return b.dir ? 1 : -1
-            })
+            });
+            router.replacePage(router.pathname, { home: dir })
         }).catch(() => {
             local.isLoading = false
         })
@@ -64,8 +71,17 @@ export default function TaskList() {
             local.q = q;
         }
     }, [])
+    const jump = useCallback((i) => {
+        const paths = local.dirpath.split('/');
+        let result_path = '';
+        for (let k = 0; k <= i; k++) {
+            result_path = result_path + paths[k] + '/';
+        }
+        search(result_path);
+    })
     useEffect(() => {
-        search()
+        const query = router.getQuery();
+        search(query.home || '/')
     })
     return <Observer>{() => (
         <FullHeight>
@@ -113,6 +129,7 @@ export default function TaskList() {
                     <Button disabled={local.chosen_files.length === 0} loading={local.isExcuting} onClick={() => {
                         if (outputRef.current) {
                             outputRef.current.value = ''
+                            outputRef.current.state.value = '';
                         }
                         local.show_cmd = true;
                     }}>执行命令</Button>
@@ -146,7 +163,7 @@ export default function TaskList() {
                                 oinput.value = ''
                                 nameRef.current.state.value = ''
                                 local.showModal = false
-                                search()
+                                search(local.dirpath)
                                 notification.success({ message: '创建成功' });
                             } else {
                                 notification.error({ message: '创建失败' });
@@ -165,48 +182,56 @@ export default function TaskList() {
             </Modal>
             <Modal
                 visible={local.show_cmd}
-                okText="执行"
-                cancelText="取消"
-                closable={false}
-                onCancel={() => local.show_cmd = false}
-                onOk={async () => {
-                    local.template_data.filename = local.template_data.filename.trim()
-                    if (!local.template_data.id || !local.template_data.filename) {
-                        return notification.warn({ message: '缺少必要参数' })
-                    }
-                    if (local.template_data.limit !== 0 && local.chosen_files.length !== local.template_data.limit) {
-                        return notification.warn({ message: '文件个数不符合要求' })
-                    }
-                    local.isExcuting = true;
-                    try {
-                        const id = local.template_data.id;
-                        const data = {
-                            filename: local.template_data.filename,
-                            files: local.chosen_files,
+                footer={<div style={{ textAlign: 'right' }}>
+                    <Button type="ghost" onClick={() => { local.show_cmd = false }}>取消</Button>
+                    <Button type="primary" disabled={local.isExcuting} onClick={async () => {
+                        local.template_data.filename = local.template_data.filename.trim()
+                        if (!local.template_data.id || !local.template_data.filename) {
+                            return notification.warn({ message: '缺少必要参数' })
                         }
-                        await apis.excuteTemplate(id, data)
-                        local.show_cmd = false;
-                    } finally {
-                        local.isExcuting = false;
-                    }
-                }}
+                        if (local.template_data.limit !== 0 && local.chosen_files.length !== local.template_data.limit) {
+                            return notification.warn({ message: '文件个数不符合要求' })
+                        }
+                        local.isExcuting = true;
+                        try {
+                            const id = local.template_data.id;
+                            const data = {
+                                filename: local.template_data.filename,
+                                files: local.chosen_files,
+                            }
+                            await apis.excuteTemplate(id, data)
+                            if (outputRef.current) {
+                                outputRef.current.value = '';
+                            }
+                            search(local.dirpath);
+                            local.show_cmd = false;
+                        } finally {
+                            local.isExcuting = false;
+                        }
+                    }}>执行</Button>
+                </div>}
+                closable={false}
             >
                 <Input
-                    addonBefore={<Select style={{ width: 150 }} value={local.template_data.id} onSelect={v => {
-                        local.template_data.id = v;
-                        const item = local.cmd_templates.find(item => item.name === v);
-                        if (item) {
-                            local.template_data.placeholder = item.placeholder;
-                            local.template_data.limit = item.limit;
-                        }
-                    }}>
+                    addonBefore={<Select
+                        style={{ width: 150 }}
+                        value={local.template_data.id}
+                        disabled={local.isExcuting}
+                        onSelect={v => {
+                            local.template_data.id = v;
+                            const item = local.cmd_templates.find(item => item.name === v);
+                            if (item) {
+                                local.template_data.placeholder = item.placeholder;
+                                local.template_data.limit = item.limit;
+                            }
+                        }}>
                         <Select.Option value="">请选择</Select.Option>
                         {local.cmd_templates.map(tpl => (
                             <Select.Option value={tpl.name} key={tpl.name}>{tpl.title}</Select.Option>
                         ))}
                     </Select>}
                     defaultValue={''}
-                    disabled={local.isLoading}
+                    disabled={local.isExcuting}
                     placeholder={local.template_data.placeholder}
                     ref={ref => outputRef.current = ref}
                     onChange={e => {
@@ -229,23 +254,34 @@ export default function TaskList() {
                             }
                         }} />
                     }} />
-                    <Column title={<span>{local.dirpath !== '/' && <ArrowLeftOutlined onClick={() => {
-                        const sp = local.dirpath.substr(1, local.dirpath.length - 2).split('/')
-                        sp.pop();
-                        local.dirpath = '/' + sp.join('/')
-                        search()
-                    }} />}文件名</span>} dataIndex="name" key="name" render={(text, record) => {
+                    <Column title={
+                        <span>
+                            <HomeOutlined onClick={() => jump(0)} />&nbsp;/&nbsp;
+                            {
+                                local.dirpath
+                                    .split('/')
+                                    .filter(n => !!n)
+                                    .map((name, i) => <span key={i} style={i !== local.dirLevel ? { cursor: 'pointer' } : {}} onClick={() => {
+                                        if (i !== local.dirLevel)
+                                            jump(i + 1)
+                                    }}>
+                                        {name}
+                                        <span style={{ margin: 3 }}>/</span>
+                                    </span>)
+                            }
+                        </span>
+                    } dataIndex="name" key="name" render={(text, record) => {
                         return <Observer>{() => {
                             if (record.dir) {
                                 return <Link to={''} onClick={(e) => {
                                     e.stopPropagation()
                                     e.preventDefault()
-                                    local.dirpath += text + '/';
+                                    const new_dir = local.dirpath + text + '/';
                                     local.q = '';
                                     if (searchRef.current) {
                                         searchRef.current.value = ''
                                     }
-                                    search()
+                                    search(new_dir)
                                 }}>{text}</Link>
                             } else if (record.editing) {
                                 return <Input
@@ -258,7 +294,7 @@ export default function TaskList() {
                                             record.isLoading = true
                                             try {
                                                 await renameFile({ dirpath: local.dirpath, oldname: text, newname: o.value })
-                                                search()
+                                                search(local.dirpath)
                                                 record.editing = false
                                             } catch (e) {
                                                 message.info(e.message)
@@ -279,7 +315,7 @@ export default function TaskList() {
                         return <Fragment>
                             <VisualBox visible={record.dir === true}>
                                 <Popconfirm title={`确定删除 ${record.name} 所有子文件?`} okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={() => {
-                                    destroyFile({ param: local.dirpath + record.name, isDir: 1 }).then(() => search())
+                                    destroyFile({ param: local.dirpath + record.name, isDir: 1 }).then(() => search(local.dirpath))
                                 }}>
                                     <DeleteOutlined />
                                 </Popconfirm>
@@ -296,7 +332,7 @@ export default function TaskList() {
                                 }} /> */}
                                 <Divider type="vertical" />
                                 <Popconfirm title="确定?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={() => {
-                                    destroyFile({ param: local.dirpath + record.name }).then(() => search())
+                                    destroyFile({ param: local.dirpath + record.name }).then(() => search(local.dirpath))
                                 }}>
                                     <DeleteOutlined />
                                 </Popconfirm>
