@@ -142,7 +142,7 @@ export default function TaskList() {
                         }, 300)
                     }}>创建文件夹</Button>
                     <Divider type="vertical" />
-                    <Button onClick={() => search(local.dirpath)}>刷新</Button>
+                    <Button disabled={local.isLoading} onClick={() => search(local.dirpath)}>刷新</Button>
                 </Right>
             </FullHeightFix>
             <Modal
