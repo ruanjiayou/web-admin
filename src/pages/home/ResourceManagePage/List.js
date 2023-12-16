@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 // import LoadingView from '../HolderView/LoadingView'
 import apis from '../../../api';
 import { Table, Popconfirm, notification, Select, Tag, Divider, } from 'antd';
-import { FormOutlined, DeleteOutlined, WarningOutlined, CloudServerOutlined, SyncOutlined, CloudSyncOutlined } from '@ant-design/icons'
+import { FormOutlined, DeleteOutlined, WarningOutlined, CloudServerOutlined, SyncOutlined, CloudSyncOutlined, LinkOutlined } from '@ant-design/icons'
 import { Icon, VisualBox, EditTag } from '../../../component'
 import store from '../../../store'
 
@@ -60,6 +60,12 @@ export default function ResourceList({ items, children, categories, search, loca
 				)}
 				</Observer>
 			)} />
+			<Column title="" width={20} dataIndex="origin" key="origin" render={(url, record) => {
+				if (url) {
+					return <a href={url} target='_blank'><LinkOutlined /></a>
+				}
+				return null;
+			}} />
 			<Column title="标题" width={200} dataIndex="title" key="title" render={(text, record) => {
 				let isDev = window.origin.includes('localhost:3000') ? true : false;
 				let url = isDev ? 'http://localhost:8097' : window.origin;
