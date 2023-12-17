@@ -4,9 +4,11 @@ import { Link } from 'react-router-dom'
 // import LoadingView from '../HolderView/LoadingView'
 import apis from '../../../api';
 import { Table, Popconfirm, notification, Select, Tag, Divider, } from 'antd';
-import { FormOutlined, DeleteOutlined, WarningOutlined, CloudServerOutlined, SyncOutlined, CloudSyncOutlined, LinkOutlined } from '@ant-design/icons'
+import { FormOutlined, DeleteOutlined, WarningOutlined, CloudServerOutlined, SyncOutlined, CloudSyncOutlined, LinkOutlined, SwitcherOutlined } from '@ant-design/icons'
 import { Icon, VisualBox, EditTag } from '../../../component'
+import { CenterXY } from '../../../component/style'
 import store from '../../../store'
+import Clipboard from 'react-clipboard.js';
 
 const { Column } = Table;
 const StatusMap = {
@@ -61,10 +63,13 @@ export default function ResourceList({ items, children, categories, search, loca
 				</Observer>
 			)} />
 			<Column title="" width={20} dataIndex="origin" key="origin" render={(url, record) => {
-				if (url) {
-					return <a href={url} target='_blank'><LinkOutlined /></a>
-				}
-				return null;
+				return <CenterXY>
+					{url && <a href={url} target='_blank'><LinkOutlined /></a>}
+					&nbsp;&nbsp;
+					<Clipboard data-clipboard-text={record.id} component={'a'}>
+						<SwitcherOutlined />
+					</Clipboard>
+				</CenterXY>
 			}} />
 			<Column title="标题" width={200} dataIndex="title" key="title" render={(text, record) => {
 				let isDev = window.origin.includes('localhost:3000') ? true : false;
