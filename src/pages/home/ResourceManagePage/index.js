@@ -11,6 +11,7 @@ import store from '../../../store'
 import { Right } from '../../../component/style';
 import CodeEditor from '../../../component/CodeEditor'
 import { match } from 'path-to-regexp'
+import { events } from '../../../utils/events';
 
 const { getResources, search, createResource, updateResource, destroyResource, getGroupTypes, v2getRules, v2GetResourceByRule, v2previewRule } = apis
 
@@ -81,7 +82,20 @@ export default function ResourceManagePage() {
     getGroupTypes().then(result => {
       local.categories = result.data
       console.log(result, 'types')
-    })
+    });
+    function resource_change(data) {
+      if (data.resource_type === 'resource') {
+        local.resources.forEach(resource => {
+          if (resource.id === data.resource_id) {
+            resource.status = data.status;
+          }
+        })
+      }
+    }
+    events.on('resource_change', resource_change);
+    return () => {
+      events.off('resource_change', resource_change)
+    }
   }, [])
   return (<Observer>{() => {
     return <div className={'box'}>

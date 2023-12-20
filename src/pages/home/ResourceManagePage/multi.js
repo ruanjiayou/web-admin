@@ -2,7 +2,7 @@ import React, { useCallback, Fragment, useRef } from 'react';
 import { useEffectOnce } from 'react-use'
 import { Observer, useLocalStore } from 'mobx-react-lite'
 import apis from '../../../api'
-import { Button, notification, Input, Form, Tag, Upload, Select, Divider, Switch, message, Modal, Radio } from 'antd';
+import { Button, notification, Input, Form, Tag, Upload, Select, Divider, Switch, message, Modal, Radio, Row, Col } from 'antd';
 import { SortListView } from '../../../component'
 import Icon from '../../../component/Icon'
 import qs from 'qs'
@@ -14,6 +14,7 @@ import api from '../../../api';
 import { formatNumber } from '../../../utils/helper'
 import { FullWidth, FullHeightAuto, AlignVertical, FullWidthFix, FullHeight } from '../../../component/style';
 import TextArea from 'antd/lib/input/TextArea';
+import { events } from '../../../utils/events';
 
 function deepEqual(a, b) {
   const keys = Array.from(new Set([...Object.keys(a), ...Object.keys(b)]));
@@ -74,6 +75,23 @@ export default function ResourceEdit() {
       local.video_formats = [];
       local.audio_formats = [];
     },
+    setStatus(status) {
+      local.data.status = status;
+    },
+    setVideoStatus(id, status) {
+      local.data.videos.forEach(video => {
+        if (video.id === id) {
+          video.status = status;
+        }
+      })
+    },
+    setImageStatus(id, status) {
+      local.data.images.forEach(image => {
+        if (image.id === id) {
+          image.status = status;
+        }
+      })
+    }
   }))
   const onEdit = useCallback(async (sync = false) => {
     const changed = !deepEqual(toJS(local.origin), toJS(local.data));
@@ -89,6 +107,17 @@ export default function ResourceEdit() {
     local.loading = false;
   }, [])
   useEffectOnce(() => {
+    function changeResource(data) {
+      const resource_id = data.resource_id;
+      if (data.resource_type === 'resource' && resource_id === local.id) {
+        local.data.status = data.status;
+      } else if (data.resource_type === 'video') {
+        local.setVideoStatus(resource_id, data.status)
+      } else if (data.resource_type === 'image') {
+        local.setImageStatus(resource_id, data.status);
+      }
+    }
+    events.on('resource_change', changeResource);
     if (local.id) {
       local.loading = true
       apis.getResource({ id: local.id }).then(res => {
@@ -106,54 +135,84 @@ export default function ResourceEdit() {
         local.loading = false
       })
     }
+    return () => {
+      events.off(changeResource);
+    }
   })
 
   return <Observer>{() => (<Fragment>
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', }}>
       <div style={{ flex: 1, overflowY: 'auto', paddingTop: 20 }}>
-        <Form.Item label="标题" labelCol={lb} wrapperCol={rb}>
-          <Input style={{ width: '50%' }} value={local.data.title} autoFocus onChange={e => local.data.title = e.target.value} />
-        </Form.Item>
-        <Form.Item label="别名" labelCol={lb} wrapperCol={rb}>
-          <Input style={{ width: '50%' }} value={local.data.alias} onChange={e => local.data.alias = e.target.value} />
-        </Form.Item>
+        <Row style={{ alignItems: 'center', margin: 8 }}>
+          <Col span={3} style={{ textAlign: 'right' }}>
+            标题：
+          </Col>
+          <Col className="gutter-row" span={9}>
+            <Input value={local.data.title} autoFocus onChange={e => local.data.title = e.target.value} />
+          </Col>
+          <Divider type='vertical' />
+          <div>别名：</div>
+          <Col className="gutter-row" span={6}>
+            <Input style={{ width: '50%' }} value={local.data.alias} onChange={e => local.data.alias = e.target.value} />
+          </Col>
+        </Row>
         <Form.Item label="描述" labelCol={lb} wrapperCol={rb}>
           <TextArea style={{ width: '50%' }} value={local.data.desc} onChange={e => local.data.desc = e.target.value} />
         </Form.Item>
-        <Form.Item label="系列" labelCol={lb} wrapperCol={rb}>
-          <Input style={{ width: '50%' }} value={local.data.series} onChange={e => local.data.series = e.target.value} />
-        </Form.Item>
-        <Form.Item label="发布时间" labelCol={lb} wrapperCol={rb}>
-          <Input style={{ width: '50%' }} value={local.data.publishedAt} onChange={e => local.data.publishedAt = e.target.value} />
-        </Form.Item>
+        <Row style={{ alignItems: 'center', margin: 8 }}>
+          <Col span={3} style={{ textAlign: 'right' }}>
+            系列：
+          </Col>
+          <Col className="gutter-row" span={9}>
+            <Input value={local.data.series} onChange={e => local.data.series = e.target.value} />
+          </Col>
+          <Divider type='vertical' />
+          <div>发布时间：</div>
+          <Col className="gutter-row" span={6}>
+            <Input style={{ width: '50%' }} value={local.data.publishedAt} onChange={e => local.data.publishedAt = e.target.value} />
+          </Col>
+        </Row>
         <Form.Item label="来源" labelCol={lb} wrapperCol={rb}>
           <Input style={{ width: '50%' }} value={local.data.origin} onChange={e => local.data.origin = e.target.value} />
         </Form.Item>
-        <Form.Item label="来源id" labelCol={lb} wrapperCol={rb}>
-          <Input style={{ width: '50%' }} value={local.data.source_id} onChange={e => local.data.source_id = e.target.value} />
-        </Form.Item>
-        <Form.Item label="规则id" labelCol={lb} wrapperCol={rb}>
-          <Input style={{ width: '50%' }} value={local.data.spider_id} onChange={e => local.data.spider_id = e.target.value} />
-        </Form.Item>
+        <Row style={{ alignItems: 'center', margin: 8 }}>
+          <Col span={3} style={{ textAlign: 'right' }}>
+            规则id：
+          </Col>
+          <Col className="gutter-row" span={9}>
+            <Input value={local.data.spider_id} onChange={e => local.data.spider_id = e.target.value} />
+          </Col>
+          <Divider type='vertical' />
+          <div>来源id：</div>
+          <Col className="gutter-row" span={6}>
+            <Input value={local.data.source_id} onChange={e => local.data.source_id = e.target.value} />
+          </Col>
+        </Row>
         <Form.Item label="统一编号" labelCol={lb} wrapperCol={rb}>
           <Input style={{ width: '50%' }} value={local.data.cspn} onChange={e => local.data.cspn = e.target.value} />
         </Form.Item>
-        <Form.Item label="状态" labelCol={lb} wrapperCol={rb}>
-          <Switch checked={local.data.status === 'finished'} onClick={e => {
-            local.data.status = local.data.status === 'finished' ? 'loading' : 'finished'
-            onEdit()
-          }} /> {local.data.status}
-          <Divider type="vertical" />
-          <span>公开:</span>
-          <Switch checked={local.data.open} onClick={e => {
-            local.data.open = !local.data.open;
-            onEdit()
-          }} /> {local.data.open}
-        </Form.Item>
-        <Form.Item label="资源类型" labelCol={lb} wrapperCol={rb}>
-          <FullWidth>
-            <FullWidthFix style={{ width: '25%' }}>
-              <Select value={local.data.source_type} onChange={value => {
+        <Row style={{ alignItems: 'center', margin: 8 }}>
+          <Col span={3} style={{ textAlign: 'right' }}>
+            状态：
+          </Col>
+          <Col className="gutter-row" span={3}>
+            <Switch checked={local.data.status === 'finished'} onClick={e => {
+              local.data.status = local.data.status === 'finished' ? 'loading' : 'finished'
+              onEdit()
+            }} /> {local.data.status}
+          </Col>
+
+          <Col className="gutter-row" span={3}>公开：
+            <Switch checked={local.data.open} onClick={e => {
+              local.data.open = !local.data.open;
+              onEdit()
+            }} /> {local.data.open}
+          </Col>
+
+          <Row style={{ alignItems: 'center' }}>
+            <div>资源类型：</div>
+            <FullWidthFix >
+              <Select style={{ width: 150 }} value={local.data.source_type} onChange={value => {
                 local.data.source_type = value
               }}>
                 {store.resource_types.map(type => (
@@ -161,10 +220,12 @@ export default function ResourceEdit() {
                 ))}
               </Select>
             </FullWidthFix>
-            <Divider type="vertical" />
-            <div>国家地区: </div>
-            <FullWidthFix style={{ width: '25%' }}>
-              <Select value={local.data.country} onChange={value => {
+          </Row>
+          <Col span={1}></Col>
+          <Row style={{ alignItems: 'center' }}>
+            <div>地区：</div>
+            <FullWidthFix>
+              <Select style={{ width: 150 }} value={local.data.country} onChange={value => {
                 local.data.country = value
               }}>
                 {store.regions.map(region => (
@@ -172,8 +233,8 @@ export default function ResourceEdit() {
                 ))}
               </Select>
             </FullWidthFix>
-          </FullWidth>
-        </Form.Item>
+          </Row>
+        </Row>
         <Form.Item label="分类" labelCol={lb} wrapperCol={rb}>
           {local.data.types.map((type, index) => <Tag key={index} closable onClose={() => { local.data.types.filter(t => t !== type) }}>{type}</Tag>)}
           {local.typeAddVisible && (
@@ -394,38 +455,41 @@ export default function ResourceEdit() {
                     defaultValue={item.url}
                     disabled
                     addonBefore={
-                      <Observer>{() => (
-                        <Fragment>
-                          <Select style={{ width: 90 }} value={item.status} onChange={async (status) => {
-                            item.loading = true
-                            try {
-                              await api.updateResourceVideo(local.id, { id: item.id, status })
-                              item.status = status
-                            } finally {
-                              item.loading = false
-                            }
-                          }}>
-                            <Select.Option value="init">初始化</Select.Option>
-                            <Select.Option value="loading">下载中</Select.Option>
-                            <Select.Option value="finished">已下载</Select.Option>
-                            <Select.Option value="fail">失败</Select.Option>
-                          </Select>
-                          <Divider type="vertical" />
-                          <Select style={{ width: 80 }} value={item.type} onChange={async (type) => {
-                            item.loading = true
-                            try {
-                              await api.updateResourceVideo(local.id, { id: item.id, type })
-                              item.type = type
-                            } finally {
-                              item.loading = false
-                            }
-                          }}>
-                            <Select.Option value="normal">正片</Select.Option>
-                            <Select.Option value="trailer">预告</Select.Option>
-                            <Select.Option value="tidbits">花絮</Select.Option>
-                          </Select>
-                        </Fragment>
-                      )}</Observer>
+                      <Observer>{() => {
+                        console.log(item)
+                        return (
+                          <Fragment>
+                            <Select style={{ width: 90 }} value={item.status} onChange={async (status) => {
+                              item.loading = true
+                              try {
+                                await api.updateResourceVideo(local.id, { id: item.id, status })
+                                item.status = status
+                              } finally {
+                                item.loading = false
+                              }
+                            }}>
+                              <Select.Option value="init">初始化</Select.Option>
+                              <Select.Option value="loading">下载中</Select.Option>
+                              <Select.Option value="finished">已下载</Select.Option>
+                              <Select.Option value="fail">失败</Select.Option>
+                            </Select>
+                            <Divider type="vertical" />
+                            <Select style={{ width: 80 }} value={item.type} onChange={async (type) => {
+                              item.loading = true
+                              try {
+                                await api.updateResourceVideo(local.id, { id: item.id, type })
+                                item.type = type
+                              } finally {
+                                item.loading = false
+                              }
+                            }}>
+                              <Select.Option value="normal">正片</Select.Option>
+                              <Select.Option value="trailer">预告</Select.Option>
+                              <Select.Option value="tidbits">花絮</Select.Option>
+                            </Select>
+                          </Fragment>
+                        )
+                      }}</Observer>
                     }
                     addonAfter={!local.fullEditVideo ? <Observer>{() => (
                       <CloseOutlined disabled={item.loading || item.status === 'loading'} onClick={async () => {
