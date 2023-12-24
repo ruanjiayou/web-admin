@@ -456,14 +456,17 @@ export default function ResourceEdit() {
                     disabled
                     addonBefore={
                       <Observer>{() => {
-                        console.log(item)
                         return (
                           <Fragment>
                             <Select style={{ width: 90 }} value={item.status} onChange={async (status) => {
                               item.loading = true
                               try {
-                                await api.updateResourceVideo(local.id, { id: item.id, status })
-                                item.status = status
+                                const result = await api.updateResourceVideo(local.id, { id: item.id, status })
+                                if(result.code === 0) {
+                                  item.status = status
+                                } else {
+                                  message.error(result.message)
+                                }
                               } finally {
                                 item.loading = false
                               }
