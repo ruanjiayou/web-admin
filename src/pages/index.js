@@ -9,6 +9,7 @@ import SyncPage from './home/DataManagePage/sync'
 import RulePage from './home/SpiderManagePage/rule'
 import Rule2Page from './home/SpiderManagePage/rule2'
 import TaskPage from './home/SpiderManagePage/task'
+import DownloadPage from './home/DownloadManagePage'
 import SchedulePage from './home/ScheduleManagePage'
 import ResourceEdit from './home/ResourceManagePage/article'
 import TradePage from './home/StockManagePage/trade'
@@ -42,6 +43,7 @@ import {
   AndroidOutlined,
   QuestionCircleOutlined,
   FolderOutlined,
+  DownloadOutlined,
 } from '@ant-design/icons'
 
 const page_map = {
@@ -70,6 +72,7 @@ const page_map = {
   'ComponentManagePage': ComponentManagePage,
   'FeedbackPage': FeedbackPage,
   'SpiderPage': SpiderPage,
+  'DownloadPage': DownloadPage,
 }
 export const icon_map = {
   LinkOutlined,
@@ -89,6 +92,7 @@ export const icon_map = {
   AndroidOutlined,
   QuestionCircleOutlined,
   FolderOutlined,
+  DownloadOutlined,
 };
 
 export function pagination(menus) {
