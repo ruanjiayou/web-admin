@@ -3,10 +3,10 @@ import { Observer, useLocalStore } from 'mobx-react-lite'
 import axios from 'axios'
 import { useEffectOnce } from 'react-use';
 import { Table, Popconfirm, notification, Select, Tag, Divider, message, Tooltip, Button, Form, Input, Radio, Modal } from 'antd';
-import { LinkOutlined, PoweroffOutlined, PlayCircleOutlined, PlusCircleOutlined, SyncOutlined, FormOutlined } from '@ant-design/icons'
+import { LinkOutlined, PoweroffOutlined, PlayCircleOutlined, PlusCircleOutlined, SyncOutlined, FormOutlined, DeleteOutlined } from '@ant-design/icons'
 import { events } from '../../../utils/events';
 
-
+const download_api_url = 'https://192.168.0.124/gw/download';
 const { Column } = Table;
 const Item = Form.Item;
 
@@ -34,7 +34,7 @@ export default function Page() {
   const onSearch = useCallback(async () => {
     try {
       local.loading = true;
-      const resp = await axios.get('https://192.168.0.124/gw/download/tasks?page=' + local.page);
+      const resp = await axios.get(`${download_api_url}/tasks?page=${local.page}`);
       if (resp.status === 200) {
         const result = resp.data;
         if (result.code === 0) {
@@ -97,13 +97,13 @@ export default function Page() {
             <div style={{ height: 22, backgroundColor: 'grey', color: 'white' }}>
               {task.params.finished * 2 > task.params.total ? <div style={{ backgroundColor: '#54c77d', color: 'white', textAlign: 'right', width: `${Math.round(100 * task.params.finished / task.params.total)}%` }}>{task.params.finished + '/' + task.params.total + ''}&nbsp;</div> : (
                 <Fragment>
-                  <div style={{ backgroundColor: '#54c77d', color: 'white', width: `${Math.round(100 * task.params.finished / task.params.total)}%` }}></div>
+                  <div style={{ float: 'left', backgroundColor: '#54c77d', height: 22, color: 'white', width: `${Math.round(100 * task.params.finished / task.params.total)}%` }}></div>
                   &nbsp;&nbsp;{task.params.finished + '/' + task.params.total}
                 </Fragment>)}
             </div>
           </div>
         )} />
-        <Column title="状态" dataIndex={'status'} render={status => {
+        <Column title="下载状态" width={100} dataIndex={'status'} render={status => {
           if (status === 1) {
             return '已解析'
           } else if (status === 2) {
@@ -116,14 +116,14 @@ export default function Page() {
             return '未知状态'
           }
         }} />
-        <Column dataIndex={'_id'} render={(id, task) => (
-          <div>
+        <Column title="转码状态" width={120} dataIndex={'transcode'} key="transcode" render={(transcode, task) => (
+          <Fragment>
             {task.status === 1 && <PlayCircleOutlined />}
             {task.status === 2 && <PoweroffOutlined />}
             {(task.status === 3 && task.transcode === 1) ? <Button disabled={local.loading} type='link' onClick={async () => {
               try {
                 local.loading = true
-                await axios.post(`https://192.168.0.124/gw/download/excute/transcode`, { id: task._id });
+                await axios.post(`${download_api_url}/excute/transcode`, { id: task._id });
                 task.transcode = 2;
               } finally {
                 local.loading = false
@@ -132,6 +132,21 @@ export default function Page() {
             {task.status === 3 && task.transcode === 2 && <SyncOutlined />}
             {task.status === 3 && task.transcode === 3 && '转码成功'}
             {task.status === 3 && task.transcode === 4 && '转码失败'}
+          </Fragment>
+        )} />
+        <Column dataIndex={'_id'} render={(id, task) => (
+          <div>
+            <DeleteOutlined onClick={async () => {
+              try {
+                local.loading = true;
+                await axios.delete(`${download_api_url}/tasks/${id}`);
+                await onSearch();
+              } catch (e) {
+                message.error('删除失败')
+              } finally {
+                local.loading = false;
+              }
+            }} />
             <Divider type='vertical' />
             <FormOutlined onClick={() => {
               local.edit_id = task._id

@@ -18,10 +18,11 @@ const { getFiles, createFile, destroyFile, renameFile } = apis
 const { Column } = Table;
 
 export default function TaskList() {
+  const router = useRouter();
   const local = useLocalStore(() => ({
     isLoading: false,
     showModal: false,
-    dirpath: '/',
+    dirpath: '/downloads/',
     get dirLevel() {
       return this.dirpath.split('/').filter(n => !!n).length;
     },
@@ -47,7 +48,6 @@ export default function TaskList() {
       { name: 'transcode_mp4', title: '转码为mp4', placeholder: '输入转码后的文件名(如 default.mp4)', limit: 1 },
     ],
   }))
-  const router = useRouter();
   const nameRef = useRef(null)
   const outputRef = useRef(null)
   const searchRef = useRef(null)
@@ -84,7 +84,7 @@ export default function TaskList() {
   })
   useEffect(() => {
     const query = router.getQuery();
-    search(query.home || '/')
+    search(local.dirpath)
   })
   return <Observer>{() => (
     <FullHeight>

@@ -10,7 +10,7 @@ import { FullHeight, FullHeightAuto, FullHeightFix } from './component/style';
 
 function NoMatch() {
   const store = useStore()
-  return store.user.isSignIn ? <Redirect to={store.app.menuKey || '/admin/home/dashboard'} /> : <Redirect to={'/admin/auth/sign-in'} />
+  return store.user.isSignIn ? <Redirect to={store.app.menuKey} /> : <Redirect to={'/admin/auth/sign-in'} />
 }
 
 function Poster(props) {
