@@ -551,7 +551,7 @@ export default function ResourceEdit() {
                             type: item.url.includes('.m3u8') ? 'm3u8' : 'mp4',
                           }
                           await Axios.post(`https://192.168.0.124/gw/download/tasks`, data)
-                          await api.updateResourceVideo(item.id, { status: 'download' })
+                          await api.updateResourceVideo(local.id, { id: item.id, status: 'download' })
                           item.status = 'loading'
                         } catch (e) {
                           console.log(e)
