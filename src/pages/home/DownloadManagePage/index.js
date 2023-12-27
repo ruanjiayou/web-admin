@@ -72,6 +72,7 @@ export default function Page() {
     <Fragment>
       <div style={{ padding: 10, textAlign: 'right' }}>
         <Button type='primary' onClick={() => {
+          local.edit_id = ''
           local.data = { type: 'm3u8', status: 1, name: '', url: '', proxy: true, transcode: 1, filepath: '', params: {} };
           local.showDialog = true;
         }}>添加</Button>
