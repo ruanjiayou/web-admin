@@ -34,7 +34,7 @@ export default function Page() {
   const onSearch = useCallback(async () => {
     try {
       local.loading = true;
-      const resp = await axios.get('http://192.168.0.124:7777/tasks?page=' + local.page);
+      const resp = await axios.get('https://192.168.0.124/gw/download/tasks?page=' + local.page);
       if (resp.status === 200) {
         const result = resp.data;
         if (result.code === 0) {
@@ -123,7 +123,7 @@ export default function Page() {
             {(task.status === 3 && task.transcode === 1) ? <Button disabled={local.loading} type='link' onClick={async () => {
               try {
                 local.loading = true
-                await axios.post(`http://192.168.0.124:7777/excute/transcode`, { id: task._id });
+                await axios.post(`https://192.168.0.124/gw/download/excute/transcode`, { id: task._id });
                 task.transcode = 2;
               } finally {
                 local.loading = false
@@ -151,7 +151,7 @@ export default function Page() {
           local.loading = true
           try {
             local.loading = true;
-            const resp = local.edit_id ? await axios.put('http://192.168.0.124:7777/tasks/' + local.edit_id, local.data) : await axios.post('http://192.168.0.124:7777/tasks', local.data);
+            const resp = local.edit_id ? await axios.put('https://192.168.0.124/gw/download/tasks/' + local.edit_id, local.data) : await axios.post('https://192.168.0.124/gw/download/tasks', local.data);
             if (resp.status === 200 && resp.data.code === 0) {
               local.showDialog = false;
               message.success('成功')
