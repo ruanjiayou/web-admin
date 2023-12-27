@@ -45,6 +45,8 @@ ws.on('message', (data) => {
     events.emit(data.type, { ...data, resource_type: data.resource_type, resource_id: data.resource_id });
   } else if (data.type === 'progress_change') {
     events.emit(data.type, data)
+  } else if (data.type === 'transcode') {
+    events.emit(data.type, data);
   }
 })
 

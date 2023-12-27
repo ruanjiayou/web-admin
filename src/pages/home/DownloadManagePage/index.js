@@ -38,10 +38,6 @@ export default function Page() {
       if (resp.status === 200) {
         const result = resp.data;
         if (result.code === 0) {
-          const ts = Date.now();
-          result.data.list.forEach((it, i) => {
-            it.ts = ts + i;
-          })
           local.tasks = result.data.list;
           local.total = result.data.total;
         } else {
@@ -61,6 +57,12 @@ export default function Page() {
       local.ts = Date.now();
     }
     events.on('progress_change', progress);
+    events.on('resource_change', function (d) {
+      onSearch();
+    });
+    events.on('transcode', function (d) {
+      onSearch();
+    })
     return () => {
       events.off('progress_change', progress);
     }
@@ -87,12 +89,12 @@ export default function Page() {
         <Column title="" width={30} dataIndex={'url'} render={url => (
           <a href={url} target='_blank' style={{ whiteSpace: 'nowrap' }}><LinkOutlined /></a>
         )} />
-        <Column title="名称" width={120} dataIndex={'name'} render={(name, task) => (
+        <Column title="名称" width={150} dataIndex={'name'} render={(name, task) => (
           <Tooltip title={task._id}>
             {name}
           </Tooltip>
         )} />
-        <Column title="进度" dataIndex={'_id'} key={'ts'} render={(id, task) => (
+        <Column title="进度" dataIndex={'_id'} render={(id, task) => (
           <div>
             <div style={{ height: 22, backgroundColor: 'grey', color: 'white' }}>
               {task.params.finished * 2 > task.params.total ? <div style={{ backgroundColor: '#54c77d', color: 'white', textAlign: 'right', width: `${Math.round(100 * task.params.finished / task.params.total)}%` }}>{task.params.finished + '/' + task.params.total + ''}&nbsp;</div> : (
@@ -103,24 +105,54 @@ export default function Page() {
             </div>
           </div>
         )} />
-        <Column title="下载状态" width={100} dataIndex={'status'} render={status => {
+        <Column title="下载状态" width={100} dataIndex={'status'} render={(status, task) => {
           if (status === 1) {
-            return '已解析'
+            return <div>已解析&nbsp;<PlayCircleOutlined onClick={async () => {
+              try {
+                local.loading = true;
+                await axios.post(`${download_api_url}/excute/start`, { id: task._id });
+                task.status = 2;
+              } catch (e) {
+                message.error('启动下载失败')
+              } finally {
+                local.loading = false;
+              }
+            }} /></div>
           } else if (status === 2) {
-            return '下载中'
+            return <div>下载中&nbsp;<PoweroffOutlined onClick={async () => {
+              try {
+                local.loading = true;
+                await axios.post(`${download_api_url}/excute/stop`, { id: task._id });
+                task.status = 1;
+              } catch (e) {
+                message.error('停止下载失败')
+              } finally {
+                local.loading = false;
+              }
+            }} /></div>
           } else if (status === 3) {
-            return '成功'
+            return <div>下载成功 {task.transcode === 3 && <Button type='primary' onClick={async () => {
+              try {
+                local.loading = true;
+                await axios.post(`${download_api_url}/excute/move`, { id: task._id });
+                task.status = 5;
+              } catch (e) {
+                message.error('转移失败')
+              } finally {
+                local.loading = false;
+              }
+            }}>转移文件</Button>}</div>
           } else if (status === 4) {
             return '出错'
+          } else if (status === 5) {
+            return '已完成'
           } else {
             return '未知状态'
           }
         }} />
         <Column title="转码状态" width={120} dataIndex={'transcode'} key="transcode" render={(transcode, task) => (
           <Fragment>
-            {task.status === 1 && <PlayCircleOutlined />}
-            {task.status === 2 && <PoweroffOutlined />}
-            {(task.status === 3 && task.transcode === 1) ? <Button disabled={local.loading} type='link' onClick={async () => {
+            {task.transcode === 1 && (task.status === 3 ? <Button disabled={local.loading} type='link' onClick={async () => {
               try {
                 local.loading = true
                 await axios.post(`${download_api_url}/excute/transcode`, { id: task._id });
@@ -128,10 +160,11 @@ export default function Page() {
               } finally {
                 local.loading = false
               }
-            }}>转码</Button> : null}
-            {task.status === 3 && task.transcode === 2 && <SyncOutlined />}
-            {task.status === 3 && task.transcode === 3 && '转码成功'}
-            {task.status === 3 && task.transcode === 4 && '转码失败'}
+            }}>转码</Button> : '待转码')}
+            {task.transcode === 2 && '转码中'}
+            {task.transcode === 3 && '转码成功'}
+            {task.transcode === 4 && '转码失败'}
+
           </Fragment>
         )} />
         <Column dataIndex={'_id'} render={(id, task) => (
