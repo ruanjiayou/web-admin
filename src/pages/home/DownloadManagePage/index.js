@@ -265,8 +265,9 @@ export default function Page() {
             }}>
               <Radio value={1}>已创建</Radio>
               <Radio value={2}>下载中</Radio>
-              <Radio value={3}>已完成</Radio>
+              <Radio value={3}>已下载</Radio>
               <Radio value={4}>失败</Radio>
+              <Radio value={5}>已完成</Radio>
             </Radio.Group>
           </Item>
           <Item label="转码" labelCol={{ span: 4 }}>
