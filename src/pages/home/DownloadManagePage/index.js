@@ -17,6 +17,7 @@ export default function Page() {
     headers_list: JSON.parse(localStorage.getItem('headers_history') || '[]'),
     loading: false,
     edit_id: '',
+    status: '1,2,3',
     total: 0,
     data: {},
     ts: Date.now(),
@@ -26,6 +27,9 @@ export default function Page() {
         if (task._id === d.id) {
           task.params.total = d.total;
           task.params.finished = d.finished;
+          if (d.total === d.finished) {
+            task.status = 3;
+          }
         }
       })
     }
@@ -34,7 +38,7 @@ export default function Page() {
   const onSearch = useCallback(async () => {
     try {
       local.loading = true;
-      const resp = await axios.get(`${download_api_url}/tasks?page=${local.page}`);
+      const resp = await axios.get(`${download_api_url}/tasks?page=${local.page}&status=${local.status}`);
       if (resp.status === 200) {
         const result = resp.data;
         if (result.code === 0) {
@@ -71,6 +75,19 @@ export default function Page() {
   return <Observer>{() => (
     <Fragment>
       <div style={{ padding: 10, textAlign: 'right' }}>
+        <Select defaultValue={local.status} onChange={(status) => {
+          local.status = status;
+          onSearch();
+        }}>
+          <Select.Option value="">全部</Select.Option>
+          <Select.Option value="1,2,3">未完成</Select.Option>
+          <Select.Option value="1">已解析</Select.Option>
+          <Select.Option value="2">下载中</Select.Option>
+          <Select.Option value="3">已下载</Select.Option>
+          <Select.Option value="4">失败</Select.Option>
+          <Select.Option value="5">已完成</Select.Option>
+        </Select>
+        <Divider type='vertical' />
         <Button type='primary' onClick={() => {
           local.edit_id = ''
           local.data = { type: 'm3u8', status: 1, name: '', url: '', proxy: true, transcode: 1, filepath: '', params: {} };

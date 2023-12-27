@@ -15,6 +15,7 @@ import { formatNumber } from '../../../utils/helper'
 import { FullWidth, FullHeightAuto, AlignVertical, FullWidthFix, FullHeight } from '../../../component/style';
 import TextArea from 'antd/lib/input/TextArea';
 import { events } from '../../../utils/events';
+import Axios from 'axios';
 
 function deepEqual(a, b) {
   const keys = Array.from(new Set([...Object.keys(a), ...Object.keys(b)]));
@@ -452,8 +453,10 @@ export default function ResourceEdit() {
                     </Fragment>
                   )}
                   <Input className="url"
-                    defaultValue={item.url}
-                    disabled
+                    value={item.url}
+                    onChange={(e) => {
+                      item.url = e.target.value;
+                    }}
                     addonBefore={
                       <Observer>{() => {
                         return (
@@ -462,7 +465,7 @@ export default function ResourceEdit() {
                               item.loading = true
                               try {
                                 const result = await api.updateResourceVideo(local.id, { id: item.id, status })
-                                if(result.code === 0) {
+                                if (result.code === 0) {
                                   item.status = status
                                 } else {
                                   message.error(result.message)
@@ -538,11 +541,20 @@ export default function ResourceEdit() {
 
                     )}
                     <Observer>{() => (
-                      <Icon type={item.loading && item.status === 'loading' ? 'loading' : 'download'} disabled={item.loading} onClick={async () => {
+                      <Icon type={item.loading && item.status === 'loading' ? 'loading' : 'download'} disabled={item.loading} onClick={async (e) => {
                         item.loading = true
                         try {
-                          await api.downloadResourceVideo(local.id, item.id)
+                          const data = {
+                            _id: item.id,
+                            url: item.url,
+                            filepath: item.path,
+                            type: item.url.includes('.m3u8') ? 'm3u8' : 'mp4',
+                          }
+                          await Axios.post(`https://192.168.0.124/gw/download/tasks`, data)
+                          await api.updateResourceVideo(item.id, { status: 'download' })
                           item.status = 'loading'
+                        } catch (e) {
+                          console.log(e)
                         } finally {
                           item.loading = false
                         }
