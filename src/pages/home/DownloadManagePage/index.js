@@ -3,7 +3,7 @@ import { Observer, useLocalStore } from 'mobx-react-lite'
 import axios from 'axios'
 import { useEffectOnce } from 'react-use';
 import { Table, Popconfirm, notification, Select, Tag, Divider, message, Tooltip, Button, Form, Input, Radio, Modal } from 'antd';
-import { LinkOutlined, PoweroffOutlined, PlayCircleOutlined, PlusCircleOutlined, SyncOutlined, FormOutlined, DeleteOutlined } from '@ant-design/icons'
+import { LinkOutlined, PoweroffOutlined, PlayCircleOutlined, PlusCircleOutlined, SyncOutlined, FormOutlined, DeleteOutlined, CheckOutlined } from '@ant-design/icons'
 import { events } from '../../../utils/events';
 
 const download_api_url = 'https://192.168.0.124/gw/download';
@@ -159,7 +159,7 @@ export default function Page() {
               } finally {
                 local.loading = false;
               }
-            }}>转移文件</Button>: '下载成功'}</div>
+            }}>转移文件</Button> : '下载成功'}</div>
           } else if (status === 4) {
             return '出错'
           } else if (status === 5) {
@@ -203,6 +203,18 @@ export default function Page() {
               local.edit_id = task._id
               local.data = task;
               local.showDialog = true;
+            }} />
+            <Divider type='vertical' />
+            <CheckOutlined onClick={async () => {
+              try {
+                local.loading = true
+                const res = await axios.post(`${download_api_url}/excute/check`, { id: task._id });
+                if (res.status === 200) {
+                  res.data.code === 0 ? message.success('检查完毕') : message.error(res.data.message || '失败');
+                }
+              } finally {
+                local.loading = false
+              }
             }} />
           </div>
         )} />
