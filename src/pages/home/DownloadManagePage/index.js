@@ -149,7 +149,7 @@ export default function Page() {
               }
             }} /></div>
           } else if (status === 3) {
-            return <div>下载成功 {task.transcode === 3 && <Button type='primary' onClick={async () => {
+            return <div>{task.transcode === 3 ? <Button type='primary' onClick={async () => {
               try {
                 local.loading = true;
                 await axios.post(`${download_api_url}/excute/move`, { id: task._id });
@@ -159,7 +159,7 @@ export default function Page() {
               } finally {
                 local.loading = false;
               }
-            }}>转移文件</Button>}</div>
+            }}>转移文件</Button>: '下载成功'}</div>
           } else if (status === 4) {
             return '出错'
           } else if (status === 5) {

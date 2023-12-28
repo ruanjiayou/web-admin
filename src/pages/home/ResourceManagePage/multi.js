@@ -9,7 +9,7 @@ import qs from 'qs'
 import * as _ from 'lodash'
 import store from '../../../store'
 import { toJS } from 'mobx';
-import { PlusCircleOutlined, CloseOutlined, UploadOutlined } from '@ant-design/icons'
+import { PlusCircleOutlined, CloseOutlined, UploadOutlined, LinkOutlined } from '@ant-design/icons'
 import api from '../../../api';
 import { formatNumber } from '../../../utils/helper'
 import { FullWidth, FullHeightAuto, AlignVertical, FullWidthFix, FullHeight } from '../../../component/style';
@@ -174,7 +174,7 @@ export default function ResourceEdit() {
           </Col>
         </Row>
         <Form.Item label="来源" labelCol={lb} wrapperCol={rb}>
-          <Input style={{ width: '50%' }} value={local.data.origin} onChange={e => local.data.origin = e.target.value} />
+          <Input style={{ width: '50%' }} value={local.data.origin} onChange={e => local.data.origin = e.target.value} addonAfter={local.data.origin && <a href={local.data.origin} target='_blank'><LinkOutlined /></a>} />
         </Form.Item>
         <Row style={{ alignItems: 'center', margin: 8 }}>
           <Col span={3} style={{ textAlign: 'right' }}>
@@ -432,9 +432,9 @@ export default function ResourceEdit() {
             renderItem={({ item, index }) => (
               <FullWidth className="container" style={{ width: '100%' }}>
                 <FullHeightAuto>
+                  <Input className="title" addonBefore={'标题'} defaultValue={item.title} />
                   {local.fullEditVideo && (
                     <Fragment>
-                      <Input className="title" addonBefore={'标题'} defaultValue={item.title} />
                       <Input
                         addonBefore={'字幕'}
                         defaultValue={item.subtitles}
@@ -449,83 +449,75 @@ export default function ResourceEdit() {
                             item.loading = false
                           }
                         }} />} />
-                      <Input className="path" style={{ margin: '5px 0' }} addonBefore={'文件:' + item.nth} defaultValue={item.path} />
+
                     </Fragment>
                   )}
-                  <Input className="url"
-                    value={item.url}
-                    onChange={(e) => {
-                      item.url = e.target.value;
-                    }}
-                    addonBefore={
-                      <Observer>{() => {
-                        return (
-                          <Fragment>
-                            <Select style={{ width: 90 }} value={item.status} onChange={async (status) => {
-                              item.loading = true
-                              try {
-                                const result = await api.updateResourceVideo(local.id, { id: item.id, status })
-                                if (result.code === 0) {
-                                  item.status = status
-                                } else {
-                                  message.error(result.message)
+                  <Observer>{() => (
+                    <Input className="url"
+                      style={{ margin: '10px 0' }}
+                      value={item.url}
+                      onChange={(e) => {
+                        item.url = e.target.value;
+                      }}
+                      addonBefore={
+                        <Observer>{() => {
+                          return (
+                            <Fragment>
+                              <Select style={{ width: 90 }} value={item.status} onChange={async (status) => {
+                                item.loading = true
+                                try {
+                                  const result = await api.updateResourceVideo(local.id, { id: item.id, status })
+                                  if (result.code === 0) {
+                                    item.status = status
+                                  } else {
+                                    message.error(result.message)
+                                  }
+                                } finally {
+                                  item.loading = false
                                 }
-                              } finally {
-                                item.loading = false
-                              }
-                            }}>
-                              <Select.Option value="init">初始化</Select.Option>
-                              <Select.Option value="loading">下载中</Select.Option>
-                              <Select.Option value="finished">已下载</Select.Option>
-                              <Select.Option value="fail">失败</Select.Option>
-                            </Select>
-                            <Divider type="vertical" />
-                            <Select style={{ width: 80 }} value={item.type} onChange={async (type) => {
-                              item.loading = true
-                              try {
-                                await api.updateResourceVideo(local.id, { id: item.id, type })
-                                item.type = type
-                              } finally {
-                                item.loading = false
-                              }
-                            }}>
-                              <Select.Option value="normal">正片</Select.Option>
-                              <Select.Option value="trailer">预告</Select.Option>
-                              <Select.Option value="tidbits">花絮</Select.Option>
-                            </Select>
-                          </Fragment>
-                        )
-                      }}</Observer>
-                    }
-                    addonAfter={!local.fullEditVideo ? <Observer>{() => (
-                      <CloseOutlined disabled={item.loading || item.status === 'loading'} onClick={async () => {
-                        item.loading = true
-                        try {
-                          await api.removeResourceVideo({ id: item.id, mid: local.id })
-                          local.data.videos = local.data.videos.filter(t => t.url !== item.url)
-                        } finally {
-                          item.loading = false
-                        }
-                      }} />
-                    )}</Observer> : null}
-                  />
+                              }}>
+                                <Select.Option value="init">初始化</Select.Option>
+                                <Select.Option value="loading">下载中</Select.Option>
+                                <Select.Option value="finished">已下载</Select.Option>
+                                <Select.Option value="fail">失败</Select.Option>
+                              </Select>
+                              <Divider type="vertical" />
+                              <Select style={{ width: 80 }} value={item.type} onChange={async (type) => {
+                                item.loading = true
+                                try {
+                                  await api.updateResourceVideo(local.id, { id: item.id, type })
+                                  item.type = type
+                                } finally {
+                                  item.loading = false
+                                }
+                              }}>
+                                <Select.Option value="normal">正片</Select.Option>
+                                <Select.Option value="trailer">预告</Select.Option>
+                                <Select.Option value="tidbits">花絮</Select.Option>
+                              </Select>
+                            </Fragment>
+                          )
+                        }}</Observer>
+                      }
+                      addonAfter={!local.fullEditVideo ? <Observer>{() => (
+                        <CloseOutlined disabled={item.loading || item.status === 'loading'} onClick={async () => {
+                          item.loading = true
+                          try {
+                            await api.removeResourceVideo({ id: item.id, mid: local.id })
+                            local.data.videos = local.data.videos.filter(t => t.url !== item.url)
+                          } finally {
+                            item.loading = false
+                          }
+                        }} />
+                      )}</Observer> : null}
+                    />
+                  )}</Observer>
+                  <Input className="path" addonBefore={'文件:' + item.nth} defaultValue={item.path} />
                 </FullHeightAuto>
                 <FullHeight>
                   <AlignVertical style={{ padding: '0 10px' }}>
                     {local.fullEditVideo && (
                       <Fragment>
-                        <Icon type="check" onClick={async (e) => {
-                          const container = e.target.closest('.container');
-                          const otitle = container.querySelector('.title input');
-                          const opath = container.querySelector('.path input');
-                          const ourl = container.querySelectorAll('.url input')[2];
-                          item.loading = true
-                          try {
-                            await api.updateResourceVideo(local.id, { id: item.id, url: ourl.value, path: opath.value, title: otitle.value });
-                          } finally {
-                            item.loading = false
-                          }
-                        }} />
                         <Observer>{() => (
                           <CloseOutlined disabled={item.loading || item.status === 'loading'} onClick={async () => {
                             item.loading = true
@@ -540,6 +532,22 @@ export default function ResourceEdit() {
                       </Fragment>
 
                     )}
+                    <Icon type="check" onClick={async (e) => {
+                      const container = e.target.closest('.container');
+                      const otitle = container.querySelector('.title input');
+                      const opath = container.querySelector('.path input');
+                      const ourl = container.querySelectorAll('.url input')[2];
+                      item.loading = true
+                      try {
+                        console.log(otitle)
+                        console.log(opath)
+                        console.log(ourl)
+                        await api.updateResourceVideo(local.id, { id: item.id, url: ourl.value, path: opath.value, title: otitle.value });
+                        message.success('修改成功')
+                      } finally {
+                        item.loading = false
+                      }
+                    }} />
                     <Observer>{() => (
                       <Icon type={item.loading && item.status === 'loading' ? 'loading' : 'download'} disabled={item.loading} onClick={async (e) => {
                         item.loading = true
