@@ -552,14 +552,19 @@ export default function ResourceEdit() {
                       <Icon type={item.loading && item.status === 'loading' ? 'loading' : 'download'} disabled={item.loading} onClick={async (e) => {
                         item.loading = true
                         try {
-                          const data = {
-                            _id: item.id,
-                            url: item.url,
-                            filepath: item.path,
-                            type: item.url.includes('.m3u8') ? 'm3u8' : 'mp4',
+                          const type = item.url.includes('.m3u8') ? 'm3u8' : 'mp4';
+                          if (type === 'm3u8') {
+                            const data = {
+                              _id: item.id,
+                              url: item.url,
+                              filepath: item.path,
+                              type,
+                            }
+                            await Axios.post(`https://192.168.0.124/gw/download/tasks`, data)
+                            await api.updateResourceVideo(local.id, { id: item.id, status: 'loading' })
+                          } else {
+                            await api.downloadResourceVideo(local.id, item.id)
                           }
-                          await Axios.post(`https://192.168.0.124/gw/download/tasks`, data)
-                          await api.updateResourceVideo(local.id, { id: item.id, status: 'download' })
                           item.status = 'loading'
                         } catch (e) {
                           console.log(e)
