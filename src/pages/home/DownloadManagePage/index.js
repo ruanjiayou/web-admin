@@ -172,11 +172,9 @@ export default function Page() {
           <Fragment>
             {task.transcode === 1 && (task.status === 3 ? <Button disabled={local.loading} type='link' onClick={async () => {
               try {
-                local.loading = true
-                await axios.post(`${download_api_url}/excute/transcode`, { id: task._id });
+                axios.post(`${download_api_url}/excute/transcode`, { id: task._id });
                 task.transcode = 2;
               } finally {
-                local.loading = false
               }
             }}>转码</Button> : '待转码')}
             {task.transcode === 2 && '转码中'}

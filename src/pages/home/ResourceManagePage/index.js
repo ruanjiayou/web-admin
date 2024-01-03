@@ -403,9 +403,14 @@ export default function ResourceManagePage() {
                 }} /> {local.temp.open}
               </Form.Item>
               <Form.Item label="连载" labelCol={lb} wrapperCol={rb}>
-                <Switch checked={local.temp.status === 'loading'} onClick={e => {
-                  local.temp.status = local.temp.status === 'finished' ? 'finished' : 'loading'
-                }} />
+                <Select value={local.temp.status} onChange={v => {
+                  local.temp.status = v;
+                }}>
+                  <Select.Option value='init'>初始化</Select.Option>
+                  <Select.Option value='loading'>下载中</Select.Option>
+                  <Select.Option value='finished'>已成功</Select.Option>
+                  <Select.Option value='fail'>失败</Select.Option>
+                </Select>
               </Form.Item>
             </Form>
           </Modal>
