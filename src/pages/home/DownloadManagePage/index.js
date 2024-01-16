@@ -187,17 +187,22 @@ export default function Page() {
         )} />
         <Column dataIndex={'_id'} render={(id, task) => (
           <div>
-            <DeleteOutlined onClick={async () => {
-              try {
-                local.loading = true;
-                await axios.delete(`${download_api_url}/tasks/${id}`);
-                await onSearch();
-              } catch (e) {
-                message.error('删除失败')
-              } finally {
-                local.loading = false;
-              }
-            }} />
+            <Popconfirm
+              title="确认"
+              onConfirm={async () => {
+                try {
+                  local.loading = true;
+                  await axios.delete(`${download_api_url}/tasks/${id}`);
+                  await onSearch();
+                } catch (e) {
+                  message.error('删除失败')
+                } finally {
+                  local.loading = false;
+                }
+              }}
+            >
+              <DeleteOutlined />
+            </Popconfirm>
             <Divider type='vertical' />
             <FormOutlined onClick={() => {
               local.edit_id = task._id
