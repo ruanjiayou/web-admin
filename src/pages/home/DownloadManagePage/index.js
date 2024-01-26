@@ -3,8 +3,9 @@ import { Observer, useLocalStore } from 'mobx-react-lite'
 import axios from 'axios'
 import { useEffectOnce } from 'react-use';
 import { Table, Popconfirm, notification, Select, Tag, Divider, message, Tooltip, Button, Form, Input, Radio, Modal } from 'antd';
-import { LinkOutlined, PoweroffOutlined, PlayCircleOutlined, PlusCircleOutlined, SyncOutlined, FormOutlined, DeleteOutlined, CheckOutlined } from '@ant-design/icons'
+import { LinkOutlined, PoweroffOutlined, PlayCircleOutlined, PlusCircleOutlined, SyncOutlined, FormOutlined, DeleteOutlined, CheckOutlined, BarcodeOutlined } from '@ant-design/icons'
 import { events } from '../../../utils/events';
+import shortid from 'shortid';
 
 const download_api_url = 'https://192.168.0.124/gw/download';
 const { Column } = Table;
@@ -252,7 +253,11 @@ export default function Page() {
         }}>
         <Form>
           {!local.edit_id && <Item label="video_id" labelCol={{ span: 4 }}>
-            <Input value={local.data._id} onChange={e => local.data._id = e.target.value} defaultValue={''} />
+            <Input value={local.data._id} onChange={e => local.data._id = e.target.value} defaultValue={''} addonAfter={<BarcodeOutlined onClick={() => {
+              if (!local.data._id) {
+                local.data._id = shortid();
+              }
+            }} />} />
           </Item>}
           <Item label="保存路径:" labelCol={{ span: 4 }}>
             <Input value={local.data.filepath} onChange={e => local.data.filepath = e.target.value} defaultValue={local.data.filepath} />
@@ -315,9 +320,6 @@ export default function Page() {
               <Radio value={3}>成功</Radio>
               <Radio value={4}>失败</Radio>
             </Radio.Group>
-          </Item>
-          <Item>
-
           </Item>
         </Form>
       </Modal>
