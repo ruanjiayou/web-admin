@@ -13,6 +13,7 @@ import { HoverTitle } from './file.style'
 import { useRouter } from '../../../contexts';
 import TextArea from 'antd/lib/input/TextArea';
 import Clipboard from 'react-clipboard.js';
+import { useEffectOnce } from 'react-use';
 
 const { getFiles, createFile, destroyFile, renameFile } = apis
 const { Column } = Table;
@@ -22,7 +23,7 @@ export default function TaskList() {
   const local = useLocalStore(() => ({
     isLoading: false,
     showModal: false,
-    dirpath: '/downloads/',
+    dirpath: '/download/',
     get dirLevel() {
       return this.dirpath.split('/').filter(n => !!n).length;
     },
@@ -82,8 +83,7 @@ export default function TaskList() {
     }
     search(result_path);
   })
-  useEffect(() => {
-    const query = router.getQuery();
+  useEffectOnce(() => {
     search(local.dirpath)
   })
   return <Observer>{() => (
@@ -338,7 +338,7 @@ export default function TaskList() {
                 <Clipboard data-clipboard-text={window.location.origin + local.dirpath + record.name} component={'a'}>
                   <SwitcherOutlined />
                 </Clipboard>
-                <Divider type='vertical'/>
+                <Divider type='vertical' />
                 <Popconfirm icon={null} title={<QRCode style={{ marginLeft: -22 }} value={filepath} />} okText='打开' cancelText='取消' onConfirm={() => {
                   window.open(filepath, '_blank');
                 }}>

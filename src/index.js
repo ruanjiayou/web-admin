@@ -1,5 +1,5 @@
 import React, { Fragment, Component } from 'react';
-import { useAsync } from 'react-use';
+import { useAsync, useEffectOnce } from 'react-use';
 import Router from './router'
 import ReactDOM from 'react-dom';
 import { createStore } from './contexts'
