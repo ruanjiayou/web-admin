@@ -544,18 +544,14 @@ export default function ResourceEdit() {
                         item.loading = true
                         try {
                           const type = item.url.includes('.m3u8') ? 'm3u8' : 'mp4';
-                          if (type === 'm3u8') {
-                            const data = {
-                              _id: item.id,
-                              url: item.url,
-                              filepath: item.path,
-                              type,
-                            }
-                            await Axios.post(`https://192.168.0.124/gw/download/tasks`, data)
-                            await api.updateResourceVideo(local.id, { id: item.id, status: 'loading' })
-                          } else {
-                            await api.downloadResourceVideo(local.id, item.id)
+                          const data = {
+                            _id: item.id,
+                            url: item.url,
+                            filepath: item.path,
+                            type,
                           }
+                          await Axios.post(`https://192.168.0.124/gw/download/tasks`, data)
+                          await api.updateResourceVideo(local.id, { id: item.id, status: 'loading' })
                           item.status = 'loading'
                         } catch (e) {
                           console.log(e)
