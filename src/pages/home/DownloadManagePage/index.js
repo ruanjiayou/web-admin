@@ -6,6 +6,7 @@ import { Table, Popconfirm, notification, Select, Tag, Divider, message, Tooltip
 import { LinkOutlined, PoweroffOutlined, PlayCircleOutlined, PlusCircleOutlined, SyncOutlined, FormOutlined, DeleteOutlined, CheckOutlined, BarcodeOutlined } from '@ant-design/icons'
 import { events } from '../../../utils/events';
 import shortid from 'shortid';
+import { formatNumber } from '../../../utils/helper';
 
 const download_api_url = 'https://192.168.0.124/gw/download';
 const { Column } = Table;
@@ -119,7 +120,7 @@ export default function Page() {
               {task.params.finished * 2 > task.params.total ? <div style={{ backgroundColor: '#54c77d', color: 'white', textAlign: 'right', width: `${Math.round(100 * task.params.finished / task.params.total)}%` }}>{task.params.finished + '/' + task.params.total + ''}&nbsp;</div> : (
                 <Fragment>
                   <div style={{ float: 'left', backgroundColor: '#54c77d', height: 22, color: 'white', width: `${Math.round(100 * task.params.finished / task.params.total)}%` }}></div>
-                  &nbsp;&nbsp;{task.params.finished + '/' + task.params.total}
+                  &nbsp;&nbsp;{task.type === 'm3u8' ? task.params.finished + '/' + task.params.total : formatNumber(task.params.finished) + '/' + formatNumber(task.params.total)}
                 </Fragment>)}
             </div>
           </div>
@@ -183,6 +184,7 @@ export default function Page() {
             {task.transcode === 2 && '转码中'}
             {task.transcode === 3 && '转码成功'}
             {task.transcode === 4 && '转码失败'}
+            {task.transcode === 0 && '无需转码'}
 
           </Fragment>
         )} />
@@ -252,6 +254,9 @@ export default function Page() {
           local.showDialog = false;
         }}>
         <Form>
+          {!local.edit_id && <Item label="标题" labelCol={{ span: 4 }}>
+            <Input value={local.data.name} onChange={e => local.data.name = e.target.value} defaultValue={''} />
+          </Item>}
           {!local.edit_id && <Item label="video_id" labelCol={{ span: 4 }}>
             <Input value={local.data._id} onChange={e => local.data._id = e.target.value} defaultValue={''} addonAfter={<BarcodeOutlined onClick={() => {
               if (!local.data._id) {
