@@ -49,11 +49,7 @@ export default function RulePage(props) {
     }))
     const [isModalOpen, setIsModalOpen] = useState(false);
     useEffectOnce(() => {
-        apis.getSpiders().then(result => {
-            if (result.code === 0) {
-                local.spiders = result.data;
-            }
-        })
+        getSpiders()
         return () => {
 
         }
@@ -65,6 +61,9 @@ export default function RulePage(props) {
     const getSpiders = async () => {
         const result = await apis.getSpiders({ page: local.page, limit: local.limit })
         if (result.code === 0) {
+            result.data.forEach(it => {
+                it.origin = new URL(it.pattern).origin;
+            })
             local.spiders = result.data;
         } else {
             notification.error({ message: '获取数据失败' })
@@ -144,7 +143,7 @@ export default function RulePage(props) {
             title: '名称',
             dataIndex: 'name',
             key: "_id",
-            render: (text) => <a>{text}</a>,
+            render: (text, record) => <a href={record.origin} target='_blank'>{text}</a>,
         },
         {
             title: '标识',
