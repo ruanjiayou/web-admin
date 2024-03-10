@@ -16,7 +16,22 @@ export default types.model('Resource', {
   source_type: types.optional(types.string, ''),
   source_name: types.optional(types.string, ''),
   tags: types.optional(types.array(types.string), []),
-  images: types.optional(types.array(types.string), []),
+  images: types.array(
+    types.union(
+      types.string,
+      types.model({
+        path: types.optional(types.string, ''),
+        id: types.optional(types.string, ''),
+        nth: types.optional(types.number, 1),
+        more: types.maybe(
+          types.model({
+            width: types.maybe(types.number),
+            height: types.maybe(types.number),
+          }),
+        ),
+      }),
+    ),
+  ),
   children: types.optional(types.array(types.model({
     id: types.string,
     url: types.string,

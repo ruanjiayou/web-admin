@@ -137,7 +137,7 @@ export default function ResourceEdit() {
       })
     }
     return () => {
-      events.off(changeResource);
+      events.off && events.off(changeResource);
     }
   })
 

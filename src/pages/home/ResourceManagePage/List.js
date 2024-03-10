@@ -250,17 +250,17 @@ export default function ResourceList({ items, children, categories, search, loca
 					}}>
 						<SyncOutlined title='同步es' spin={state.syncItems[record.id] ? true : false} />
 					</Popconfirm>
-					<VisualBox visible={['article', 'news'].includes(record.source_type)}>
+					<VisualBox visible={['article'].includes(record.source_type)}>
 						<Link title="编辑" style={{ display: 'inherit' }} to={'/admin/home/resource-manage/edit?id=' + record.id} target="_blank"><FormOutlined /></Link>
 					</VisualBox>
-					<VisualBox visible={record.source_type === 'video' || record.source_type === 'image'}>
+					<VisualBox visible={['video', 'image', 'movie', 'animation'].includes(record.source_type)}>
 						<Link title="编辑" style={{ display: 'inherit' }} target="_blank" to={'/admin/home/resource-manage/edit-multi?id=' + record.id} ><FormOutlined /></Link>
 					</VisualBox>
 					<VisualBox visible={record.source_type === 'novel'}>
 						<Divider type="vertical" />
 						<CloudServerOutlined title="保存小说" onClick={() => props.store(record)} />
 					</VisualBox>
-					<VisualBox visible={record.source_type === 'article' || record.source_type === 'news' || record.source_type === 'image'}>
+					<VisualBox visible={record.source_type === 'article'}>
 						<CloudSyncOutlined title="抓取image" onClick={() => {
 							apis.grabImages({ id: record.id }).then(res => {
 								notification.info({ message: `success:${res.data.success} fail:${res.data.fail}` })
