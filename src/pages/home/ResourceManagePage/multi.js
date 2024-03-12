@@ -544,7 +544,7 @@ export default function ResourceEdit() {
                         item.loading = true
                         try {
                           if (item.url.startsWith('https://googlevideo.com')) {
-                            await api.downloadResourceVideo(local.id, item.id)
+                            api.downloadResourceVideo(local.id, item.id)
                           } else {
                             const type = item.url.includes('.m3u8') ? 'm3u8' : 'mp4';
                             const data = {
