@@ -23,15 +23,14 @@ const store = {
 
     { name: 'comic', title: '漫画' },
     { name: 'video', title: '视频' },
-    { name: 'shortVideo', title: '短视频' },
     { name: 'movie', title: '电影' },
     { name: 'program', title: '节目' },
+    { name: 'animation', title: '动画' },
+    { name: 'short', title: '短视频' },
     { name: 'series', title: '电视剧' },
-    { name: 'animate', title: '动漫' },
 
     { name: 'novel', title: '小说' },
     { name: 'article', title: '文章' },
-    { name: 'news', title: '资讯' },
     { name: 'private', title: '私人' },
   ],
   medias: [
