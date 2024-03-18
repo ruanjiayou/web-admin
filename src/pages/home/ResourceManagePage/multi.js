@@ -2,7 +2,7 @@ import React, { useCallback, Fragment, useRef } from 'react';
 import { useEffectOnce } from 'react-use'
 import { Observer, useLocalStore } from 'mobx-react-lite'
 import apis from '../../../api'
-import { Button, notification, Input, Form, Tag, Upload, Select, Divider, Switch, message, Modal, Radio, Row, Col } from 'antd';
+import { Button, notification, Input, Form, Tag, Upload, Select, Divider, Switch, message, Modal, Radio, Row, Col, Popover } from 'antd';
 import { SortListView } from '../../../component'
 import Icon from '../../../component/Icon'
 import qs from 'qs'
@@ -65,6 +65,7 @@ export default function ResourceEdit() {
     imageAddVisible: false,
     loading: false,
     fullEditVideo: false,
+    fullEditImage: false,
     showFormat: false,
     video_formats: [],
     audio_formats: [],
@@ -546,16 +547,16 @@ export default function ResourceEdit() {
                           // if (item.url.startsWith('https://googlevideo.com')) {
                           //   api.downloadResourceVideo(local.id, item.id)
                           // } else {
-                            const type = item.url.includes('.m3u8') ? 'm3u8' : 'mp4';
-                            const data = {
-                              _id: item.id,
-                              url: item.url,
-                              filepath: item.path,
-                              type,
-                            }
-                            await Axios.post(`https://192.168.0.124/gw/download/tasks`, data)
-                            await api.updateResourceVideo(local.id, { id: item.id, status: 'loading' })
-                            item.status = 'loading'
+                          const type = item.url.includes('.m3u8') ? 'm3u8' : 'mp4';
+                          const data = {
+                            _id: item.id,
+                            url: item.url,
+                            filepath: item.path,
+                            type,
+                          }
+                          await Axios.post(`https://192.168.0.124/gw/download/tasks`, data)
+                          await api.updateResourceVideo(local.id, { id: item.id, status: 'loading' })
+                          item.status = 'loading'
                           // }
                         } catch (e) {
                           console.log(e)
@@ -668,7 +669,9 @@ export default function ResourceEdit() {
             </Tag>
           )}
         </Form.Item>
-        <Form.Item label="图片列表" labelCol={lb} wrapperCol={rb}>
+        <Form.Item label={<span>图片列表<br /><Switch checked={local.fullEditVideo} onClick={e => {
+          local.fullEditImage = !local.fullEditImage;
+        }} /></span>} labelCol={lb} wrapperCol={rb}>
           <SortListView
             isLoading={local.loading}
             direction="vertical"
@@ -698,70 +701,97 @@ export default function ResourceEdit() {
             itemStyle={{ display: 'flex', alignItems: 'center', lineHeight: 1, marginBottom: 5, backgroundColor: 'transparent' }}
             renderItem={({ item, index }) => (
               <Observer>{() => (
-                <Input
-                  key={index}
-                  value={item.nth + ' ' + item.url}
-                  disabled
-                  className="custom"
-                  style={item.status === 'finished' ? { backgroundColor: '#00b578', color: 'white' } : { backgroundColor: '#ff8f1f' }}
-                  addonBefore={<Observer>{() => (
-                    <Fragment>
-                      <Select style={{ width: 90 }} value={item.status} onChange={async (status) => {
-                        item.loading = true
-                        try {
-                          await api.updateResourceImage(local.id, { id: item.id, status, source_name: local.data.source_name })
-                          item.status = status
-                        } finally {
-                          item.loading = false
-                        }
-                      }}>
-                        <Select.Option value="init">初始化</Select.Option>
-                        <Select.Option value="loading">下载中</Select.Option>
-                        <Select.Option value="finished">已下载</Select.Option>
-                        <Select.Option value="fail">失败</Select.Option>
-                      </Select>
-                      <Divider type="vertical" />
-                      <Select style={{ width: 80 }} value={item.type} onChange={async (type) => {
-                        item.loading = true
-                        try {
-                          await api.updateResourceImage(local.id, { id: item.id, type })
-                          item.type = type
-                        } finally {
-                          item.loading = false
-                        }
-                      }}>
-                        <Select.Option value="poster">封面</Select.Option>
-                        <Select.Option value="content">正文图片</Select.Option>
-                        <Select.Option value="thumbnail">缩略图</Select.Option>
-                        <Select.Option value="gallery">图集</Select.Option>
-                      </Select>
-                    </Fragment>
-                  )}</Observer>}
-                  suffix={<CloseOutlined disabled={item.loading || item.status === 'loading'} onClick={async () => {
-                    item.loading = true
-                    try {
-                      await api.removeResourceImage({ id: item.id, mid: local.id })
-                      local.data.images = local.data.images.filter(t => t.url !== item.url)
-                    } finally {
-                      item.loading = false
-                    }
-                  }} />}
-                  addonAfter={<Observer>{() => (
-                    <Icon type={item.loading || item.status === 'loading' ? 'loading' : 'download'} disabled={item.loading} onClick={async () => {
-                      if (item.status === 'finished') {
-                        return notification.error({ message: '已下载' })
-                      }
-                      item.status = 'loading'
+                <FullHeight style={{ flex: 1 }}>
+                  <Input
+                    key={index}
+                    value={item.nth + ' ' + item.path}
+                    disabled
+                    className="custom"
+                    style={item.status === 'finished' ? { backgroundColor: '#00b578', color: 'white' } : { backgroundColor: '#ff8f1f' }}
+                    addonBefore={<Observer>{() => (
+                      <Fragment>
+                        <Select style={{ width: 90 }} value={item.status} onChange={async (status) => {
+                          item.loading = true
+                          try {
+                            await api.updateResourceImage(local.id, { id: item.id, status, source_name: local.data.source_name })
+                            item.status = status
+                          } finally {
+                            item.loading = false
+                          }
+                        }}>
+                          <Select.Option value="init">初始化</Select.Option>
+                          <Select.Option value="loading">下载中</Select.Option>
+                          <Select.Option value="finished">已下载</Select.Option>
+                          <Select.Option value="fail">失败</Select.Option>
+                        </Select>
+                        <Divider type="vertical" />
+                        <Select style={{ width: 80 }} value={item.type} onChange={async (type) => {
+                          item.loading = true
+                          try {
+                            await api.updateResourceImage(local.id, { id: item.id, type })
+                            item.type = type
+                          } finally {
+                            item.loading = false
+                          }
+                        }}>
+                          <Select.Option value="poster">封面</Select.Option>
+                          <Select.Option value="content">正文图片</Select.Option>
+                          <Select.Option value="thumbnail">缩略图</Select.Option>
+                          <Select.Option value="gallery">图集</Select.Option>
+                        </Select>
+                      </Fragment>
+                    )}</Observer>}
+                    suffix={<CloseOutlined disabled={item.loading || item.status === 'loading'} onClick={async () => {
                       item.loading = true
                       try {
-                        await api.downloadResourceImage(local.id, item.id, { source_name: local.data.source_name })
-                        item.status = 'finished'
+                        await api.removeResourceImage({ id: item.id, mid: local.id })
+                        local.data.images = local.data.images.filter(t => t.url !== item.url)
                       } finally {
                         item.loading = false
                       }
-                    }} />
-                  )}</Observer>}
-                />
+                    }} />}
+                    addonAfter={<Observer>{() => (<FullWidth>
+                      <Icon type="upload" disabled={item.loading} />
+                      <div style={{ width: 12 }}></div>
+                      <Popover trigger={'click'} content={<img style={{ width: 120, height: 120 }} src={store.app.imageLine + item.path} />}>
+                        <Icon type={'page-search'} />
+                      </Popover>
+                    </FullWidth>)}</Observer>}
+                  />
+                  <Input
+                    value={item.url}
+                    onChange={(e) => {
+                      item.url = e.target.value;
+                    }}
+                    addonAfter={<Observer>{() => (
+                      <FullWidth>
+                        <Icon type="check" onClick={async () => {
+                          item.loading = true
+                          try {
+                            await api.updateResourceImage(local.id, { id: item.id, url: item.url })
+                          } finally {
+                            item.loading = false
+                          }
+                        }} />
+                        <div style={{ width: 12 }}></div>
+                        <Icon type={item.loading || item.status === 'loading' ? 'loading' : 'download'} disabled={item.loading} onClick={async () => {
+                          if (item.status === 'finished') {
+                            return notification.error({ message: '已下载' })
+                          }
+                          item.status = 'loading'
+                          item.loading = true
+                          try {
+                            await api.downloadResourceImage(local.id, item.id, { source_name: local.data.source_name })
+                            item.status = 'finished'
+                          } finally {
+                            item.loading = false
+                          }
+                        }} />
+
+                      </FullWidth>
+                    )}</Observer>}
+                  />
+                </FullHeight>
               )}</Observer>
             )}
           />
