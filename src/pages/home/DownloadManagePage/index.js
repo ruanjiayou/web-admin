@@ -111,7 +111,7 @@ export default function Page() {
         )} />
         <Column title="名称" width={150} dataIndex={'name'} render={(name, task) => (
           <Tooltip title={task._id}>
-            {name}
+            <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</div>
           </Tooltip>
         )} />
         <Column title="进度" dataIndex={'_id'} render={(id, task) => (
