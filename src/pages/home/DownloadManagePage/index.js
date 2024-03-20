@@ -2,8 +2,8 @@ import React, { useRef, useCallback, Fragment } from 'react'
 import { Observer, useLocalStore } from 'mobx-react-lite'
 import axios from 'axios'
 import { useEffectOnce } from 'react-use';
-import { Table, Popconfirm, notification, Select, Tag, Divider, message, Tooltip, Button, Form, Input, Radio, Modal } from 'antd';
-import { LinkOutlined, PoweroffOutlined, PlayCircleOutlined, PlusCircleOutlined, SyncOutlined, FormOutlined, DeleteOutlined, CheckOutlined, BarcodeOutlined } from '@ant-design/icons'
+import { Table, Popconfirm, notification, Select, Tag, Divider, message, Tooltip, Button, Form, Input, Radio, Modal, } from 'antd';
+import { LinkOutlined, PoweroffOutlined, PlayCircleOutlined, PlusCircleOutlined, SyncOutlined, FormOutlined, DeleteOutlined, CheckOutlined, BarcodeOutlined, FileImageOutlined, VideoCameraOutlined } from '@ant-design/icons'
 import { events } from '../../../utils/events';
 import shortid from 'shortid';
 import { formatNumber } from '../../../utils/helper';
@@ -106,8 +106,14 @@ export default function Page() {
         local.page = page.current
         onSearch()
       }}>
-        <Column title="" width={30} dataIndex={'url'} render={url => (
-          <a href={url} target='_blank' style={{ whiteSpace: 'nowrap' }}><LinkOutlined /></a>
+        <Column title="" width={70} dataIndex={'url'} render={(url, task) => (
+          <Fragment>
+            <a href={url} target='_blank' style={{ whiteSpace: 'nowrap' }}>
+              <LinkOutlined />
+            </a>
+            &nbsp;&nbsp;
+            {task.type === 'image' ? <FileImageOutlined /> : <VideoCameraOutlined />}
+          </Fragment>
         )} />
         <Column title="名称" width={150} dataIndex={'name'} render={(name, task) => (
           <Tooltip title={task._id}>
@@ -257,8 +263,8 @@ export default function Page() {
           {!local.edit_id && <Item label="标题" labelCol={{ span: 4 }}>
             <Input value={local.data.name} onChange={e => local.data.name = e.target.value} defaultValue={''} />
           </Item>}
-          {!local.edit_id && <Item label="video_id" labelCol={{ span: 4 }}>
-            <Input value={local.data._id} onChange={e => local.data._id = e.target.value} defaultValue={''} addonAfter={<BarcodeOutlined onClick={() => {
+          {!local.edit_id && <Item label="_id" labelCol={{ span: 4 }}>
+            <Input value={local.data._id} disabled={local.data._id || local.data.status !== 1} onChange={e => local.data._id = e.target.value} defaultValue={''} addonAfter={<BarcodeOutlined onClick={() => {
               if (!local.data._id) {
                 local.data._id = shortid();
               }
@@ -299,9 +305,13 @@ export default function Page() {
           <Item label="from" labelCol={{ span: 4 }}>
             <Radio.Group name="from" value={local.data.type} onChange={e => {
               local.data.type = e.target.value;
+              if (local.data.type === 'image') {
+                local.data.transcode = 0;
+              }
             }}>
               <Radio value={'m3u8'}>m3u8</Radio>
               <Radio value={'mp4'}>mp4</Radio>
+              <Radio value={'image'}>image</Radio>
             </Radio.Group>
           </Item>
           <Item label="状态" labelCol={{ span: 4 }}>
