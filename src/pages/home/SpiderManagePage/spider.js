@@ -64,7 +64,7 @@ export default function RulePage(props) {
             result.data.forEach(it => {
                 it.origin = new URL(it.pattern).origin;
             })
-            local.spiders = result.data;
+            local.spiders = result.data.sort((a, b) => a.status === 2 ? 1 : -1);
         } else {
             notification.error({ message: '获取数据失败' })
         }

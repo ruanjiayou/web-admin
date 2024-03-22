@@ -44,7 +44,12 @@ export default function Page() {
       if (resp.status === 200) {
         const result = resp.data;
         if (result.code === 0) {
-          local.tasks = result.data.list;
+          local.tasks = result.data.list.map(d => {
+            if (!d.params) {
+              d.params = { finished: 1024, total: 1024 }
+            }
+            return d;
+          });
           local.total = result.data.total;
         } else {
           message.error('获取任务列表出错')

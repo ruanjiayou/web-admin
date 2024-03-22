@@ -77,12 +77,14 @@ export function createEmptyGroup(parent = {}, view = '') {
 
 
 export function formatNumber(n) {
-  const G = 1024 * 1024 * 1024, M = 1024 * 1024;
+  const G = 1024 * 1024 * 1024, M = 1024 * 1024, K = 1024;
   if (n >= G) {
     return (n / G).toFixed(2) + 'G'
   } else if (n >= M) {
     return (n / M).toFixed(2) + 'M'
-  } else {
+  } else if (n > K) {
     return (n / 1024).toFixed(2) + 'K'
+  } else {
+    return n + 'B';
   }
 }
