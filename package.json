@@ -68,6 +68,7 @@
   "devDependencies": {
     "@babel/plugin-transform-for-of": "^7.22.5",
     "customize-cra": "^1.0.0",
+    "http-proxy-middleware": "^2.0.6",
     "mockjs": "^1.1.0",
     "source-map-explorer": "^2.4.2",
     "webpack-bundle-analyzer": "^3.8.0"

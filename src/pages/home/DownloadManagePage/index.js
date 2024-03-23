@@ -237,6 +237,7 @@ export default function Page() {
             }} />
           </div>
         )} />
+        <Column title='创建时间' dataIndex={'createdAt'} render={t => new Date(t).toLocaleString()} />
       </Table>
       <Modal
         width={750}

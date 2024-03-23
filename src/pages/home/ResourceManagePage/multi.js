@@ -16,6 +16,7 @@ import { FullWidth, FullHeightAuto, AlignVertical, FullWidthFix, FullHeight } fr
 import TextArea from 'antd/lib/input/TextArea';
 import { events } from '../../../utils/events';
 import Axios from 'axios';
+import Ueditor from '../../../component/Ueditor'
 
 function deepEqual(a, b) {
   const keys = Array.from(new Set([...Object.keys(a), ...Object.keys(b)]));
@@ -38,6 +39,7 @@ function deepEqual(a, b) {
 }
 
 export default function ResourceEdit() {
+  const ueditor = useRef(null)
   const picture = useRef(null)
   const inp = useRef(null)
   const inputType = useRef(null)
@@ -47,7 +49,7 @@ export default function ResourceEdit() {
   const query = qs.parse(window.location.search.substr(1))
   const local = useLocalStore(() => ({
     id: query.id,
-    data: { tags: [], types: [], children: [], videos: [], images: [] },
+    data: { tags: [], types: [], children: [], videos: [], images: [], content: '' },
     origin: {},
     // 临时
     tempThumbnailImg: '',
@@ -488,6 +490,7 @@ export default function ResourceEdit() {
                               }
                             }}>
                               <Select.Option value="normal">正片</Select.Option>
+                              <Select.Option value="content">正文</Select.Option>
                               <Select.Option value="trailer">预告</Select.Option>
                               <Select.Option value="tidbits">花絮</Select.Option>
                             </Select>
@@ -629,6 +632,7 @@ export default function ResourceEdit() {
                   local.tempUrlType = type;
                 }}>
                   <Select.Option value="normal">正片</Select.Option>
+                  <Select.Option value="content">正文</Select.Option>
                   <Select.Option value="trailer">预告</Select.Option>
                   <Select.Option value="tidbits">花絮</Select.Option>
                 </Select>
@@ -882,6 +886,11 @@ export default function ResourceEdit() {
               可输入多个图片(,分隔)
             </Fragment>
           )}
+        </Form.Item>
+        <Form.Item label="内容" labelCol={lb} wrapperCol={rb}>
+          <div style={{ lineHeight: 'initial', height: '100%' }}>
+            <Ueditor ref={ref => ueditor.current = ref} initData={local.data.content} />
+          </div>
         </Form.Item>
       </div>
       <Form.Item label="" style={{ textAlign: 'center', backgroundColor: '#b5cbde', height: 50, lineHeight: '50px', margin: 0, }}>

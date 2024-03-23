@@ -251,7 +251,7 @@ export default function ResourceList({ items, children, categories, search, loca
 						<SyncOutlined title='同步es' spin={state.syncItems[record.id] ? true : false} />
 					</Popconfirm>
 					<VisualBox visible={['article'].includes(record.source_type)}>
-						<Link title="编辑" style={{ display: 'inherit' }} to={'/admin/home/resource-manage/edit?id=' + record.id} target="_blank"><FormOutlined /></Link>
+						<Link title="编辑" style={{ display: 'inherit' }} to={'/admin/home/resource-manage/edit-multi?id=' + record.id} target="_blank"><FormOutlined /></Link>
 					</VisualBox>
 					<VisualBox visible={['video', 'image', 'movie', 'animation'].includes(record.source_type)}>
 						<Link title="编辑" style={{ display: 'inherit' }} target="_blank" to={'/admin/home/resource-manage/edit-multi?id=' + record.id} ><FormOutlined /></Link>
