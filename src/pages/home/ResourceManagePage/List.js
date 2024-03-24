@@ -72,13 +72,13 @@ export default function ResourceList({ items, children, categories, search, loca
 				</CenterXY>
 			}} />
 			<Column title="标题" width={200} dataIndex="title" key="title" render={(text, record) => {
-				let isDev = window.origin.includes('localhost:3000') ? true : false;
-				let url = isDev ? 'http://localhost:8097' : window.origin;
-				if (record.source_type === 'video') {
+				let isDev = window.origin.includes('localhost') ? true : false;
+				let url = isDev ? 'https://192.168.0.124' : window.origin;
+				if (['video', 'movie', 'short', 'animation'].includes(record.source_type)) {
 					url += ('/novel/groups/GroupTree/VideoInfo?GroupTree.name=video&VideoInfo.id=' + record.id)
 				} else if (record.source_type === 'novel') {
 					url += ('/novel/home/BookInfo?home.tab=&BookInfo.id=' + record.id)
-				} else if (['news', 'article', 'private'].includes(record.source_type)) {
+				} else if (['article', 'private'].includes(record.source_type)) {
 					url += ('/novel/home/Article?home.tab=QD7vNfJCU&Article.id=' + record.id)
 				} else if (['image'].includes(record.source_type)) {
 					url += ('/novel/groups/GroupTree/Image?GroupTree.name=image&Image.id=' + record.id)
