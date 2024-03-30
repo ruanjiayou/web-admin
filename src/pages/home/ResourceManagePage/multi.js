@@ -366,7 +366,7 @@ export default function ResourceEdit() {
         </Form.Item>
         {(local.data.source_name === 'youtube' || local.data.source_name === 'youtube_shorts' || ['youtube_short', 'youtube_video'].includes(local.data.spider_id)) && <Form.Item label="youtube下载设置">
           <Button onClick={e => {
-            local.video_formats = local.data.original.formats.filter(item => item.video_ext !== 'none').sort((a, b) => b.filesize - a.filesize).map(item => ({
+            local.video_formats = local.data.original.formats.filter(item => item.video_ext !== 'none' && item.filesize).sort((a, b) => b.filesize - a.filesize).map(item => ({
               ext: item.ext,
               url: item.url,
               quality: item.format_note,
@@ -376,7 +376,7 @@ export default function ResourceEdit() {
               filesize: formatNumber(item.filesize),
               id: item.format_id
             }));
-            local.audio_formats = local.data.original.formats.filter(item => item.audio_ext !== 'none').sort((a, b) => b.filesize - a.filesize).map(item => ({
+            local.audio_formats = local.data.original.formats.filter(item => item.audio_ext !== 'none' && item.filesize).sort((a, b) => b.filesize - a.filesize).map(item => ({
               ext: item.ext,
               url: item.url,
               quality: item.format_note,
@@ -547,9 +547,6 @@ export default function ResourceEdit() {
                       <Icon type={item.loading && item.status === 'loading' ? 'loading' : 'download'} disabled={item.loading} onClick={async (e) => {
                         item.loading = true
                         try {
-                          // if (item.url.startsWith('https://googlevideo.com')) {
-                          //   api.downloadResourceVideo(local.id, item.id)
-                          // } else {
                           const type = item.url.includes('.m3u8') ? 'm3u8' : 'mp4';
                           const data = {
                             _id: item.id,
@@ -898,7 +895,7 @@ export default function ResourceEdit() {
       </Form.Item>
     </div>
     <Observer>{() => <Modal visible={local.showFormat}
-      style={{ overflow: 'auto', padding: 0 }}
+      style={{ overflow: 'auto', padding: 0, zIndex: 1201 }}
       width={700}
       bodyStyle={{ height: 500, overflow: 'auto' }}
       onCancel={local.cancelFormat}
