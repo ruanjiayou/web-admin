@@ -578,7 +578,7 @@ export default function ResourceEdit() {
                           const dirs = segs.join('/')
                           try {
                             const res = await apis.createFile({
-                              isdir: 0,
+                              isDir: 0,
                               param: dirs,
                               name: name,
                               upfile: e.file
