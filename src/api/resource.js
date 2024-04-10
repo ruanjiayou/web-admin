@@ -161,6 +161,50 @@ export function sortResourceImage({ id, data }) {
   })
 }
 
+export function addResourceAudio(id, data) {
+  const form = new FormData()
+  for (let k in data) {
+    if (data[k] instanceof Array) {
+      for (let i = 0; i < data[k].length; i++) {
+        form.append(k, data[k][i])
+      }
+    } else {
+      form.append(k, data[k])
+    }
+  }
+  return shttp({
+    url: `/v1/admin/resource/${id}/audio`,
+    method: 'POST',
+    data: form,
+  })
+}
+
+export function updateResourceAudio(id, data) {
+  const form = new FormData()
+  for (let k in data) {
+    if (data[k] instanceof Array) {
+      for (let i = 0; i < data[k].length; i++) {
+        form.append(k, data[k][i])
+      }
+    } else {
+      form.append(k, data[k])
+    }
+  }
+  return shttp({
+    url: `/v1/admin/resource/${id}/audio/${data.id}`,
+    method: 'PUT',
+    data: form,
+  })
+}
+
+export function removeResourceAudio({ id, mid }) {
+  return shttp({
+    url: `/v1/admin/resource/${mid}/audio`,
+    method: 'DELETE',
+    data: { id },
+  })
+}
+
 
 export function grabImages(params) {
   return shttp({

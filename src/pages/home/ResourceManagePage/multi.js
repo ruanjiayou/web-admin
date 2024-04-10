@@ -3,7 +3,7 @@ import { useEffectOnce } from 'react-use'
 import { Observer, useLocalStore } from 'mobx-react-lite'
 import apis from '../../../api'
 import { Button, notification, Input, Form, Tag, Upload, Select, Divider, Switch, message, Modal, Radio, Row, Col, Popover } from 'antd';
-import { SortListView } from '../../../component'
+import { SortListView, VisualBox } from '../../../component'
 import Icon from '../../../component/Icon'
 import qs from 'qs'
 import * as _ from 'lodash'
@@ -45,11 +45,12 @@ export default function ResourceEdit() {
   const inputType = useRef(null)
   const inputUrl = useRef(null)
   const inputImage = useRef(null)
+  const inputAudio = useRef(null)
   const lb = { span: 3 }, rb = { span: 18 }
   const query = qs.parse(window.location.search.substr(1))
   const local = useLocalStore(() => ({
     id: query.id,
-    data: { tags: [], types: [], children: [], videos: [], images: [], content: '' },
+    data: { tags: [], types: [], children: [], videos: [], images: [], audios: [], content: '', source_type: '' },
     origin: {},
     // 临时
     tempThumbnailImg: '',
@@ -63,6 +64,7 @@ export default function ResourceEdit() {
     typeAddVisible: false,
     tempUrl: '',
     tempImage: '',
+    tempAudio: '',
     urlAddVisible: false,
     imageAddVisible: false,
     loading: false,
@@ -82,22 +84,17 @@ export default function ResourceEdit() {
     setStatus(status) {
       local.data.status = status;
     },
-    setVideoStatus(id, status) {
-      local.data.videos.forEach(video => {
-        if (video.id === id) {
-          video.status = status;
-        }
-      })
-    },
-    setImageStatus(id, status) {
-      local.data.images.forEach(image => {
-        if (image.id === id) {
-          image.status = status;
-        }
-      })
+    setSubStatus(type, id, status) {
+      if (local.data[type]) {
+        local.data[type].forEach(doc => {
+          if (doc.id === id) {
+            doc.status = status;
+          }
+        })
+      }
     }
   }))
-  const onEdit = useCallback(async (sync = false) => {
+  const onEdit = useCallback(async (sync = true) => {
     const changed = !deepEqual(toJS(local.origin), toJS(local.data));
     if (!changed) {
       notification.info({ message: '数据未改动' })
@@ -116,9 +113,9 @@ export default function ResourceEdit() {
       if (data.resource_type === 'resource' && resource_id === local.id) {
         local.data.status = data.status;
       } else if (data.resource_type === 'video') {
-        local.setVideoStatus(resource_id, data.status)
+        local.setSubStatus('videos', resource_id, data.status)
       } else if (data.resource_type === 'image') {
-        local.setImageStatus(resource_id, data.status);
+        local.setSubStatus('images', resource_id, data.status);
       }
     }
     events.on('resource_change', changeResource);
@@ -140,7 +137,7 @@ export default function ResourceEdit() {
       })
     }
     return () => {
-      events.off && events.off(changeResource);
+      events && events.off && events.off(changeResource);
     }
   })
 
@@ -364,40 +361,42 @@ export default function ResourceEdit() {
             </Upload>
           </FullWidth>
         </Form.Item>
-        {(local.data.source_name === 'youtube' || local.data.source_name === 'youtube_shorts' || ['youtube_short', 'youtube_video'].includes(local.data.spider_id)) && <Form.Item label="youtube下载设置">
-          <Button onClick={e => {
-            local.video_formats = local.data.original.formats.filter(item => item.video_ext !== 'none' && item.filesize).sort((a, b) => b.filesize - a.filesize).map(item => ({
-              ext: item.ext,
-              url: item.url,
-              quality: item.format_note,
-              height: item.height,
-              width: item.width,
-              resolution: item.resolution,
-              filesize: formatNumber(item.filesize),
-              id: item.format_id
-            }));
-            local.audio_formats = local.data.original.formats.filter(item => item.audio_ext !== 'none' && item.filesize).sort((a, b) => b.filesize - a.filesize).map(item => ({
-              ext: item.ext,
-              url: item.url,
-              quality: item.format_note,
-              height: item.height,
-              width: item.width,
-              resolution: item.resolution,
-              filesize: formatNumber(item.filesize),
-              id: item.format_id
-            }));
-            // local.formats = local.data.original.formats.filter(item => item.filesize && item.resolution !== 'audio only').sort((a, b) => b.filesize - a.filesize).map(item => ({
-            //   ext: item.ext,
-            //   url: item.url,
-            //   quality: item.format_note,
-            //   height: item.height,
-            //   width: item.width,
-            //   resolution: item.resolution,
-            //   filesize: formatNumber(item.filesize),
-            // }));
-            local.showFormat = true;
-          }}>选择youtube</Button>
-        </Form.Item>}
+        <VisualBox visible={local.data.source_name === 'youtube' || local.data.source_name === 'youtube_shorts' || ['youtube_short', 'youtube_video'].includes(local.data.spider_id)}>
+          <Form.Item label="youtube下载设置">
+            <Button onClick={e => {
+              local.video_formats = local.data.original.formats.filter(item => item.video_ext !== 'none' && item.filesize).sort((a, b) => b.filesize - a.filesize).map(item => ({
+                ext: item.ext,
+                url: item.url,
+                quality: item.format_note,
+                height: item.height,
+                width: item.width,
+                resolution: item.resolution,
+                filesize: formatNumber(item.filesize),
+                id: item.format_id
+              }));
+              local.audio_formats = local.data.original.formats.filter(item => item.audio_ext !== 'none' && item.filesize).sort((a, b) => b.filesize - a.filesize).map(item => ({
+                ext: item.ext,
+                url: item.url,
+                quality: item.format_note,
+                height: item.height,
+                width: item.width,
+                resolution: item.resolution,
+                filesize: formatNumber(item.filesize),
+                id: item.format_id
+              }));
+              // local.formats = local.data.original.formats.filter(item => item.filesize && item.resolution !== 'audio only').sort((a, b) => b.filesize - a.filesize).map(item => ({
+              //   ext: item.ext,
+              //   url: item.url,
+              //   quality: item.format_note,
+              //   height: item.height,
+              //   width: item.width,
+              //   resolution: item.resolution,
+              //   filesize: formatNumber(item.filesize),
+              // }));
+              local.showFormat = true;
+            }}>选择youtube</Button>
+          </Form.Item>
+        </VisualBox>
         <Form.Item label={<span>视频列表<br /><Switch checked={local.fullEditVideo} onClick={e => {
           local.fullEditVideo = !local.fullEditVideo;
         }} /></span>} labelCol={lb} wrapperCol={rb}>
@@ -432,25 +431,18 @@ export default function ResourceEdit() {
               <FullWidth className="container" style={{ width: '100%' }}>
                 <FullHeightAuto>
                   <Input className="title" addonBefore={'标题'} defaultValue={item.title} />
-                  {local.fullEditVideo && (
-                    <Fragment>
+                  <VisualBox visible={true}>
+                    {(item.subtitles || []).map(subtitle => (
                       <Input
-                        addonBefore={'字幕'}
-                        defaultValue={item.subtitles}
+                        defaultValue={subtitle.url}
+                        addonBefore={subtitle.lang}
+                        addonAfter={<Icon type='delete' />}
                         onChange={e => {
-                          local.subtitle_url = e.target.value
+                          subtitle.url = e.target.value
                         }}
-                        addonAfter={<Icon type="check" disabled={item.loading || !(item.subtitles || '').startsWith('http')} onClick={async () => {
-                          item.loading = true
-                          try {
-                            await api.downloadVideoSubtitles({ mid: item.mid, id: item.id, subtitles: local.subtitle_url })
-                          } finally {
-                            item.loading = false
-                          }
-                        }} />} />
-
-                    </Fragment>
-                  )}
+                      />
+                    ))}
+                  </VisualBox>
                   <Observer>{() => (
                     <Input className="url"
                       style={{ margin: '10px 0' }}
@@ -884,14 +876,197 @@ export default function ResourceEdit() {
             </Fragment>
           )}
         </Form.Item>
-        <Form.Item label="内容" labelCol={lb} wrapperCol={rb}>
-          <div style={{ lineHeight: 'initial', height: '100%' }}>
-            <Ueditor ref={ref => ueditor.current = ref} initData={local.data.content} />
-          </div>
-        </Form.Item>
+        <VisualBox visible={local.data.source_type === 'music'}>
+          <Form.Item label={<span>音频列表</span>} labelCol={lb} wrapperCol={rb}>
+            <SortListView
+              isLoading={local.loading}
+              direction="vertical"
+              mode="edit"
+              handler={<Icon type="drag" style={{ marginRight: 10 }} />}
+              sort={async (oldIndex, newIndex) => {
+                const data = local.data.audios.map(item => ({ id: item.id, url: item.url }))
+                const id = data.splice(oldIndex, 1)
+                data.splice(newIndex, 0, ...id)
+                data.forEach((d, i) => {
+                  d.nth = i + 1
+                })
+                local.loading = false
+                try {
+                  await api.sortResourceAudio({ id: local.id, data })
+                  const items = local.data.audios.map(item => item)
+                  const item = items.splice(oldIndex, 1);
+                  items.splice(newIndex, 0, ...item)
+                  local.data.audios = items
+                } finally {
+                  local.loading = false
+                }
+              }}
+              items={local.data.audios}
+              droppableId={local.id}
+              listStyle={{ boxSizing: 'border-box' }}
+              itemStyle={{ display: 'flex', alignItems: 'center', lineHeight: 1, marginBottom: 5, backgroundColor: 'transparent' }}
+              renderItem={({ item, index }) => (
+                <Observer>{() => (
+                  <FullHeight style={{ flex: 1 }}>
+                    <Input
+                      key={index}
+                      value={item.path}
+                      disabled
+                      className="custom"
+                      style={item.status === 'finished' ? { backgroundColor: '#00b578', color: 'white' } : { backgroundColor: '#ff8f1f' }}
+                      addonBefore={<Observer>{() => (
+                        <Fragment>
+                          <Select style={{ width: 90 }} value={item.status} onChange={async (status) => {
+                            item.loading = true
+                            try {
+                              await api.updateResourceAudio(local.id, { id: item.id, status, source_name: local.data.source_name })
+                              item.status = status
+                            } finally {
+                              item.loading = false
+                            }
+                          }}>
+                            <Select.Option value="init">初始化</Select.Option>
+                            <Select.Option value="loading">下载中</Select.Option>
+                            <Select.Option value="finished">已下载</Select.Option>
+                            <Select.Option value="fail">失败</Select.Option>
+                          </Select>
+                        </Fragment>
+                      )}</Observer>}
+                      addonAfter={
+                        <Fragment>
+                          <Icon type="check" onClick={async () => {
+                            item.loading = true
+                            try {
+                              await api.updateResourceAudio(local.id, { id: item.id, status: item.status, url: item.url })
+                            } finally {
+                              item.loading = false
+                            }
+                          }} />
+                          <Divider type='vertical' /><CloseOutlined disabled={item.loading || item.status === 'loading'} onClick={async () => {
+                            item.loading = true
+                            try {
+                              await api.removeResourceAudio({ id: item.id, mid: local.id })
+                              local.data.audios = local.data.audios.filter(t => t.url !== item.url)
+                            } finally {
+                              item.loading = false
+                            }
+                          }} />
+                        </Fragment>
+                      }
+                    />
+                    <Input
+                      value={item.url}
+                      onChange={(e) => {
+                        item.url = e.target.value;
+                      }}
+                      addonBefore='url'
+                      addonAfter={<Observer>{() => (
+                        <FullWidth>
+                          <label htmlFor={`audio_${index}`}>
+                            <input id={`audio_${index}`} type='file' style={{ display: 'none' }} onChange={async (e) => {
+                              item.music = e.target.files[0];
+                              item.status = 'loading'
+                              item.loading = true
+                              try {
+                                await api.updateResourceAudio(local.id, { id: item.id, music: item.music, status: 'finished' })
+                                item.status = 'finished'
+                              } finally {
+                                item.music = null;
+                                item.loading = false;
+                              }
+                            }} />
+                            <Icon type={item.loading || item.status === 'loading' ? 'loading' : 'upload'} disabled={item.loading} />
+                          </label>
+                          <Divider type='vertical' />
+                          <Icon type={item.loading || item.status === 'loading' ? 'loading' : 'download'} disabled={item.loading} onClick={async () => {
+                            return notification.error({ message: '功能未开放' })
+                            if (item.status === 'finished') {
+                              return notification.error({ message: '已下载' })
+                            }
+                            item.status = 'loading'
+                            item.loading = true
+                            try {
+                              await api.downloadResourceAudio(local.id, item.id, { source_name: local.data.source_name })
+                              item.status = 'finished'
+                            } finally {
+                              item.loading = false
+                            }
+                          }} />
+                        </FullWidth>
+                      )}</Observer>}
+                    />
+                  </FullHeight>
+                )}</Observer>
+              )}
+            />
+            <Input
+              ref={inputAudio}
+              type="text"
+              size="small"
+              style={{ margin: '10px 5px' }}
+              value={local.tempAudio}
+              autoFocus
+              disabled={local.isDealUrl}
+              onChange={e => local.tempAudio = e.target.value}
+              addonBefore={<Fragment>
+                <Select style={{ width: 90 }} disabled={local.isDealUrl} value={local.tempStatus} onChange={async (status) => {
+                  local.tempStatus = status;
+                }}>
+                  <Select.Option value="init">初始化</Select.Option>
+                  <Select.Option value="loading">下载中</Select.Option>
+                  <Select.Option value="finished">已下载</Select.Option>
+                  <Select.Option value="fail">失败</Select.Option>
+                </Select>
+              </Fragment>}
+              addonAfter={
+                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                  <div>
+                    <input type='file' id="music" style={{ display: 'none' }} onChange={e => {
+                      local.data.music = e.target.files[0]
+                    }} />
+                    <label htmlFor="music">
+                      <Icon type="arrow-up-line" /> {local.data.music ? '已选择' : '待选择'}
+                    </label>
+                  </div>
+                  <Divider type='vertical' />
+                  <Icon type="check" onClick={async () => {
+                    if (local.isDealUrl) {
+                      return;
+                    }
+                    let audio = local.tempAudio.trim()
+                    if ('' === audio) {
+                      return;
+                    }
+                    local.isDealUrl = true
+                    try {
+                      const res = await api.addResourceAudio(local.id, { title: local.data.title, url: local.tempAudio, type: 'audio', status: local.tempStatus, music: local.data.music })
+                      if (res && res.code === 0) {
+                        local.data.audios.push(_.omit(res.data, ['createdAt', 'more']))
+                      } else {
+                        notification.info('fail')
+                      }
+                    } finally {
+                      local.music = null;
+                      local.tempAudio = '';
+                      local.isDealUrl = false;
+                      local.tempStatus = 'init';
+                    }
+                  }} />
+                </div>
+              }
+            />
+          </Form.Item>
+        </VisualBox>
+        <VisualBox visible={local.data.source_type === 'article'}>
+          <Form.Item label="内容" labelCol={lb} wrapperCol={rb}>
+            <div style={{ lineHeight: 'initial', height: '100%' }}>
+              <Ueditor ref={ref => ueditor.current = ref} initData={local.data.content} />
+            </div>
+          </Form.Item>
+        </VisualBox>
       </div>
       <Form.Item label="" style={{ textAlign: 'center', backgroundColor: '#b5cbde', height: 50, lineHeight: '50px', margin: 0, }}>
-        <Button loading={local.loading} disabled={local.loading} type="primary" onClick={() => onEdit(true)}>保存并同步</Button>
+        <Button loading={local.loading} disabled={local.loading} type="primary" onClick={() => onEdit()}>保存并同步</Button>
       </Form.Item>
     </div>
     <Observer>{() => <Modal visible={local.showFormat}
@@ -968,7 +1143,6 @@ export default function ResourceEdit() {
         })}
       </Radio.Group>
     </Modal>}</Observer>
-
   </Fragment>)
   }</Observer >
 }

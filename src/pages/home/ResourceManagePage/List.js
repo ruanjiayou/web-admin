@@ -253,7 +253,7 @@ export default function ResourceList({ items, children, categories, search, loca
 					<VisualBox visible={['article'].includes(record.source_type)}>
 						<Link title="编辑" style={{ display: 'inherit' }} to={'/admin/home/resource-manage/edit-multi?id=' + record.id} target="_blank"><FormOutlined /></Link>
 					</VisualBox>
-					<VisualBox visible={['video', 'image', 'movie', 'animation'].includes(record.source_type)}>
+					<VisualBox visible={['video', 'image', 'music', 'movie', 'animation'].includes(record.source_type)}>
 						<Link title="编辑" style={{ display: 'inherit' }} target="_blank" to={'/admin/home/resource-manage/edit-multi?id=' + record.id} ><FormOutlined /></Link>
 					</VisualBox>
 					<VisualBox visible={record.source_type === 'novel'}>
