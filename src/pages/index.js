@@ -16,6 +16,7 @@ import TradePage from './home/StockManagePage/trade'
 import ExamineListPage from './home/ExamineManagePage/List'
 import ExamineDetailPage from './home/ExamineManagePage/Detail'
 import LinkManagePage from './home/LinkManagePage'
+import LineManagePage from './home/LineManagePage'
 import ConfigPage from './home/ConfigPage'
 import RobotManage from './home/RobotManage'
 import BackupTablePage from './home/DataManagePage/table'
@@ -64,6 +65,7 @@ const page_map = {
   'ExamineListPage': ExamineListPage,
   'ExamineDetailPage': ExamineDetailPage,
   'LinkManagePage': LinkManagePage,
+  'LineManagePage': LineManagePage,
   'ConfigPage': ConfigPage,
   'RobotManage': RobotManage,
   'BackupTablePage': BackupTablePage,

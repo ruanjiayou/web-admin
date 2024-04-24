@@ -11,6 +11,7 @@ import * as user from './user'
 import * as schedule from './schedule'
 import * as examine from './examine'
 import * as link from './link'
+import * as line from './line'
 import * as pub from './public'
 import * as config from './config'
 import * as robot from './robot'
@@ -67,6 +68,7 @@ export default {
   ...schedule,
   ...examine,
   ...link,
+  ...line,
   ...pub,
   ...config,
   ...robot,
