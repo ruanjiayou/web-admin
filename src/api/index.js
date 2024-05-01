@@ -44,7 +44,7 @@ const getTradeBalance = function () {
 
 const excuteTemplate = async (id, data) => {
   return shttp({
-    url: '/v1/admin/excute/' + id,
+    url: 'http://192.168.0.124:7777/ffmpeg/' + id,
     data,
     method: 'POST'
   })
