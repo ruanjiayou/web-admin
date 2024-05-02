@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 // import LoadingView from '../HolderView/LoadingView'
 import apis from '../../../api';
 import { Table, Popconfirm, notification, Select, Tag, Divider, } from 'antd';
-import { FormOutlined, DeleteOutlined, WarningOutlined, CloudServerOutlined, SyncOutlined, CloudSyncOutlined, LinkOutlined, SwitcherOutlined } from '@ant-design/icons'
+import { FormOutlined, DeleteOutlined, WarningOutlined, CloudServerOutlined, SyncOutlined, CloudSyncOutlined, LinkOutlined, SwitcherOutlined, DownloadOutlined } from '@ant-design/icons'
 import { Icon, VisualBox, EditTag } from '../../../component'
 import { CenterXY } from '../../../component/style'
 import store from '../../../store'
@@ -255,6 +255,13 @@ export default function ResourceList({ items, children, categories, search, loca
 					</VisualBox>
 					<VisualBox visible={['video', 'image', 'music', 'movie', 'animation'].includes(record.source_type)}>
 						<Link title="编辑" style={{ display: 'inherit' }} target="_blank" to={'/admin/home/resource-manage/edit-multi?id=' + record.id} ><FormOutlined /></Link>
+					</VisualBox>
+					<VisualBox visible={record.source_type === 'movie' && record.status === 'loading'}>
+						<DownloadOutlined onClick={() => {
+							const url = new URL(record.origin);
+							url.searchParams.set('crawl', '1')
+							window.open(url.href, '_blank');
+						}} />
 					</VisualBox>
 					<VisualBox visible={record.source_type === 'novel'}>
 						<Divider type="vertical" />
