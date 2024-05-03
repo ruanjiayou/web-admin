@@ -74,17 +74,10 @@ export default function Page() {
     events.on('transcode', function (d) {
       onSearch();
     })
-    events.on('open_url', function (d) {
-      console.log('open_url', d)
-      if (window.location.pathname === '/admin/home/download-manage') {
-        window.open(d.url)
-      }
-    })
     return () => {
       events.off('progress_change', progress);
       events.off('resource_change');
       events.off('transcode');
-      events.off('open_url');
     }
   })
 
