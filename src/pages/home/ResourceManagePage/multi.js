@@ -196,11 +196,19 @@ export default function ResourceEdit() {
           <Col span={3} style={{ textAlign: 'right' }}>
             状态：
           </Col>
-          <Col className="gutter-row" span={3}>
-            <Switch checked={local.data.status === 'finished'} onClick={e => {
-              local.data.status = local.data.status === 'finished' ? 'loading' : 'finished'
-              onEdit()
-            }} /> {local.data.status}
+          <Col className="gutter-row" span={6}>
+            <Radio.Group
+              style={{ backgroundColor: '#eee', padding: '4px 0 4px 10px', borderRadius: 5 }}
+              value={local.data.status}
+              onChange={e => {
+                local.data.status = e.target.value
+                onEdit()
+              }}>
+              <Radio value={"init"}>待下载</Radio>
+              <Radio value={"loading"}>下载中</Radio>
+              <Radio value={"fail"}>已失败</Radio>
+              <Radio value={"finished"}>已完成</Radio>
+            </Radio.Group>
           </Col>
 
           <Col className="gutter-row" span={3}>公开：
@@ -213,7 +221,7 @@ export default function ResourceEdit() {
           <Row style={{ alignItems: 'center' }}>
             <div>资源类型：</div>
             <FullWidthFix >
-              <Select style={{ width: 150 }} value={local.data.source_type} onChange={value => {
+              <Select style={{ width: 120 }} value={local.data.source_type} onChange={value => {
                 local.data.source_type = value
               }}>
                 {store.resource_types.map(type => (

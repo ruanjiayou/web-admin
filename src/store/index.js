@@ -15,22 +15,22 @@ const store = {
   menus: [],
   resource_types: [
     { name: '', title: '无' },
-    { name: 'file', title: '文件' },
+    { name: 'video', title: '视频' },
+    { name: 'movie', title: '电影' },
     { name: 'image', title: '图片' },
 
+    { name: 'animation', title: '动画' },
+    { name: 'comic', title: '漫画' },
+    { name: 'novel', title: '小说' },
+    { name: 'article', title: '文章' },
+    { name: 'file', title: '文件' },
     { name: 'audio', title: '音频' },
     { name: 'music', title: '音乐' },
 
-    { name: 'comic', title: '漫画' },
-    { name: 'video', title: '视频' },
-    { name: 'movie', title: '电影' },
     { name: 'program', title: '节目' },
-    { name: 'animation', title: '动画' },
     { name: 'short', title: '短视频' },
     { name: 'series', title: '电视剧' },
 
-    { name: 'novel', title: '小说' },
-    { name: 'article', title: '文章' },
     { name: 'private', title: '私人' },
   ],
   medias: [
@@ -55,7 +55,8 @@ const store = {
 
 storage.prefix = store.app.storagePrefix
 store.app.set('menuKey', storage.getValue('menu-key') || '/admin/home/resource-manage/list')
-store.app.set('baseUrl', '/gw/admin')
+// store.app.set('baseUrl', '/gw/admin')
+store.app.set('baseUrl', 'https://192.168.0.124/gw/novel')
 store.app.set('imageLine', '')
 store.user.setToken(storage.getValue('user-token') || '')
 store.user.setUsername(storage.getValue('user-username') || '')
