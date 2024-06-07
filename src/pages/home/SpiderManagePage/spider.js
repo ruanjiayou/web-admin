@@ -37,6 +37,7 @@ export default function RulePage(props) {
         spiders: [],
         page: 1,
         limit: 20,
+        loading: false,
         preview: false,
         matchURL: {
             open: false,
@@ -45,6 +46,9 @@ export default function RulePage(props) {
             matched_spider_id: '',
             params: null,
             isComposition: false,
+        },
+        setData(spiders) {
+            this.spiders = spiders;
         }
     }))
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -59,6 +63,7 @@ export default function RulePage(props) {
         setIsModalOpen(true);
     }
     const getSpiders = async () => {
+        local.loading = true;
         const result = await apis.getSpiders({ page: local.page, limit: local.limit })
         if (result.code === 0) {
             result.data.forEach(it => {
@@ -68,6 +73,7 @@ export default function RulePage(props) {
         } else {
             notification.error({ message: '获取数据失败' })
         }
+        local.loading = false;
     }
     function openMatch() {
         local.matchURL.matched_spider_id = '';
@@ -198,10 +204,12 @@ export default function RulePage(props) {
                 <Button type="primary" onClick={() => { local.tempData = {}; setIsModalOpen(true) }}>添加</Button>
                 <Button type='primary' onClick={openMatch}>抓取</Button>
                 <Button type="primary">
-                    <Icon type="sync-horizon" onClick={() => getSpiders()} color="#blue" />
+                    <Icon type="sync-horizon" spin={local.loading} onClick={() => getSpiders()} color="#blue" />
                 </Button>
             </Space>
             {isModalOpen && <EditPage cancel={() => setIsModalOpen(false)} data={local.tempData} save={async (data) => {
+                const u = local.tempData.urls.find(it => it.enabled === true);
+                local.tempData.pattern = u ? u.url : '';
                 const result = local.tempData._id ? await apis.updateSpider(local.tempData._id, data) : await apis.createSpider(data)
                 if (result.code === 0) {
                     await getSpiders()
