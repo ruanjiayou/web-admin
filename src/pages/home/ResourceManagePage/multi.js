@@ -538,6 +538,7 @@ export default function ResourceEdit() {
                       item.loading = true
                       try {
                         await api.updateResourceVideo(local.id, { id: item.id, url: ourl.value, path: opath.value, title: otitle.value });
+                        item.path = opath.value;
                         message.success('修改成功')
                       } finally {
                         item.loading = false
@@ -554,9 +555,13 @@ export default function ResourceEdit() {
                             filepath: item.path,
                             type,
                           }
-                          await Axios.post(`https://192.168.0.124/gw/download/tasks`, data)
-                          await api.updateResourceVideo(local.id, { id: item.id, status: 'loading' })
-                          item.status = 'loading'
+                          const resp = await Axios.post(`https://192.168.0.124/gw/download/tasks`, data)
+                          if (resp.status === 200 && resp.data.code === 0) {
+                            await api.updateResourceVideo(local.id, { id: item.id, status: 'loading' })
+                            item.status = 'loading'
+                          } else {
+                            message.error('失败：' + resp.body.message)
+                          }
                           // }
                         } catch (e) {
                           console.log(e)

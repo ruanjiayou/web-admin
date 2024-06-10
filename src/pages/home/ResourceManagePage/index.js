@@ -12,6 +12,7 @@ import { Right } from '../../../component/style';
 import CodeEditor from '../../../component/CodeEditor'
 import { match } from 'path-to-regexp'
 import { events } from '../../../utils/events';
+import * as _ from 'lodash'
 
 const { getResources, search, createResource, updateResource, destroyResource, getGroupTypes, v2getRules, v2GetResourceByRule, v2previewRule } = apis
 
@@ -347,7 +348,7 @@ export default function ResourceManagePage() {
               <Button type="primary" loading={local.isLoading} onClick={async () => {
                 local.isLoading = true
                 try {
-                  await updateResource(local.temp)
+                  await updateResource(_.pick(local.temp, ['title', 'types', 'series', 'open', 'status', 'source_type', 'thumbnail', 'id']))
                   local.showFastEdit = false
                   local.thumbnail = ''
                 } catch (e) {
