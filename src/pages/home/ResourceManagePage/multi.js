@@ -1088,6 +1088,7 @@ export default function ResourceEdit() {
     <Observer>{() => <Modal visible={local.showFormat}
       style={{ overflow: 'auto', padding: 0, zIndex: 1201 }}
       width={700}
+      confirmLoading={local.loading}
       bodyStyle={{ height: 500, overflow: 'auto' }}
       onCancel={local.cancelFormat}
       onOk={async () => {
@@ -1100,6 +1101,7 @@ export default function ResourceEdit() {
           let url = 'https://googlevideo.com/' + videoItem.id + '+' + audioItem.id + '.' + videoItem.ext
           local.isDealUrl = true
           try {
+            local.loading = true
             const size = videoItem.size + audioItem.size;
             const more = { size, width: videoItem.width, height: videoItem.height };
             const res = await api.addResourceVideo({ id: local.id, title: '', url, type: 'normal', status: 'init', more, ext: videoItem.ext, more: videoItem, subtitles: local.subtitle_url })
@@ -1110,6 +1112,7 @@ export default function ResourceEdit() {
               notification.info('fail')
             }
           } finally {
+            local.loading = false;
             local.tempUrl = '';
             local.isDealUrl = false;
             local.tempStatus = 'init';

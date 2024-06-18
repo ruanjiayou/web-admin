@@ -151,7 +151,7 @@ export default function Page() {
             {task.params && task.params.total && <div style={{ height: 22, backgroundColor: 'grey', color: 'white' }}>
               {task.params.finished * 2 > task.params.total ? <div style={{ backgroundColor: '#54c77d', color: 'white', textAlign: 'right', width: `${Math.round(100 * task.params.finished / task.params.total)}%` }}>{task.type === 'm3u8' ? task.params.finished + '/' + task.params.total : formatNumber(task.params.finished) + '/' + formatNumber(task.params.total)}&nbsp;</div> : (
                 <Fragment>
-                  <div style={{ float: 'left', backgroundColor: '#54c77d', height: 22, color: 'white', width: `${Math.round(100 * task.params.finished / task.params.total)}%` }}></div>
+                  <div style={{ float: 'left', backgroundColor: '#54c77d', height: 22, color: 'white', maxWidth: '100%', width: `${Math.round(100 * task.params.finished / task.params.total)}%` }}></div>
                   &nbsp;&nbsp;{task.type === 'm3u8' ? task.params.finished + '/' + task.params.total : formatNumber(task.params.finished) + '/' + formatNumber(task.params.total)}
                 </Fragment>)}
             </div>}
