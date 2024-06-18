@@ -1100,9 +1100,11 @@ export default function ResourceEdit() {
           let url = 'https://googlevideo.com/' + videoItem.id + '+' + audioItem.id + '.' + videoItem.ext
           local.isDealUrl = true
           try {
-            const res = await api.addResourceVideo({ id: local.id, title: '', url, type: 'normal', status: 'init', more: _.pick(videoItem, ['size', 'width', 'height']), ext: videoItem.ext, more: videoItem, subtitles: local.subtitle_url })
+            const size = videoItem.size + audioItem.size;
+            const more = { size, width: videoItem.width, height: videoItem.height };
+            const res = await api.addResourceVideo({ id: local.id, title: '', url, type: 'normal', status: 'init', more, ext: videoItem.ext, more: videoItem, subtitles: local.subtitle_url })
             if (res && res.code === 0) {
-              local.data.videos.push({ url: res.data.url, path: res.data.path, id: res.data.id, status: 'init', type: 'normal', more: _.pick(videoItem, ['size', 'width', 'height']), nth: local.data.videos.length, subtitles: res.data.subtitles })
+              local.data.videos.push({ url: res.data.url, path: res.data.path, id: res.data.id, status: 'init', type: 'normal', more, nth: local.data.videos.length, subtitles: res.data.subtitles })
               local.urlAddVisible = false
             } else {
               notification.info('fail')
