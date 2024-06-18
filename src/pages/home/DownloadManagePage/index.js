@@ -1,5 +1,6 @@
 import React, { useRef, useCallback, Fragment } from 'react'
 import { Observer, useLocalStore } from 'mobx-react-lite'
+import { toJS } from 'mobx'
 import axios from 'axios'
 import { useEffectOnce } from 'react-use';
 import { Table, Popconfirm, notification, Select, Tag, Divider, message, Tooltip, Button, Form, Input, Radio, Modal, } from 'antd';
@@ -19,7 +20,7 @@ export default function Page() {
     headers_list: JSON.parse(localStorage.getItem('headers_history') || '[]'),
     loading: false,
     edit_id: '',
-    status: '1,2,3',
+    status: '',
     type: '',
     total: 0,
     data: {},
@@ -70,7 +71,6 @@ export default function Page() {
     onSearch();
     const progress = function (d) {
       local.changeProgress(d)
-      local.ts = Date.now();
     }
     events.on('progress_change', progress);
     events.on('resource_change', function (d) {
@@ -124,7 +124,7 @@ export default function Page() {
         <Divider type='vertical' />
         <Button type='primary' onClick={() => { onSearch() }}>刷新</Button>
       </div>
-      <Table dataSource={local.tasks} rowKey="_id" scroll={{ y: 'calc(100vh - 273px)' }} key={local.ts} loading={local.loading} pagination={{
+      <Table dataSource={toJS(local.tasks)} rowKey="_id" scroll={{ y: 'calc(100vh - 273px)' }} loading={local.loading} pagination={{
         pageSize: 20,
         current: local.page,
         total: local.total,
