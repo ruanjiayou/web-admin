@@ -65,7 +65,6 @@ export default function TaskList() {
             search()
           }}>
           {/* <Column title="id" width={100} dataIndex="id" key="id" render={text => <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block', width: '100%' }}>{text}</span>} /> */}
-          <Column title="名称" dataIndex="name" key="name" />
           <Column title="类型" dataIndex="type" key="type" />
           <Column title="环境" dataIndex="env" key="env" />
           <Column title="地址" dataIndex="url" key="url" render={text => {

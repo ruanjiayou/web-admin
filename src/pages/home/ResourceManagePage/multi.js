@@ -380,6 +380,7 @@ export default function ResourceEdit() {
                 width: item.width,
                 resolution: item.resolution,
                 filesize: formatNumber(item.filesize),
+                size: item.filesize || 0,
                 id: item.format_id
               }));
               local.audio_formats = local.data.original.formats.filter(item => item.audio_ext !== 'none' && item.filesize).sort((a, b) => b.filesize - a.filesize).map(item => ({
@@ -390,6 +391,7 @@ export default function ResourceEdit() {
                 width: item.width,
                 resolution: item.resolution,
                 filesize: formatNumber(item.filesize),
+                size: item.filesize || 0,
                 id: item.format_id
               }));
               // local.formats = local.data.original.formats.filter(item => item.filesize && item.resolution !== 'audio only').sort((a, b) => b.filesize - a.filesize).map(item => ({
@@ -554,6 +556,7 @@ export default function ResourceEdit() {
                             url: item.url,
                             filepath: item.path,
                             type,
+                            params: { total: item.size, finished: 0 }
                           }
                           const resp = await Axios.post(`https://192.168.0.124/gw/download/tasks`, data)
                           if (resp.status === 200 && resp.data.code === 0) {

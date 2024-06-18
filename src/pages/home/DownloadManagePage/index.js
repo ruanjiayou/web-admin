@@ -20,6 +20,7 @@ export default function Page() {
     loading: false,
     edit_id: '',
     status: '1,2,3',
+    type: '',
     total: 0,
     data: {},
     ts: Date.now(),
@@ -27,8 +28,12 @@ export default function Page() {
     changeProgress: (d) => {
       local.tasks.forEach(task => {
         if (task._id === d.id) {
-          task.params.total = d.total;
-          task.params.finished = d.finished;
+          if (d.total) {
+            task.params.total = d.total;
+          }
+          if (d.finished) {
+            task.params.finished = d.finished;
+          }
           if (d.total === d.finished) {
             task.status = 3;
           }
@@ -40,7 +45,7 @@ export default function Page() {
   const onSearch = useCallback(async () => {
     try {
       local.loading = true;
-      const resp = await axios.get(`${download_api_url}/tasks?page=${local.page}&status=${local.status}`);
+      const resp = await axios.get(`${download_api_url}/tasks?page=${local.page}&status=${local.status}&type=${local.type}`);
       if (resp.status === 200) {
         const result = resp.data;
         if (result.code === 0) {
@@ -75,16 +80,30 @@ export default function Page() {
       onSearch();
     })
     return () => {
-      events.off('progress_change', progress);
-      events.off('resource_change');
-      events.off('transcode');
+      if (events) {
+        events.off('progress_change', progress);
+        events.off('resource_change');
+        events.off('transcode');
+      }
     }
   })
 
   return <Observer>{() => (
     <Fragment>
       <div style={{ padding: 10, textAlign: 'right' }}>
+        <Select defaultValue={local.type} onChange={(type) => {
+          local.page = 1;
+          local.type = type;
+          onSearch();
+        }}>
+          <Select.Option value="">全部</Select.Option>
+          <Select.Option value="image">图片</Select.Option>
+          <Select.Option value="m3u8">m3u8</Select.Option>
+          <Select.Option value="mp4">mp4</Select.Option>
+        </Select>
+        &nbsp;&nbsp;
         <Select defaultValue={local.status} onChange={(status) => {
+          local.page = 1;
           local.status = status;
           onSearch();
         }}>
@@ -108,7 +127,7 @@ export default function Page() {
       <Table dataSource={local.tasks} rowKey="_id" scroll={{ y: 'calc(100vh - 273px)' }} key={local.ts} loading={local.loading} pagination={{
         pageSize: 20,
         current: local.page,
-        total: local.count,
+        total: local.total,
       }} onChange={(page) => {
         local.page = page.current
         onSearch()
