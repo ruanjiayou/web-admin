@@ -26,6 +26,14 @@ export default function Page() {
     data: {},
     ts: Date.now(),
     showDialog: false,
+    setById: (_id, kv) => {
+      const t = local.tasks.find(t => t._id === _id);
+      if (t) {
+        for (let k in kv) {
+          t[k] = kv[k];
+        }
+      }
+    },
     changeProgress: (d) => {
       local.tasks.forEach(task => {
         if (task._id === d.id) {
@@ -163,7 +171,7 @@ export default function Page() {
               try {
                 local.loading = true;
                 await axios.post(`${download_api_url}/excute/start`, { id: task._id });
-                task.status = 2;
+                local.setById(task._id, { status: 2 })
               } catch (e) {
                 message.error('启动下载失败')
               } finally {
@@ -175,7 +183,7 @@ export default function Page() {
               try {
                 local.loading = true;
                 await axios.post(`${download_api_url}/excute/stop`, { id: task._id });
-                task.status = 1;
+                local.setById(task._id, { status: 1 })
               } catch (e) {
                 message.error('停止下载失败')
               } finally {
@@ -187,7 +195,7 @@ export default function Page() {
               try {
                 local.loading = true;
                 await axios.post(`${download_api_url}/excute/move`, { id: task._id });
-                task.status = 5;
+                local.setById(task._id, { status: 5 })
               } catch (e) {
                 message.error('转移失败')
               } finally {
@@ -208,7 +216,7 @@ export default function Page() {
               try {
                 local.loading = true;
                 axios.post(`${download_api_url}/excute/transcode`, { id: task._id });
-                task.transcode = 2;
+                local.setById(task._id, { transcode: 2 })
                 local.loading = false;
               } finally {
               }
@@ -304,16 +312,20 @@ export default function Page() {
             <Input value={local.data.url} autoFocus onChange={e => local.data.url = e.target.value} defaultValue={local.data.url} />
           </Item>
           <Item label="header:" labelCol={{ span: 4 }}>
-            <Select onChange={(v) => {
-              local.data.header = JSON.parse(v);
+            <Select defaultValue={""} onChange={(v) => {
+              local.data.header = local.headers_list.find(it => it.Origin === v) || {};
             }}>
-              {local.headers_list.map((headers, i) => (<Select.Option key={i} value={JSON.stringify(headers)}>{headers.Origin}</Select.Option>))}
+              <Select.Option value="">None</Select.Option>
+              {local.headers_list.map((headers, i) => (<Select.Option key={i} value={headers.Origin}>{headers.Origin}</Select.Option>))}
             </Select>
             <Divider />
             <Input ref={ref => addRef.current = ref} addonAfter={<PlusCircleOutlined onClick={(e) => {
               try {
                 if (addRef.current) {
                   const d = JSON.parse(addRef.current.input.value.trim());
+                  if (!d.Origin) {
+                    return message.info('必须填写Origin字段')
+                  }
                   local.headers_list.push(d);
                   localStorage.setItem('headers_history', JSON.stringify(local.headers_list))
                 }
