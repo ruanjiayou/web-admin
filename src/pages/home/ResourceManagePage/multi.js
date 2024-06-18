@@ -556,7 +556,7 @@ export default function ResourceEdit() {
                             url: item.url,
                             filepath: item.path,
                             type,
-                            params: { total: item.size, finished: 0 }
+                            params: { total: item.more.size, finished: 0 }
                           }
                           const resp = await Axios.post(`https://192.168.0.124/gw/download/tasks`, data)
                           if (resp.status === 200 && resp.data.code === 0) {
@@ -1100,7 +1100,7 @@ export default function ResourceEdit() {
           let url = 'https://googlevideo.com/' + videoItem.id + '+' + audioItem.id + '.' + videoItem.ext
           local.isDealUrl = true
           try {
-            const res = await api.addResourceVideo({ id: local.id, title: '', url, type: 'normal', status: 'init', ext: videoItem.ext, more: videoItem, subtitles: local.subtitle_url })
+            const res = await api.addResourceVideo({ id: local.id, title: '', url, type: 'normal', status: 'init', more: _.pick(videoItem, ['size', 'width', 'height']), ext: videoItem.ext, more: videoItem, subtitles: local.subtitle_url })
             if (res && res.code === 0) {
               local.data.videos.push({ url: res.data.url, path: res.data.path, id: res.data.id, status: 'init', type: 'normal', nth: local.data.videos.length, subtitles: res.data.subtitlesf })
               local.urlAddVisible = false
