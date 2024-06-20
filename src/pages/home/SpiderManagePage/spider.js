@@ -208,8 +208,6 @@ export default function RulePage(props) {
                 </Button>
             </Space>
             {isModalOpen && <EditPage cancel={() => setIsModalOpen(false)} data={local.tempData} save={async (data) => {
-                const u = local.tempData.urls.find(it => it.enabled === true);
-                local.tempData.pattern = u ? u.url : '';
                 const result = local.tempData._id ? await apis.updateSpider(local.tempData._id, data) : await apis.createSpider(data)
                 if (result.code === 0) {
                     await getSpiders()

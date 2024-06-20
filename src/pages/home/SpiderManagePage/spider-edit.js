@@ -10,7 +10,7 @@ const Item = Form.Item;
 export default function RuleEdit({ data, cancel, save }) {
   const local = useLocalStore(() => ({
     editORadd: data._id ? 'edit' : 'add',
-    data: data._id ? _.cloneDeep(data) : { config: { proxy: 0, from: 'url' }, urls: [], script: '', name: '', desc: '', header: {}, status: 0 },
+    data: data._id ? _.cloneDeep(data) : { config: { proxy: 0, from: 'url' }, urls: [], pattern: '', script: '', name: '', desc: '', header: {}, status: 0 },
     loading: false,
     ref: '',
     poster: data.poster || '',
@@ -73,8 +73,12 @@ export default function RuleEdit({ data, cancel, save }) {
       </Item>
       <Item label="规则" labelCol={{ span: 4 }}>
         <Space direction='vertical' style={{ width: '100%' }}>
+          <p>{local.data.pattern}</p>
           {local.data.urls.length === 0 && <label style={{ lineHeight: '32px' }}>暂无数据</label>}
-          {local.data.urls.map((item, i) => <Input key={i} value={item.url} readOnly addonAfter={<Switch checked={item.enabled} onChange={v => item.enabled = v} />} addonBefore={item.enabled ? '开启' : '关闭'} />)}
+          {local.data.urls.map((item, i) => <Input key={i} value={item.url} readOnly addonAfter={<Switch checked={item.enabled} onChange={v => {
+            item.enabled = v;
+            local.data.pattern = item.url;
+          }} />} addonBefore={item.enabled ? '开启' : '关闭'} />)}
           <Input addonBefore="添加" ref={ref => urlRef.current = ref} addonAfter={<Icon type="check" onClick={() => {
             if (urlRef.current) {
               const url = urlRef.current.input.value.trim();
