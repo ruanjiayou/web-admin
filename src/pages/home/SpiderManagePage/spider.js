@@ -116,15 +116,17 @@ export default function RulePage(props) {
         if (!link || !link.startsWith('http')) {
             return null;
         }
-        const url1 = new window.URL(link)
+        const url1 = new window.URL(encodeURI(link))
         let found = null;
         for (let i = 0; i < local.spiders.length; i++) {
             const spider = local.spiders[i];
             const url_pattern = spider.pattern;
-            const url2 = new window.URL(url_pattern);
+            const url2 = new window.URL(encodeURI(url_pattern));
             if (url_pattern.startsWith(url1.origin)) {
-                const fn = match(url2.pathname, { decode: decodeURIComponent })
-                const result = fn(url1.pathname)
+                console.log(decodeURI(url2.pathname))
+                const fn = match(decodeURI(url2.pathname), { decode: decodeURIComponent })
+                const result = fn(decodeURI(url1.pathname))
+                console.log(result, decodeURI(url1.pathname));
                 if (result.params) {
                     found = result.params;
                     [...url2.searchParams.entries()].forEach(([key, value]) => {
