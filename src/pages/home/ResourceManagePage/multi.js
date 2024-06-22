@@ -556,7 +556,7 @@ export default function ResourceEdit() {
                             url: item.url,
                             filepath: item.path,
                             type,
-                            params: { total: item.more.size, finished: 0 }
+                            params: { total: _.get(item, 'more.size', 0), finished: 0 }
                           }
                           const resp = await Axios.post(`https://192.168.0.124/gw/download/tasks`, data)
                           if (resp.status === 200 && resp.data.code === 0) {
