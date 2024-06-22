@@ -9,7 +9,7 @@ export function getSchedules() {
 
 export function tickSchedule(data) {
   return shttp({
-    url: `/v1/admin/schedule/${data.name}`,
+    url: `/v1/admin/schedule/${data._id}`,
     method: 'PATCH',
   })
 }
