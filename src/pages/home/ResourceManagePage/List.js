@@ -78,7 +78,7 @@ export default function ResourceList({ items, children, categories, search, loca
 					url += ('/novel/groups/GroupTree/VideoInfo?GroupTree.name=video&VideoInfo.id=' + record.id)
 				} else if (record.source_type === 'novel') {
 					url += ('/novel/home/BookInfo?home.tab=&BookInfo.id=' + record.id)
-				} else if (['article', 'private'].includes(record.source_type)) {
+				} else if (['article', 'post', 'private'].includes(record.source_type)) {
 					url += ('/novel/home/Article?home.tab=QD7vNfJCU&Article.id=' + record.id)
 				} else if (['image'].includes(record.source_type)) {
 					url += ('/novel/groups/GroupTree/Image?GroupTree.name=image&Image.id=' + record.id)
@@ -90,7 +90,7 @@ export default function ResourceList({ items, children, categories, search, loca
 					} else {
 						notification.info({ message: '类型不可预览' })
 					}
-				}}>{text}</a>
+				}}>{record.source_type === 'post' ? record.content : text}</a>
 			}} />
 			<Column title="类型" width={100} dataIndex="source_type" key="source_type" render={(text, record) => (
 				<Observer>{() => (
@@ -250,7 +250,7 @@ export default function ResourceList({ items, children, categories, search, loca
 					}}>
 						<SyncOutlined title='同步es' spin={state.syncItems[record.id] ? true : false} />
 					</Popconfirm>
-					<VisualBox visible={['article'].includes(record.source_type)}>
+					<VisualBox visible={['article', 'post'].includes(record.source_type)}>
 						<Link title="编辑" style={{ display: 'inherit' }} to={'/admin/home/resource-manage/edit-multi?id=' + record.id} target="_blank"><FormOutlined /></Link>
 					</VisualBox>
 					<VisualBox visible={['video', 'image', 'music', 'movie', 'animation'].includes(record.source_type)}>

@@ -23,6 +23,7 @@ const store = {
     { name: 'comic', title: '漫画' },
     { name: 'novel', title: '小说' },
     { name: 'article', title: '文章' },
+    { name: 'post', title: '帖子' },
     { name: 'file', title: '文件' },
     { name: 'audio', title: '音频' },
     { name: 'music', title: '音乐' },

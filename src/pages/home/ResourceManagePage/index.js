@@ -142,14 +142,14 @@ export default function ResourceManagePage() {
             onSearch()
           }}>
             <Select.Option value="">全部</Select.Option>
-            <Select.Option value="file">文件</Select.Option>
-            <Select.Option value="image">图片</Select.Option>
-            <Select.Option value="music">音频</Select.Option>
             <Select.Option value="video">视频</Select.Option>
-            <Select.Option value="animation">动画</Select.Option>
-            <Select.Option value="novel">小说</Select.Option>
-            <Select.Option value="article">文章</Select.Option>
             <Select.Option value="movie">电影</Select.Option>
+            <Select.Option value="article">文章</Select.Option>
+            <Select.Option value="image">图片</Select.Option>
+            <Select.Option value="animation">动画</Select.Option>
+            <Select.Option value="music">音频</Select.Option>
+            <Select.Option value="novel">小说</Select.Option>
+            <Select.Option value="file">文件</Select.Option>
             <Select.Option value="private">私人</Select.Option>
           </Select>
           <Divider type="vertical" />
