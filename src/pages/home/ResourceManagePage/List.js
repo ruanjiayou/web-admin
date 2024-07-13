@@ -82,6 +82,8 @@ export default function ResourceList({ items, children, categories, search, loca
 					url += ('/novel/home/Article?home.tab=QD7vNfJCU&Article.id=' + record.id)
 				} else if (['image'].includes(record.source_type)) {
 					url += ('/novel/groups/GroupTree/Image?GroupTree.name=image&Image.id=' + record.id)
+				} else if (record.source_type === 'post') {
+					url += ('/novel/home/Post?home.tab=QD7vNfJCU&Article.id=' + record.id)
 				}
 				return <a style={{ color: '#1890ff', cursor: 'pointer' }} title={url} href={url} onClick={(e) => {
 					e.preventDefault()
@@ -90,7 +92,7 @@ export default function ResourceList({ items, children, categories, search, loca
 					} else {
 						notification.info({ message: '类型不可预览' })
 					}
-				}}>{record.source_type === 'post' ? record.content : text}</a>
+				}}>{record.source_type === 'post' ? record.desc || record.content : text}</a>
 			}} />
 			<Column title="类型" width={100} dataIndex="source_type" key="source_type" render={(text, record) => (
 				<Observer>{() => (

@@ -1073,7 +1073,7 @@ export default function ResourceEdit() {
             />
           </Form.Item>
         </VisualBox>
-        <VisualBox visible={local.data.source_type === 'article'}>
+        <VisualBox visible={['article', 'post'].includes(local.data.source_type)}>
           <Form.Item label="内容" labelCol={lb} wrapperCol={rb}>
             <div style={{ lineHeight: 'initial', height: '100%' }}>
               <Ueditor ref={ref => ueditor.current = ref} initData={local.data.content} />
