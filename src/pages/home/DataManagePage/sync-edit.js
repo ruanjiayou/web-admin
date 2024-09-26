@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { cloneDeep } from 'lodash'
 import React from 'react'
 import { Observer, useLocalStore } from 'mobx-react-lite'
 import { Modal, Form, Input } from 'antd';
@@ -6,7 +6,7 @@ import { Modal, Form, Input } from 'antd';
 export default function SyncEditor({ data, cancel, save }) {
   const lb = { span: 3 }, rb = { span: 18 }
   const store = useLocalStore(() => ({
-    data: data.id ? _.cloneDeep(data) : {},
+    data: data.id ? cloneDeep(data) : {},
     loading: false,
   }))
   store.data.condition = store.data.condition ? JSON.stringify(store.data.condition) : '{}'

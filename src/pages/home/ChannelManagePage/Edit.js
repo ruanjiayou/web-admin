@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { cloneDeep } from 'lodash'
 import React, { useRef } from 'react'
 import { Observer, useLocalStore } from 'mobx-react-lite'
 import { Modal, Radio, Form, Input, Select, Upload, Button, } from 'antd';
@@ -10,7 +10,7 @@ export default function ChannelEditor({ data, cancel, save, groups }) {
   const store = useStore()
   const picture = useRef(null)
   const local = useLocalStore(() => ({
-    data: data.id ? _.cloneDeep(data) : {},
+    data: data.id ? cloneDeep(data) : {},
     loading: false,
     cover: data.cover || '',
     ref: '',
@@ -59,7 +59,7 @@ export default function ChannelEditor({ data, cancel, save, groups }) {
             <img width="100%" src={(local.cover.startsWith('data') ? local.cover : store.app.imageLine + (local.cover || '/images/poster/nocover.jpg'))} alt="" />
             <Button style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)' }}>
               <UploadOutlined /> 上传
-              </Button>
+            </Button>
           </Upload>
         </Form.Item>
         <Form.Item label="描述" labelCol={lb} wrapperCol={rb}>

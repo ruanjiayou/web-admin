@@ -2,14 +2,14 @@ import React from 'react'
 import { Modal, Form, Input, notification, Radio, Select, Card, Row, Col, Divider } from 'antd'
 import { Observer, useLocalStore } from 'mobx-react-lite';
 import { toJS } from 'mobx'
-import * as _ from 'lodash';
+import { cloneDeep } from 'lodash';
 import { PlusCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
 import { VisualBox } from '../../../component'
 
 export default function GroupAdd({ cancel, save, data }) {
   const lb = { span: 6, offset: 3 }, rb = { span: 12 }
   const store = useLocalStore(() => ({
-    data: data.id ? _.cloneDeep(data) : { refs: [], nth: 1, attrs: {}, params: {}, more: {}, ...data },
+    data: data.id ? cloneDeep(data) : { refs: [], nth: 1, attrs: {}, params: {}, more: {}, ...data },
     loading: false,
     ref: '',
     maps: [

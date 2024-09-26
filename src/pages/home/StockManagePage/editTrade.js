@@ -4,7 +4,7 @@ import { Modal, Form, Input, Select, message, Col, Row, DatePicker } from 'antd'
 import * as math from 'mathjs'
 import moment from 'moment'
 import RemoteSelect from './remoteSelect'
-import _ from 'lodash'
+import { sum } from 'lodash'
 
 function toNum(n) {
   return Math.round((parseFloat(n) || 0) * 1000) / 1000
@@ -15,7 +15,7 @@ export default function ({ data, save, cancel }) {
   const local = useLocalStore(() => ({
     data: data,
     auto: () => {
-      local.data.fee = _.sum(local.data.fees.map(fee => fee.value));
+      local.data.fee = sum(local.data.fees.map(fee => fee.value));
       local.data.trade = math.multiply(math.bignumber(local.data.amount), math.bignumber(local.data.price)).toNumber()
     },
     isLoading: false,

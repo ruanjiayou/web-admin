@@ -1,5 +1,5 @@
 import shttp from '../utils/shttp'
-import _ from 'lodash'
+import { isArray, isPlainObject } from 'lodash'
 import qs from 'querystring'
 
 export function getExamines() {
@@ -19,7 +19,7 @@ export function getExamine(id) {
 export function createExamine(data) {
   const form = new FormData()
   for (let k in data) {
-    let plainO = _.isPlainObject(data[k]) || _.isArray(data[k])
+    let plainO = isPlainObject(data[k]) || isArray(data[k])
     form.append(k, plainO ? JSON.stringify(data[k]) : data[k])
   }
   return shttp({
@@ -43,7 +43,7 @@ export function destroyExamine(id) {
 export function updateExamine({ params, data }) {
   const form = new FormData()
   for (let k in data) {
-    let plainO = _.isPlainObject(data[k]) || _.isArray(data[k])
+    let plainO = isPlainObject(data[k]) || isArray(data[k])
     form.append(k, plainO ? JSON.stringify(data[k]) : data[k])
   }
   return shttp({
@@ -66,7 +66,7 @@ export function getQuestions({ params, query }) {
 export function createQuestion(data) {
   const form = new FormData()
   for (let k in data) {
-    let plainO = _.isPlainObject(data[k]) || _.isArray(data[k])
+    let plainO = isPlainObject(data[k]) || isArray(data[k])
     form.append(k, plainO ? JSON.stringify(data[k]) : data[k])
   }
   return shttp({
@@ -90,11 +90,11 @@ export function destroyQuestion(params) {
 export function updateQuestion({ params, data }) {
   const form = new FormData()
   for (let k in data) {
-    if (_.isArray(data[k])) {
+    if (isArray(data[k])) {
       for (let i = 0; i < data[k].length; i++) {
         form.append(k, data[k][i])
       }
-    } else if (_.isPlainObject(data[k])) {
+    } else if (isPlainObject(data[k])) {
       form.append(k, JSON.stringify(data[k]))
     } else {
       form.append(k, data[k])

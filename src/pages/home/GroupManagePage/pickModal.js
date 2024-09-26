@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect } from 'react'
 import { Modal, Form, Input, notification, Radio, Select, Card, Row, Col, Divider, Button, Table } from 'antd'
 import { Observer, useLocalStore } from 'mobx-react-lite';
-import * as _ from 'lodash';
 import resourcesLoader from '../../../loader/resourceListLoader'
 import { AlignAside } from '../../../component/style'
 import { getSnapshot } from 'mobx-state-tree'

@@ -56,8 +56,8 @@ const store = {
 
 storage.prefix = store.app.storagePrefix
 store.app.set('menuKey', storage.getValue('menu-key') || '/admin/home/dashboard')
-store.app.set('baseUrl', process.env.NODE_ENV == 'development' ? 'http://localhost:8097' : 'http://192.168.0.124/gw/admin')
-store.app.set('imageLine', process.env.NODE_ENV === 'development' ? 'http://192.168.0.124' : '')
+store.app.set('baseUrl', window.location.origin + '/gw/admin/')
+store.app.set('imageLine', '')
 // store.app.set('baseUrl', 'http://localhost:8097')
 // store.app.set('imageLine', '')
 store.user.setToken(storage.getValue('user-token') || '')

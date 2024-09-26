@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { cloneDeep } from 'lodash'
 import React, { Fragment, useRef } from 'react'
 import { Modal, Form, Input, notification, Select, Upload, Button, Switch, Tag } from 'antd'
 import { Observer, useLocalStore } from 'mobx-react-lite';
@@ -9,7 +9,7 @@ import { VisualBox } from '../../../component'
 export default function ResourceEdit({ data, cancel, save, }) {
   const lb = { span: 3 }, rb = { span: 18 }
   const local = useLocalStore(() => ({
-    data: data.id ? _.cloneDeep(data) : { tags: [], types: [], poster: '', urls: [], open: false, status: 'finished' },
+    data: data.id ? cloneDeep(data) : { tags: [], types: [], poster: '', urls: [], open: false, status: 'finished' },
     loading: false,
     ref: '',
     poster: data.poster || '',

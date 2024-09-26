@@ -19,7 +19,7 @@ shttp.interceptors.response.use(response => {
   // TODO: 刷新token
   return response.data
 }, (error) => {
-  if(error.response.status === 400) {
+  if (error.response.status === 400) {
     return Promise.resolve(error.response.data)
   }
   return Promise.reject(error)

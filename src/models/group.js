@@ -1,17 +1,17 @@
 import { types, getSnapshot } from 'mobx-state-tree'
 import resource from './resource'
-const _ = require('lodash')
+import { isEmpty, isEqual, set, omit, isPlainObject } from 'lodash'
 
 function deepEqual(a, b) {
   for (let k in a) {
     let equal = true;
-    if (_.isPlainObject(a[k])) {
-      if (_.isEmpty(a[k]) && !_.isEmpty(b[k])) {
+    if (isPlainObject(a[k])) {
+      if (isEmpty(a[k]) && !isEmpty(b[k])) {
         return false
       }
       equal = deepEqual(a[k], b[k]);
     } else {
-      equal = _.isEqual(a[k], b[k]);
+      equal = isEqual(a[k], b[k]);
     }
     if (!equal) {
       return false;
@@ -55,7 +55,7 @@ const GroupModel = types.model('Group', {
   // 编辑比较
   toJSON() {
     const data = getSnapshot(self);
-    return _.omit(data, ['data', 'children', '$new', '$delete', '$origin'])
+    return omit(data, ['data', 'children', '$new', '$delete', '$origin'])
   },
   diff() {
     return !deepEqual(self.$origin, self.toJSON()) || self.$delete === true || self.$new === true;
@@ -87,7 +87,7 @@ const GroupModel = types.model('Group', {
   },
   setKey(key, value) {
     document.dispatchEvent(new CustomEvent('group', { detail: { tree_id: self.tree_id } }))
-    _.set(self, key, value);
+    set(self, key, value);
   },
   // ref操作
   addRef(ref) {

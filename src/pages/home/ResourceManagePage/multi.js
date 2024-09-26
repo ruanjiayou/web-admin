@@ -6,7 +6,7 @@ import { Button, notification, Input, Form, Tag, Upload, Select, Divider, Switch
 import { SortListView } from '../../../component'
 import Icon from '../../../component/Icon'
 import qs from 'qs'
-import * as _ from 'lodash'
+import { isPlainObject, isEqual, isEmpty } from 'lodash'
 import store from '../../../store'
 import { toJS } from 'mobx';
 import { PlusCircleOutlined, CloseOutlined, UploadOutlined } from '@ant-design/icons'
@@ -20,13 +20,13 @@ function deepEqual(a, b) {
   for (let i = 0; i < keys.length; i++) {
     const k = keys[i]
     let equal = true;
-    if (_.isPlainObject(a[k])) {
-      if (_.isEmpty(a[k]) && !_.isEmpty(b[k])) {
+    if (isPlainObject(a[k])) {
+      if (isEmpty(a[k]) && !isEmpty(b[k])) {
         return false
       }
       equal = deepEqual(a[k], b[k]);
     } else {
-      equal = _.isEqual(a[k], b[k]);
+      equal = isEqual(a[k], b[k]);
     }
     if (!equal) {
       return false;

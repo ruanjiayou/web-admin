@@ -6,7 +6,6 @@ import apis from '../../../api'
 import { Button, notification, Input, Form, Tag, Upload, Select, Divider, DatePicker } from 'antd';
 import Icon from '../../../component/Icon'
 import qs from 'qs'
-import * as _ from 'lodash'
 import { toJS } from 'mobx';
 import store from '../../../store'
 
