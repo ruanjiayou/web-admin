@@ -38,7 +38,7 @@ export default types.model('Resource', {
     path: types.string,
     title: types.optional(types.string, ''),
   })), []),
-  status: types.optional(types.enumeration(['init', 'loading', 'finished']), 'finished'),
+  status: types.optional(types.enumeration(['init', 'loading', 'finished', 'fail']), 'finished'),
   types: types.optional(types.array(types.string), []),
   series: types.optional(types.string, ''),
   publishedAt: types.maybeNull(types.optional(types.string, '')),

@@ -8,7 +8,7 @@ export default function Item({ data, openEdit, destroy }) {
   return <AlignAside>
     <DragOutlined />
     <Divider type="vertical" />
-    <img src={store.app.imageLine + (data.cover || '/images/poster/nocover.jpg')} style={{ width: 40, height: 40, borderRadius: '50%' }} alt="" />
+    <img src={store.app.imageLine + (data.image || '/images/poster/nocover.jpg')} style={{ width: 40, height: 40 }} alt="" />
     <span>{data.name}</span>
     <Divider type="vertical" />
     <span style={{ flex: 1 }}>{data.title}</span>

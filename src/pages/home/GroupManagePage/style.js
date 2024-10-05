@@ -22,6 +22,7 @@ export const TabTag = styled.span`
 export const CompImg = styled.img`
   display: inline-block;
   height: 50px;
-  width: 80px;
+  width: 50px;
+  margin-bottom: 10px;
   flex: 1;
 `;
