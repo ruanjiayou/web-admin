@@ -41,7 +41,7 @@ export default function RuleEdit({ data, cancel, save }) {
         <Input value={local.data.name} onChange={e => local.data.name = e.target.value} defaultValue={local.data.name} />
       </Item>
       <Item label="cron:" labelCol={{ span: 4 }} defaultValue={local.data.cron}>
-        <Input value={local.data.cron} onChange={e => local.data.name = e.target.value} defaultValue={local.data.name} />
+        <Input value={local.data.cron} onChange={e => local.data.cron = e.target.value} defaultValue={local.data.cron} />
       </Item>
       <Item label="状态" labelCol={{ span: 4 }}>
         <Radio.Group name="status" defaultValue={local.data.status} onChange={e => {

@@ -14,7 +14,7 @@ const store = {
   pages: [],
   menus: [],
   resource_types: [
-    { name: '', title: '无' },
+    { name: '', title: '全部' },
     { name: 'video', title: '视频' },
     { name: 'movie', title: '电影' },
     { name: 'image', title: '图片' },
@@ -57,6 +57,7 @@ const store = {
 storage.prefix = store.app.storagePrefix
 store.app.set('menuKey', storage.getValue('menu-key') || '/admin/home/resource-manage/list')
 // store.app.set('baseUrl', '/gw/admin')
+// store.app.set('baseUrl', 'http://127.0.0.1:8097')
 store.app.set('baseUrl', 'https://192.168.0.124/gw/novel')
 store.app.set('imageLine', '')
 store.user.setToken(storage.getValue('user-token') || '')

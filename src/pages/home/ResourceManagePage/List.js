@@ -78,12 +78,12 @@ export default function ResourceList({ items, children, categories, search, loca
 					url += ('/novel/groups/GroupTree/VideoInfo?GroupTree.name=video&VideoInfo.id=' + record.id)
 				} else if (record.source_type === 'novel') {
 					url += ('/novel/home/BookInfo?home.tab=&BookInfo.id=' + record.id)
-				} else if (['article', 'post', 'private'].includes(record.source_type)) {
+				} else if (['article', 'private'].includes(record.source_type)) {
 					url += ('/novel/home/Article?home.tab=QD7vNfJCU&Article.id=' + record.id)
 				} else if (['image'].includes(record.source_type)) {
 					url += ('/novel/groups/GroupTree/Image?GroupTree.name=image&Image.id=' + record.id)
 				} else if (record.source_type === 'post') {
-					url += ('/novel/home/Post?home.tab=QD7vNfJCU&Article.id=' + record.id)
+					url += ('/novel/home/Post?home.tab=QD7vNfJCU&Post.id=' + record.id)
 				}
 				return <a style={{ color: '#1890ff', cursor: 'pointer' }} title={url} href={url} onClick={(e) => {
 					e.preventDefault()
