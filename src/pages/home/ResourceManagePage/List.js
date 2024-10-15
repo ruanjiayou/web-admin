@@ -92,7 +92,7 @@ export default function ResourceList({ items, children, categories, search, loca
 					} else {
 						notification.info({ message: '类型不可预览' })
 					}
-				}}>{record.source_type === 'post' ? record.desc || record.content : text}</a>
+				}}>{record.source_type === 'post' ? record.title || record.desc || record.content : text}</a>
 			}} />
 			<Column title="类型" width={100} dataIndex="source_type" key="source_type" render={(text, record) => (
 				<Observer>{() => (
