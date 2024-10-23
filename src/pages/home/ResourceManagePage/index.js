@@ -146,8 +146,6 @@ export default function ResourceManagePage() {
             ))}
           </Select>
           <Divider type="vertical" />
-        </div>
-        <div style={{ margin: '0 10px 10px' }}>
           <Button type="primary" onClick={() => {
             onSearch()
           }}>查询</Button>

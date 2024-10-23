@@ -133,7 +133,7 @@ export default function Page() {
         <Button type='primary' onClick={() => { onSearch() }}>刷新</Button>
       </div>
       <Table dataSource={toJS(local.tasks)} rowKey="_id" scroll={{ y: 'calc(100vh - 273px)' }} loading={local.loading} pagination={{
-        pageSize: 20,
+        pageSize: 10,
         current: local.page,
         total: local.total,
       }} onChange={(page) => {
