@@ -37,7 +37,7 @@ export default function ResourceList({ items, children, categories, search, loca
     }
   }, [state.resource_id]);
   return <Observer>{() => (
-    <FullWidth style={{ alignItems: 'flex-start' }}>
+    <FullWidth style={{ alignItems: 'flex-start', height: '100%' }}>
       <FullWidthAuto style={{ overflowX: 'auto' }}>
         <Table dataSource={items} rowKey="id" scroll={{ y: 'calc(100vh - 233px)' }} loading={local.isLoading} pagination={{
           pageSize: 20,

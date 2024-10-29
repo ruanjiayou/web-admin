@@ -50,11 +50,20 @@ const excuteTemplate = async (id, data) => {
   })
 }
 
+const loadingInfo = async (filepath) => {
+  return shttp({
+    url: 'http://192.168.0.124/gw/download/ffmpeg/video-info-full',
+    method: 'POST',
+    data: { filepath }
+  })
+}
+
 export default {
   boot,
   analyise,
   getTradeBalance,
   excuteTemplate,
+  loadingInfo,
   ...app,
   ...backup,
   ...channel,
