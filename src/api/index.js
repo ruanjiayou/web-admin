@@ -52,7 +52,7 @@ const excuteTemplate = async (id, data) => {
 
 const loadingInfo = async (filepath) => {
   return shttp({
-    url: 'http://192.168.0.124/gw/download/ffmpeg/video-info-full',
+    url: 'https://192.168.0.124/gw/download/ffmpeg/video-info-full',
     method: 'POST',
     data: { filepath }
   })
