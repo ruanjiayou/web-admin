@@ -40,13 +40,8 @@ ws.on('message', (data) => {
     events.emit(data.module === 'qqBot' ? 'qqSystem' : 'other', { uin: data.name, action: data.action })
   } else if (data.type === 'modal') {
     Modal.info({ title: data.action, content: 'from: ' + data.name + ' ' + data.message })
-  } else if (data.type === 'resource_change') {
-    // resource video image 
-    events.emit(data.type, { ...data, resource_type: data.resource_type, resource_id: data.resource_id });
-  } else if (data.type === 'progress_change') {
-    events.emit(data.type, data)
-  } else if (data.type === 'transcode') {
-    events.emit(data.type, data);
+  } else {
+    events.emit('event', data);
   }
 })
 

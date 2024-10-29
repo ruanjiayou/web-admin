@@ -14,6 +14,7 @@ import { useRouter } from '../../../contexts';
 import TextArea from 'antd/lib/input/TextArea';
 import Clipboard from 'react-clipboard.js';
 import { useEffectOnce } from 'react-use';
+import { events } from '../../../utils/events';
 
 const { getFiles, createFile, destroyFile, renameFile } = apis
 const { Column } = Table;
@@ -85,6 +86,16 @@ export default function TaskList() {
   })
   useEffectOnce(() => {
     search(local.dirpath)
+    events.on('event', function (event) {
+      if (event.type === 'transcoded') {
+        search(local.dirpath);
+      }
+    });
+    return () => {
+      if (events) {
+        events.off('event');
+      }
+    }
   })
   return <Observer>{() => (
     <FullHeight>

@@ -48,6 +48,20 @@ export default function Page() {
           }
         }
       })
+    },
+    transcode: d => {
+      local.tasks.forEach(task => {
+        if (task._id === d.resource_id) {
+          task.transcode = d.status;
+        }
+      })
+    },
+    transcoding: d => {
+      local.tasks.forEach(task => {
+        if (task._id === d.resource_id) {
+          task.params.progress = d.progress;
+        }
+      })
     }
   }));
   const addRef = useRef(null);
@@ -77,21 +91,27 @@ export default function Page() {
   });
   useEffectOnce(() => {
     onSearch();
-    const progress = function (d) {
-      local.changeProgress(d)
+    const multiType = function (d) {
+      switch (d.type) {
+        case 'resource_change':
+          onSearch();
+          break;
+        case 'progress_change':
+          local.changeProgress(d);
+          break;
+        case 'transcoding':
+          local.transcoding(d);
+          break;
+        case 'transcode':
+          local.transcode(d);
+          break;
+        default: break;
+      }
     }
-    events.on('progress_change', progress);
-    events.on('resource_change', function (d) {
-      onSearch();
-    });
-    events.on('transcode', function (d) {
-      onSearch();
-    })
+    events.on('event', multiType)
     return () => {
       if (events) {
-        events.off('progress_change', progress);
-        events.off('resource_change');
-        events.off('transcode');
+        events.off('event', multiType);
       }
     }
   })
@@ -155,13 +175,16 @@ export default function Page() {
           </Tooltip>
         )} />
         <Column title="进度" dataIndex={'_id'} render={(id, task) => (
-          <div>
-            {task.params && task.params.total && <div style={{ height: 22, backgroundColor: 'grey', color: 'white' }}>
+          <div style={{ position: 'relative' }}>
+            {task.params && task.params.total && <div style={{ position: 'absolute', top: -10, width: '100%', zIndex: 1, height: 22, backgroundColor: 'grey', color: 'white' }}>
               {task.params.finished * 2 > task.params.total ? <div style={{ backgroundColor: '#54c77d', color: 'white', maxWidth: '100%', textAlign: 'right', width: `${Math.round(100 * task.params.finished / task.params.total)}%` }}>{task.type === 'm3u8' ? task.params.finished + '/' + task.params.total : formatNumber(task.params.finished) + '/' + formatNumber(task.params.total)}&nbsp;</div> : (
                 <Fragment>
                   <div style={{ float: 'left', backgroundColor: '#54c77d', height: 22, color: 'white', maxWidth: '100%', width: `${Math.round(100 * task.params.finished / task.params.total)}%` }}></div>
                   &nbsp;&nbsp;{task.type === 'm3u8' ? task.params.finished + '/' + task.params.total : formatNumber(task.params.finished) + '/' + formatNumber(task.params.total)}
                 </Fragment>)}
+              {task.params && task.status === 2 && task.params.progress && <div style={{ position: 'absolute', top: 0, zIndex: 2, height: 22, width: `${task.params.progress}%`, background: 'linear-gradient(90deg, #ffc0cb5e, #ffc0cbd1, #ffc0cbd6, pink)', textAlign: task.params.progress > 50 ? 'right' : 'left' }}>
+                {task.params.progress}% &nbsp;
+              </div>}
             </div>}
           </div>
         )} />
