@@ -28,8 +28,9 @@ export default function TaskList() {
     get dirLevel() {
       return this.dirpath.split('/').filter(n => !!n).length;
     },
-    loading_info: false,
-    streamInfo: null,
+    loading_stream: false,
+    stream_path: '',
+    streams: [],
     tempname: '',
     isDir: 0,
     uploading: false,
@@ -86,25 +87,27 @@ export default function TaskList() {
     }
     search(result_path);
   })
-  const getFileInfo = useCallback(async (fullpath) => {
-    if (!local.loading_info) {
-      local.loading_info = true;
-      const resp = await apis.loadingInfo(fullpath);
+  const getFileInfo = useCallback(async () => {
+    if (!local.loading_stream && local.stream_path) {
+      local.loading_stream = true;
+      const resp = await apis.loadingInfo(local.stream_path);
       if (resp.code === 0) {
-        local.streamInfo = resp.data;
+        local.streams = resp.data;
       }
+      local.loading_stream = false;
     }
-  }, [local.loading_info])
+  }, [local.loading_stream, local.stream_path])
   useEffectOnce(() => {
-    search(local.dirpath)
-    events.on('event', function (event) {
+    search(local.dirpath);
+    const transcodedEvent = function (event) {
       if (event.type === 'transcoded') {
         search(local.dirpath);
       }
-    });
+    }
+    events.on('event', transcodedEvent);
     return () => {
       if (events) {
-        events.off('event');
+        events.off('event', transcodedEvent);
       }
     }
   })
@@ -380,16 +383,17 @@ export default function TaskList() {
                     </Popconfirm>
                     <Divider type="vertical" />
                     <ExclamationCircleOutlined onClick={() => {
-                      getFileInfo(local.dirpath + record.name);
+                      local.stream_path = local.dirpath + record.name;
+                      getFileInfo();
                     }} />
                   </VisualBox>
                 </Fragment>
               }} />
             </Table>
           </FullWidthAuto>
-          {local.streamInfo && <FullWidthFix style={{ position: 'relative', display: 'flex', width: 300, width: 270, boxSizing: 'border-box', paddingLeft: 30, flexDirection: 'column', height: '100%' }}>
-            <DeleteOutlined onClick={() => local.streamInfo = null} style={{ position: 'absolute', top: 0, right: 20 }} color='red' />
-            {local.streamInfo.map(stream => <div key={stream.id} style={{ border: '1px dashed #ccc', padding: 10, borderRadius: 10, marginRight: 30, marginBottom: 10 }}>
+          {local.stream_path && <FullWidthFix style={{ position: 'relative', display: 'flex', width: 300, width: 270, boxSizing: 'border-box', paddingLeft: 30, flexDirection: 'column', height: '100%' }}>
+            <DeleteOutlined onClick={() => { local.streams = []; local.stream_path = ''; local.loading_stream = false; }} style={{ position: 'absolute', top: 0, right: 20 }} color='red' />
+            {local.streams.map(stream => <div key={stream.id} style={{ border: '1px dashed #ccc', padding: 10, borderRadius: 10, marginRight: 30, marginBottom: 10 }}>
               <div>流类型: {stream.codec_type}</div>
               <div>编码器类型: {stream.codec_name}</div>
               <div>编解码器实现: {stream.codec_tag_string}</div>

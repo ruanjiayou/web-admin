@@ -9,7 +9,7 @@ import qs from 'qs'
 import * as _ from 'lodash'
 import store from '../../../store'
 import { toJS } from 'mobx';
-import { PlusCircleOutlined, CloseOutlined, UploadOutlined, LinkOutlined } from '@ant-design/icons'
+import { PlusCircleOutlined, CloseOutlined, UploadOutlined, LinkOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
 import api from '../../../api';
 import { formatNumber } from '../../../utils/helper'
 import { FullWidth, FullHeightAuto, AlignVertical, FullWidthFix, FullHeight } from '../../../component/style';
@@ -17,6 +17,7 @@ import TextArea from 'antd/lib/input/TextArea';
 import { events } from '../../../utils/events';
 import Axios from 'axios';
 import Ueditor from '../../../component/Ueditor'
+import StreamInfo from '../../../utils/stream';
 
 function deepEqual(a, b) {
   const keys = Array.from(new Set([...Object.keys(a), ...Object.keys(b)]));
@@ -52,6 +53,7 @@ export default function ResourceEdit() {
     id: query.id,
     data: { tags: [], types: [], children: [], videos: [], images: [], audios: [], content: '', source_type: '' },
     origin: {},
+    stream_path: '',
     // 临时
     tempThumbnailImg: '',
     tempPosterImg: '',
@@ -106,18 +108,18 @@ export default function ResourceEdit() {
       notification.info('编辑成功')
     }
     local.loading = false;
-  }, [])
-  useEffectOnce(() => {
-    function changeResource(data) {
-      const resource_id = data.resource_id;
-      if (data.resource_type === 'resource' && resource_id === local.id) {
-        local.data.status = data.status;
-      } else if (data.resource_type === 'video') {
-        local.setSubStatus('videos', resource_id, data.status)
-      } else if (data.resource_type === 'image') {
-        local.setSubStatus('images', resource_id, data.status);
-      }
+  }, []);
+  const changeResource = (data) => {
+    const resource_id = data.resource_id;
+    if (data.resource_type === 'resource' && resource_id === local.id) {
+      local.data.status = data.status;
+    } else if (data.resource_type === 'video') {
+      local.setSubStatus('videos', resource_id, data.status)
+    } else if (data.resource_type === 'image') {
+      local.setSubStatus('images', resource_id, data.status);
     }
+  };
+  useEffectOnce(() => {
     events.on('resource_change', changeResource);
     if (local.id) {
       local.loading = true
@@ -137,13 +139,13 @@ export default function ResourceEdit() {
       })
     }
     return () => {
-      events && events.off && events.off(changeResource);
+      // events && changeResource && events.off(changeResource);
     }
   })
 
   return <Observer>{() => (<Fragment>
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', }}>
-      <div style={{ flex: 1, overflowY: 'auto', paddingTop: 20 }}>
+      <div style={{ flex: 1, overflowY: 'auto', paddingTop: 20, paddingRight: local.stream_path ? 270 : 0 }}>
         <Row style={{ alignItems: 'center', margin: 8 }}>
           <Col span={3} style={{ textAlign: 'right' }}>
             标题：
@@ -608,6 +610,7 @@ export default function ResourceEdit() {
                         <UploadOutlined />
                       </Upload>
                     )}</Observer>
+                    <ExclamationCircleOutlined onClick={() => local.stream_path = item.path} />
                   </AlignVertical>
                 </FullHeight>
               </FullWidth>
@@ -1164,6 +1167,9 @@ export default function ResourceEdit() {
         })}
       </Radio.Group>
     </Modal>}</Observer>
+    <div style={{ display: local.stream_path ? 'block' : 'none', position: 'absolute', top: '50%', transform: 'translate(0, -50%)', right: 17, backgroundColor: 'wheat' }}>
+      <StreamInfo filepath={local.stream_path} onClose={() => local.stream_path = ''} />
+    </div>
   </Fragment>)
   }</Observer >
 }

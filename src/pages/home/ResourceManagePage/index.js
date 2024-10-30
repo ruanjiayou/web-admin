@@ -142,7 +142,7 @@ export default function ResourceManagePage() {
             onSearch()
           }}>
             {store.resource_types.map(item => (
-              <Select.Option value={item.name}>{item.title}</Select.Option>
+              <Select.Option key={item.name} value={item.name}>{item.title}</Select.Option>
             ))}
           </Select>
           <Divider type="vertical" />
