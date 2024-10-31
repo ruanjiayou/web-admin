@@ -52,6 +52,7 @@ const store = {
   ],
   components: [],
   rules: [],
+  spiders: [],
 }
 
 storage.prefix = store.app.storagePrefix

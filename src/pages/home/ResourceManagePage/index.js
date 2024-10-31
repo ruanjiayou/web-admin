@@ -13,6 +13,7 @@ import CodeEditor from '../../../component/CodeEditor'
 import { match } from 'path-to-regexp'
 import { events } from '../../../utils/events';
 import * as _ from 'lodash'
+import { getSpiders } from '../../../api/rule';
 
 const { getResources, search, createResource, updateResource, destroyResource, getGroupTypes, v2getRules, v2GetResourceByRule, v2previewRule } = apis
 
@@ -42,6 +43,8 @@ export default function ResourceManagePage() {
     categories: {},
     resources: [],
     rules: store.rules,
+    spider_id: '',
+    spiders: [],
     rule: {}
   }))
   const urlRef = useRef(null)
@@ -53,6 +56,7 @@ export default function ResourceManagePage() {
       key: local.search_key,
       status: local.search_status,
       type: local.search_type,
+      spider_id: local.spider_id,
       page: local.search_page,
     }
     const fn = local.search_key === 'q' && local.search_name ? search : getResources;
@@ -72,6 +76,9 @@ export default function ResourceManagePage() {
     local.isLoading = false
     local.rules = result.data
     store.rules = result.data
+    const spider = await getSpiders();
+    local.spiders = spider.data;
+    store.spiders = spider.data;
   }, [])
   useEffect(() => {
     onSearch()
@@ -82,7 +89,6 @@ export default function ResourceManagePage() {
     }
     getGroupTypes().then(result => {
       local.categories = result.data
-      console.log(result, 'types')
     });
     function resource_change(data) {
       if (data.resource_type === 'resource') {
@@ -120,9 +126,17 @@ export default function ResourceManagePage() {
               }
             }} />
           <Divider type="vertical" />
+          来源
+          <Divider type="vertical" />
+          <Select value={local.spider_id} style={{ width: 100 }} onChange={v => {
+            local.spider_id = v;
+          }}>
+            {local.spiders.map(spider => <Select.Option value={spider._id}>{spider.name}</Select.Option>)}
+          </Select>
+          <Divider type="vertical" />
           状态
           <Divider type="vertical" />
-          <Select style={{ width: 150 }} value={local.search_status} onChange={value => {
+          <Select style={{ width: 100 }} value={local.search_status} onChange={value => {
             local.search_status = value
             local.search_page = 1
             onSearch()
@@ -136,7 +150,7 @@ export default function ResourceManagePage() {
           <Divider type="vertical" />
           资源类型
           <Divider type="vertical" />
-          <Select style={{ width: 150 }} value={local.search_type} onChange={value => {
+          <Select style={{ width: 80 }} value={local.search_type} onChange={value => {
             local.search_type = value
             local.search_page = 1
             onSearch()
