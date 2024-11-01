@@ -206,6 +206,47 @@ export function removeResourceAudio({ id, mid }) {
 }
 
 
+export function addResourceCaption({ id, ...data }) {
+  return shttp({
+    url: `/v1/admin/resource/${id}/caption`,
+    method: 'POST',
+    data,
+  })
+}
+
+export function updateResourceCaption(id, data) {
+  return shttp({
+    url: `/v1/admin/resource/${id}/caption/${data.id}`,
+    method: 'PUT',
+    data,
+  })
+}
+
+export function downloadResourceCaption(mid, id, data) {
+  return shttp({
+    url: `/v1/admin/resource/${mid}/caption/${id}`,
+    method: 'PATCH',
+    data,
+  })
+}
+
+export function removeResourceCaptione({ id, mid }) {
+  return shttp({
+    url: `/v1/admin/resource/${mid}/caption`,
+    method: 'DELETE',
+    data: { id }
+  })
+}
+
+export function sortResourceCaption({ id, data }) {
+  return shttp({
+    url: `/v1/admin/resource/${id}/caption`,
+    method: 'PUT',
+    data,
+  })
+}
+
+
 export function grabImages(params) {
   return shttp({
     url: `/v1/admin/resource-grab-images/${params.id}`,

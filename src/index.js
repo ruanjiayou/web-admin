@@ -39,7 +39,7 @@ class ErrorBoundary extends Component {
 
   render() {
     return <Fragment>
-      {this.props.children}
+      {this.state.hasError ? <div>page error</div> : this.props.children}
     </Fragment>
   }
 }
