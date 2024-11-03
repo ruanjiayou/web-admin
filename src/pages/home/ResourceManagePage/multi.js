@@ -51,7 +51,7 @@ export default function ResourceEdit() {
   const lb = { span: 3 }, rb = { span: 18 }
   const query = qs.parse(window.location.search.substr(1))
   const local = useLocalStore(() => ({
-    id: query.id,
+    _id: query._id,
     data: { tags: [], types: [], children: [], videos: [], images: [], audios: [], captions: [], content: '', source_type: '' },
     origin: {},
     stream_path: '',
@@ -59,10 +59,10 @@ export default function ResourceEdit() {
     tempThumbnailImg: '',
     tempPosterImg: '',
     tempTag: '',
-    tempStatus: 'init',
+    tempStatus: store.constant.MEDIA_STATUS.init,
     tagAddVisible: false,
-    tempUrlType: 'normal',
-    tempImageType: 'gallery',
+    tempUrlType: store.constant.VIDEO_TYPE.normal,
+    tempImageType: store.constant.IMAGE_TYPE.gallery,
     tempCaptionType: 'subtitles',
     tempTypes: '',
     typeAddVisible: false,
@@ -89,10 +89,10 @@ export default function ResourceEdit() {
     setStatus(status) {
       local.data.status = status;
     },
-    setSubStatus(type, id, status) {
+    setSubStatus(type, _id, status) {
       if (local.data[type]) {
         local.data[type].forEach(doc => {
-          if (doc.id === id) {
+          if (doc._id === _id) {
             doc.status = status;
           }
         })
@@ -106,7 +106,7 @@ export default function ResourceEdit() {
       return;
     }
     local.loading = true
-    const resp = local.data.id ? await apis.updateResource(local.data, sync) : await api.createResource(local.data);
+    const resp = local.data._id ? await apis.updateResource(local.data, sync) : await api.createResource(local.data);
     if (resp && resp.data.code === 0) {
       notification.info('编辑成功')
     }
@@ -114,7 +114,7 @@ export default function ResourceEdit() {
   }, []);
   const changeResource = (data) => {
     const resource_id = data.resource_id;
-    if (data.resource_type === 'resource' && resource_id === local.id) {
+    if (data.resource_type === 'resource' && resource_id === local._id) {
       local.data.status = data.status;
     } else if (data.resource_type === 'video') {
       local.setSubStatus('videos', resource_id, data.status)
@@ -126,9 +126,9 @@ export default function ResourceEdit() {
   };
   useEffectOnce(() => {
     events.on('resource_change', changeResource);
-    if (local.id) {
+    if (local._id) {
       local.loading = true
-      apis.getResource({ id: local.id }).then(res => {
+      apis.getResource({ _id: local._id }).then(res => {
         if (res && res.status === 'success' && res.code === 0) {
           const data = res.data
           local.data = data
@@ -210,19 +210,11 @@ export default function ResourceEdit() {
                 local.data.status = e.target.value
                 onEdit()
               }}>
-              <Radio value={"init"}>待下载</Radio>
-              <Radio value={"loading"}>下载中</Radio>
-              <Radio value={"transcoding"}>转码中</Radio>
-              <Radio value={"fail"}>已失败</Radio>
-              <Radio value={"finished"}>已完成</Radio>
+              <Radio value={store.constant.RESOURCE_STATUS.init}>待下载</Radio>
+              <Radio value={store.constant.RESOURCE_STATUS.loading}>下载中</Radio>
+              <Radio value={store.constant.RESOURCE_STATUS.fail}>已失败</Radio>
+              <Radio value={store.constant.RESOURCE_STATUS.finished}>已完成</Radio>
             </Radio.Group>
-          </Col>
-
-          <Col className="gutter-row" span={3}>公开：
-            <Switch checked={local.data.open} onClick={e => {
-              local.data.open = !local.data.open;
-              onEdit()
-            }} /> {local.data.open}
           </Col>
 
           <Row style={{ alignItems: 'center' }}>
@@ -423,15 +415,15 @@ export default function ResourceEdit() {
             mode="edit"
             handler={<Icon type="drag" style={{ marginRight: 10 }} />}
             sort={async (oldIndex, newIndex) => {
-              const data = local.data.videos.map(item => ({ id: item.id, url: item.url }))
-              const id = data.splice(oldIndex, 1)
-              data.splice(newIndex, 0, ...id)
+              const data = local.data.videos.map(item => ({ _id: item._id, url: item.url }))
+              const _id = data.splice(oldIndex, 1)
+              data.splice(newIndex, 0, ..._id)
               data.forEach((d, i) => {
                 d.nth = i + 1
               })
               local.loading = false
               try {
-                await api.sortResourceVideo({ id: local.id, data })
+                await api.sortResourceVideo({ _id: local._id, data })
                 const items = local.data.videos.map(item => item)
                 const item = items.splice(oldIndex, 1);
                 items.splice(newIndex, 0, ...item)
@@ -441,7 +433,7 @@ export default function ResourceEdit() {
               }
             }}
             items={local.data.videos}
-            droppableId={local.id}
+            droppableId={local._id}
             listStyle={{ boxSizing: 'border-box' }}
             itemStyle={{ display: 'flex', alignItems: 'center', lineHeight: 1 }}
             renderItem={({ item, index }) => (
@@ -461,7 +453,7 @@ export default function ResourceEdit() {
                             <Select style={{ width: 90 }} value={item.status} onChange={async (status) => {
                               item.loading = true
                               try {
-                                const result = await api.updateResourceVideo(local.id, { id: item.id, status })
+                                const result = await api.updateResourceVideo(local._id, { _id: item._id, status })
                                 if (result.code === 0) {
                                   item.status = status
                                 } else {
@@ -471,35 +463,35 @@ export default function ResourceEdit() {
                                 item.loading = false
                               }
                             }}>
-                              <Select.Option value="init">初始化</Select.Option>
-                              <Select.Option value="loading">下载中</Select.Option>
-                              <Select.Option value="finished">已下载</Select.Option>
-                              <Select.Option value="transcoding">转码中</Select.Option>
-                              <Select.Option value="fail">失败</Select.Option>
+                              <Select.Option value={store.constant.RESOURCE_STATUS.init}>初始化</Select.Option>
+                              <Select.Option value={store.constant.RESOURCE_STATUS.loading}>下载中</Select.Option>
+                              <Select.Option value={store.constant.RESOURCE_STATUS.finished}>已下载</Select.Option>
+                              <Select.Option value={store.constant.RESOURCE_STATUS.transcoding}>转码中</Select.Option>
+                              <Select.Option value={store.constant.RESOURCE_STATUS.fail}>失败</Select.Option>
                             </Select>
                             <Divider type="vertical" />
                             <Select style={{ width: 80 }} value={item.type} onChange={async (type) => {
                               item.loading = true
                               try {
-                                await api.updateResourceVideo(local.id, { id: item.id, type })
+                                await api.updateResourceVideo(local._id, { _id: item._id, type })
                                 item.type = type
                               } finally {
                                 item.loading = false
                               }
                             }}>
-                              <Select.Option value="normal">正片</Select.Option>
-                              <Select.Option value="content">正文</Select.Option>
-                              <Select.Option value="trailer">预告</Select.Option>
-                              <Select.Option value="tidbits">花絮</Select.Option>
+                              <Select.Option value={store.constant.VIDEO_TYPE.normal}>正片</Select.Option>
+                              <Select.Option value={store.constant.VIDEO_TYPE.content}>正文</Select.Option>
+                              <Select.Option value={store.constant.VIDEO_TYPE.trailer}>预告</Select.Option>
+                              <Select.Option value={store.constant.VIDEO_TYPE.tidbits}>花絮</Select.Option>
                             </Select>
                           </Fragment>
                         )}</Observer>
                       }
                       addonAfter={!local.fullEditVideo ? <Observer>{() => (
-                        <CloseOutlined disabled={item.loading || item.status === 'loading'} onClick={async () => {
+                        <CloseOutlined disabled={item.loading || item.status === store.constant.MEDIA_STATUS.loading} onClick={async () => {
                           item.loading = true
                           try {
-                            await api.removeResourceVideo({ id: item.id, mid: local.id })
+                            await api.removeResourceVideo({ _id: item._id, mid: local._id })
                             local.data.videos = local.data.videos.filter(t => t.url !== item.url)
                           } finally {
                             item.loading = false
@@ -515,10 +507,10 @@ export default function ResourceEdit() {
                     {local.fullEditVideo && (
                       <Fragment>
                         <Observer>{() => (
-                          <CloseOutlined disabled={item.loading || item.status === 'loading'} onClick={async () => {
+                          <CloseOutlined disabled={item.loading || item.status === store.constant.MEDIA_STATUS.loading} onClick={async () => {
                             item.loading = true
                             try {
-                              await api.removeResourceVideo({ id: item.id, mid: local.id })
+                              await api.removeResourceVideo({ _id: item._id, mid: local._id })
                               local.data.videos = local.data.videos.filter(t => t.url !== item.url)
                             } finally {
                               item.loading = false
@@ -535,7 +527,7 @@ export default function ResourceEdit() {
                       const ourl = container.querySelectorAll('.url input')[2];
                       item.loading = true
                       try {
-                        await api.updateResourceVideo(local.id, { id: item.id, url: ourl.value, path: opath.value, title: otitle.value });
+                        await api.updateResourceVideo(local._id, { _id: item._id, url: ourl.value, path: opath.value, title: otitle.value });
                         item.path = opath.value;
                         message.success('修改成功')
                       } finally {
@@ -543,7 +535,7 @@ export default function ResourceEdit() {
                       }
                     }} />
                     <Observer>{() => (
-                      <Icon type={item.loading && item.status === 'loading' ? 'loading' : 'download'} disabled={item.loading} onClick={async (e) => {
+                      <Icon type={item.loading && item.status === store.constant.MEDIA_STATUS.loading ? 'loading' : 'download'} disabled={item.loading} onClick={async (e) => {
                         item.loading = true
                         try {
                           const type = item.url.includes('.m3u8') ? 'm3u8' : 'mp4';
@@ -556,8 +548,8 @@ export default function ResourceEdit() {
                           }
                           const resp = await Axios.post(`https://192.168.0.124/gw/download/tasks`, data)
                           if (resp.status === 200 && resp.data.code === 0) {
-                            await api.updateResourceVideo(local.id, { id: item.id, status: 'loading' })
-                            item.status = 'loading'
+                            await api.updateResourceVideo(local._id, { _id: item._id, status: store.constant.MEDIA_STATUS.loading })
+                            item.status = store.constant.MEDIA_STATUS.loading
                           } else {
                             message.error('失败：' + resp.body.message)
                           }
@@ -589,8 +581,8 @@ export default function ResourceEdit() {
                             })
                             if (res.code === 0) {
                               message.info('上传成功')
-                              await api.updateResourceVideo(local.id, { id: item.id, status: 'finished' })
-                              item.status = 'finished'
+                              await api.updateResourceVideo(local._id, { _id: item._id, status: store.constant.RESOURCE_STATUS.finished })
+                              item.status = store.constant.RESOURCE_STATUS.finished
                             } else {
                               message.info(res.message || '上传失败')
                             }
@@ -624,19 +616,20 @@ export default function ResourceEdit() {
                 <Select style={{ width: 90 }} disabled={local.isDealUrl} value={local.tempStatus} onChange={async (status) => {
                   local.tempStatus = status;
                 }}>
-                  <Select.Option value="init">初始化</Select.Option>
-                  <Select.Option value="loading">下载中</Select.Option>
-                  <Select.Option value="finished">已下载</Select.Option>
-                  <Select.Option value="fail">失败</Select.Option>
+                  <Select.Option value={store.constant.MEDIA_STATUS.init}>初始化</Select.Option>
+                  <Select.Option value={store.constant.MEDIA_STATUS.loading}>下载中</Select.Option>
+                  <Select.Option value={store.constant.MEDIA_STATUS.transcoding}>转码中</Select.Option>
+                  <Select.Option value={store.constant.MEDIA_STATUS.finished}>已下载</Select.Option>
+                  <Select.Option value={store.constant.MEDIA_STATUS.fail}>失败</Select.Option>
                 </Select>
                 <Divider type="vertical" />
                 <Select style={{ width: 80 }} disabled={local.isDealUrl} value={local.tempUrlType} onChange={async (type) => {
                   local.tempUrlType = type;
                 }}>
-                  <Select.Option value="normal">正片</Select.Option>
-                  <Select.Option value="content">正文</Select.Option>
-                  <Select.Option value="trailer">预告</Select.Option>
-                  <Select.Option value="tidbits">花絮</Select.Option>
+                  <Select.Option value={store.constant.VIDEO_TYPE.normal}>正片</Select.Option>
+                  <Select.Option value={store.constant.VIDEO_TYPE.content}>正文</Select.Option>
+                  <Select.Option value={store.constant.VIDEO_TYPE.trailer}>预告</Select.Option>
+                  <Select.Option value={store.constant.VIDEO_TYPE.tidbits}>花絮</Select.Option>
                 </Select>
               </Fragment>}
               addonAfter={<Icon type="check" onClick={async () => {
@@ -653,9 +646,9 @@ export default function ResourceEdit() {
                 }
                 local.isDealUrl = true
                 try {
-                  const res = await api.addResourceVideo({ id: local.id, title: local.data.title, url, type: local.tempUrlType, status: local.tempStatus })
+                  const res = await api.addResourceVideo({ _id: local._id, title: local.data.title, url, type: local.tempUrlType, status: local.tempStatus })
                   if (res && res.code === 0) {
-                    local.data.videos.push({ url: res.data.url, path: res.data.path, id: res.data.id, status: local.tempStatus, type: local.tempUrlType, nth: local.data.videos.length })
+                    local.data.videos.push({ url: res.data.url, path: res.data.path, _id: res.data._id, status: local.tempStatus, type: local.tempUrlType, nth: local.data.videos.length })
                     local.urlAddVisible = false
                   } else {
                     notification.info('fail')
@@ -663,8 +656,8 @@ export default function ResourceEdit() {
                 } finally {
                   local.tempUrl = '';
                   local.isDealUrl = false;
-                  local.tempStatus = 'init';
-                  local.tempUrlType = 'normal';
+                  local.tempStatus = store.constant.MEDIA_STATUS.init;
+                  local.tempUrlType = store.constant.VIDEO_TYPE.normal;
                 }
               }} />}
             />
@@ -684,15 +677,15 @@ export default function ResourceEdit() {
             mode="edit"
             handler={<Icon type="drag" style={{ marginRight: 10 }} />}
             sort={async (oldIndex, newIndex) => {
-              const data = local.data.images.map(item => ({ id: item.id, url: item.url }))
-              const id = data.splice(oldIndex, 1)
-              data.splice(newIndex, 0, ...id)
+              const data = local.data.images.map(item => ({ _id: item._id, url: item.url }))
+              const _id = data.splice(oldIndex, 1)
+              data.splice(newIndex, 0, ..._id)
               data.forEach((d, i) => {
                 d.nth = i + 1
               })
               local.loading = false
               try {
-                await api.sortResourceImage({ id: local.id, data })
+                await api.sortResourceImage({ _id: local._id, data })
                 const items = local.data.images.map(item => item)
                 const item = items.splice(oldIndex, 1);
                 items.splice(newIndex, 0, ...item)
@@ -702,7 +695,7 @@ export default function ResourceEdit() {
               }
             }}
             items={local.data.images}
-            droppableId={local.id}
+            droppableId={local._id}
             listStyle={{ boxSizing: 'border-box' }}
             itemStyle={{ display: 'flex', alignItems: 'center', lineHeight: 1, marginBottom: 5, backgroundColor: 'transparent' }}
             renderItem={({ item, index }) => (
@@ -713,44 +706,44 @@ export default function ResourceEdit() {
                     value={item.nth + ' ' + item.path}
                     disabled
                     className="custom"
-                    style={item.status === 'finished' ? { backgroundColor: '#00b578', color: 'white' } : { backgroundColor: '#ff8f1f' }}
+                    style={item.status === store.constant.RESOURCE_STATUS.finished ? { backgroundColor: '#00b578', color: 'white' } : { backgroundColor: '#ff8f1f' }}
                     addonBefore={<Observer>{() => (
                       <Fragment>
                         <Select style={{ width: 90 }} value={item.status} onChange={async (status) => {
                           item.loading = true
                           try {
-                            await api.updateResourceImage(local.id, { id: item.id, status, source_name: local.data.source_name })
+                            await api.updateResourceImage(local._id, { _id: item._id, status, source_name: local.data.source_name })
                             item.status = status
                           } finally {
                             item.loading = false
                           }
                         }}>
-                          <Select.Option value="init">初始化</Select.Option>
-                          <Select.Option value="loading">下载中</Select.Option>
-                          <Select.Option value="finished">已下载</Select.Option>
-                          <Select.Option value="fail">失败</Select.Option>
+                          <Select.Option value={store.constant.MEDIA_STATUS.init}>初始化</Select.Option>
+                          <Select.Option value={store.constant.MEDIA_STATUS.loading}>下载中</Select.Option>
+                          <Select.Option value={store.constant.MEDIA_STATUS.finished}>已下载</Select.Option>
+                          <Select.Option value={store.constant.MEDIA_STATUS.fail}>失败</Select.Option>
                         </Select>
                         <Divider type="vertical" />
                         <Select style={{ width: 80 }} value={item.type} onChange={async (type) => {
                           item.loading = true
                           try {
-                            await api.updateResourceImage(local.id, { id: item.id, type })
+                            await api.updateResourceImage(local._id, { _id: item._id, type })
                             item.type = type
                           } finally {
                             item.loading = false
                           }
                         }}>
-                          <Select.Option value="poster">封面</Select.Option>
-                          <Select.Option value="content">正文图片</Select.Option>
-                          <Select.Option value="thumbnail">缩略图</Select.Option>
-                          <Select.Option value="gallery">图集</Select.Option>
+                          <Select.Option value={store.constant.IMAGE_TYPE.poster}>封面</Select.Option>
+                          <Select.Option value={store.constant.IMAGE_TYPE.content}>正文图片</Select.Option>
+                          <Select.Option value={store.constant.IMAGE_TYPE.thumbnail}>缩略图</Select.Option>
+                          <Select.Option value={store.constant.IMAGE_TYPE.gallery}>图集</Select.Option>
                         </Select>
                       </Fragment>
                     )}</Observer>}
-                    suffix={<CloseOutlined disabled={item.loading || item.status === 'loading'} onClick={async () => {
+                    suffix={<CloseOutlined disabled={item.loading || item.status === store.constant.MEDIA_STATUS.loading} onClick={async () => {
                       item.loading = true
                       try {
-                        await api.removeResourceImage({ id: item.id, mid: local.id })
+                        await api.removeResourceImage({ _id: item._id, mid: local._id })
                         local.data.images = local.data.images.filter(t => t.url !== item.url)
                       } finally {
                         item.loading = false
@@ -774,21 +767,21 @@ export default function ResourceEdit() {
                         <Icon type="check" onClick={async () => {
                           item.loading = true
                           try {
-                            await api.updateResourceImage(local.id, { id: item.id, url: item.url })
+                            await api.updateResourceImage(local._id, { _id: item._id, url: item.url })
                           } finally {
                             item.loading = false
                           }
                         }} />
                         <div style={{ width: 12 }}></div>
-                        <Icon type={item.loading || item.status === 'loading' ? 'loading' : 'download'} disabled={item.loading} onClick={async () => {
-                          if (item.status === 'finished') {
+                        <Icon type={item.loading || item.status === store.constant.RESOURCE_STATUS.loading ? 'loading' : 'download'} disabled={item.loading} onClick={async () => {
+                          if (item.status === store.constant.RESOURCE_STATUS.finished) {
                             return notification.error({ message: '已下载' })
                           }
-                          item.status = 'loading'
+                          item.status = store.constant.MEDIA_STATUS.loading
                           item.loading = true
                           try {
-                            await api.downloadResourceImage(local.id, item.id, { source_name: local.data.source_name })
-                            item.status = 'finished'
+                            await api.downloadResourceImage(local._id, item._id, { source_name: local.data.source_name })
+                            item.status = store.constant.RESOURCE_STATUS.finished
                           } finally {
                             item.loading = false
                           }
@@ -815,19 +808,19 @@ export default function ResourceEdit() {
                 <Select style={{ width: 90 }} disabled={local.isDealUrl} value={local.tempStatus} onChange={async (status) => {
                   local.tempStatus = status;
                 }}>
-                  <Select.Option value="init">初始化</Select.Option>
-                  <Select.Option value="loading">下载中</Select.Option>
-                  <Select.Option value="finished">已下载</Select.Option>
-                  <Select.Option value="fail">失败</Select.Option>
+                  <Select.Option value={store.constant.RESOURCE_STATUS.init}>初始化</Select.Option>
+                  <Select.Option value={store.constant.RESOURCE_STATUS.loading}>下载中</Select.Option>
+                  <Select.Option value={store.constant.RESOURCE_STATUS.finished}>已下载</Select.Option>
+                  <Select.Option value={store.constant.RESOURCE_STATUS.fail}>失败</Select.Option>
                 </Select>
                 <Divider type="vertical" />
                 <Select style={{ width: 80 }} disabled={local.isDealUrl} value={local.tempImageType} onChange={async (type) => {
                   local.tempImageType = type;
                 }}>
-                  <Select.Option value="poster">封面</Select.Option>
-                  <Select.Option value="content">正文图片</Select.Option>
-                  <Select.Option value="thumbnail">缩略图</Select.Option>
-                  <Select.Option value="gallery">图集</Select.Option>
+                  <Select.Option value={store.constant.IMAGE_TYPE.poster}>封面</Select.Option>
+                  <Select.Option value={store.constant.IMAGE_TYPE.content}>正文图片</Select.Option>
+                  <Select.Option value={store.constant.IMAGE_TYPE.thumbnail}>缩略图</Select.Option>
+                  <Select.Option value={store.constant.IMAGE_TYPE.gallery}>图集</Select.Option>
                 </Select>
               </Fragment>}
               addonAfter={<Icon type="check" onClick={async () => {
@@ -849,9 +842,9 @@ export default function ResourceEdit() {
                         return notification.info('exists')
                       }
                       if (url) {
-                        const res = await api.addResourceImage({ id: local.id, title: '', url, type: local.tempImageType, status: local.tempStatus })
+                        const res = await api.addResourceImage({ _id: local._id, title: '', url, type: local.tempImageType, status: local.tempStatus })
                         if (res && res.code === 0) {
-                          local.data.images.push({ url: res.data.url, id: res.data.id, status: res.data.status, type: res.data.type, nth: local.data.images.length + 1 })
+                          local.data.images.push({ url: res.data.url, _id: res.data._id, status: res.data.status, type: res.data.type, nth: local.data.images.length + 1 })
                         } else {
                           notification.info('fail')
                         }
@@ -862,9 +855,9 @@ export default function ResourceEdit() {
                     if (-1 !== local.data.images.findIndex(t => t.url === image)) {
                       return notification.info('exists')
                     }
-                    const res = await api.addResourceImage({ id: local.id, title: local.data.title, url: image, type: local.tempImageType, status: local.tempStatus })
+                    const res = await api.addResourceImage({ _id: local._id, title: local.data.title, url: image, type: local.tempImageType, status: local.tempStatus })
                     if (res && res.code === 0) {
-                      local.data.images.push({ url: res.data.url, id: res.data.id, status: local.tempStatus, type: local.tempImageType, nth: local.data.images.length + 1 })
+                      local.data.images.push({ url: res.data.url, _id: res.data._id, status: local.tempStatus, type: local.tempImageType, nth: local.data.images.length + 1 })
                       local.imageAddVisible = false
                     } else {
                       notification.info('fail')
@@ -874,8 +867,8 @@ export default function ResourceEdit() {
                 } finally {
                   local.tempImage = '';
                   local.isDealUrl = false;
-                  local.tempStatus = 'init';
-                  local.tempImageType = 'poster';
+                  local.tempStatus = store.constant.MEDIA_STATUS.init;
+                  local.tempImageType = store.constant.IMAGE_TYPE.content;
                 }
               }} />}
             />
@@ -897,15 +890,15 @@ export default function ResourceEdit() {
               mode="edit"
               handler={<Icon type="drag" style={{ marginRight: 10 }} />}
               sort={async (oldIndex, newIndex) => {
-                const data = local.data.audios.map(item => ({ id: item.id, url: item.url }))
-                const id = data.splice(oldIndex, 1)
-                data.splice(newIndex, 0, ...id)
+                const data = local.data.audios.map(item => ({ _id: item._id, url: item.url }))
+                const _id = data.splice(oldIndex, 1)
+                data.splice(newIndex, 0, ..._id)
                 data.forEach((d, i) => {
                   d.nth = i + 1
                 })
                 local.loading = false
                 try {
-                  await api.sortResourceAudio({ id: local.id, data })
+                  await api.sortResourceAudio({ _id: local._id, data })
                   const items = local.data.audios.map(item => item)
                   const item = items.splice(oldIndex, 1);
                   items.splice(newIndex, 0, ...item)
@@ -915,7 +908,7 @@ export default function ResourceEdit() {
                 }
               }}
               items={local.data.audios}
-              droppableId={local.id}
+              droppableId={local._id}
               listStyle={{ boxSizing: 'border-box' }}
               itemStyle={{ display: 'flex', alignItems: 'center', lineHeight: 1, marginBottom: 5, backgroundColor: 'transparent' }}
               renderItem={({ item, index }) => (
@@ -926,22 +919,22 @@ export default function ResourceEdit() {
                       value={item.path}
                       disabled
                       className="custom"
-                      style={item.status === 'finished' ? { backgroundColor: '#00b578', color: 'white' } : { backgroundColor: '#ff8f1f' }}
+                      style={item.status === store.constant.MEDIA_STATUS.finished ? { backgroundColor: '#00b578', color: 'white' } : { backgroundColor: '#ff8f1f' }}
                       addonBefore={<Observer>{() => (
                         <Fragment>
                           <Select style={{ width: 90 }} value={item.status} onChange={async (status) => {
                             item.loading = true
                             try {
-                              await api.updateResourceAudio(local.id, { id: item.id, status, source_name: local.data.source_name })
+                              await api.updateResourceAudio(local._id, { _id: item._id, status, source_name: local.data.source_name })
                               item.status = status
                             } finally {
                               item.loading = false
                             }
                           }}>
-                            <Select.Option value="init">初始化</Select.Option>
-                            <Select.Option value="loading">下载中</Select.Option>
-                            <Select.Option value="finished">已下载</Select.Option>
-                            <Select.Option value="fail">失败</Select.Option>
+                            <Select.Option value={store.constant.MEDIA_STATUS.init}>初始化</Select.Option>
+                            <Select.Option value={store.constant.MEDIA_STATUS.loading}>下载中</Select.Option>
+                            <Select.Option value={store.constant.MEDIA_STATUS.finished}>已下载</Select.Option>
+                            <Select.Option value={store.constant.MEDIA_STATUS.fail}>失败</Select.Option>
                           </Select>
                         </Fragment>
                       )}</Observer>}
@@ -950,15 +943,15 @@ export default function ResourceEdit() {
                           <Icon type="check" onClick={async () => {
                             item.loading = true
                             try {
-                              await api.updateResourceAudio(local.id, { id: item.id, status: item.status, url: item.url })
+                              await api.updateResourceAudio(local._id, { _id: item._id, status: item.status, url: item.url })
                             } finally {
                               item.loading = false
                             }
                           }} />
-                          <Divider type='vertical' /><CloseOutlined disabled={item.loading || item.status === 'loading'} onClick={async () => {
+                          <Divider type='vertical' /><CloseOutlined disabled={item.loading || item.status === store.constant.MEDIA_STATUS.loading} onClick={async () => {
                             item.loading = true
                             try {
-                              await api.removeResourceAudio({ id: item.id, mid: local.id })
+                              await api.removeResourceAudio({ _id: item._id, mid: local._id })
                               local.data.audios = local.data.audios.filter(t => t.url !== item.url)
                             } finally {
                               item.loading = false
@@ -978,29 +971,29 @@ export default function ResourceEdit() {
                           <label htmlFor={`audio_${index}`}>
                             <input id={`audio_${index}`} type='file' style={{ display: 'none' }} onChange={async (e) => {
                               item.music = e.target.files[0];
-                              item.status = 'loading'
+                              item.status = store.constant.MEDIA_STATUS.loading
                               item.loading = true
                               try {
-                                await api.updateResourceAudio(local.id, { id: item.id, music: item.music, status: 'finished' })
-                                item.status = 'finished'
+                                await api.updateResourceAudio(local._id, { _id: item._id, music: item.music, status: store.constant.MEDIA_STATUS.finished })
+                                item.status = store.constant.MEDIA_STATUS.finished
                               } finally {
                                 item.music = null;
                                 item.loading = false;
                               }
                             }} />
-                            <Icon type={item.loading || item.status === 'loading' ? 'loading' : 'upload'} disabled={item.loading} />
+                            <Icon type={item.loading || item.status === store.constant.MEDIA_STATUS.loading ? 'loading' : 'upload'} disabled={item.loading} />
                           </label>
                           <Divider type='vertical' />
-                          <Icon type={item.loading || item.status === 'loading' ? 'loading' : 'download'} disabled={item.loading} onClick={async () => {
+                          <Icon type={item.loading || item.status === store.constant.RESOURCE_STATUS.loading ? 'loading' : 'download'} disabled={item.loading} onClick={async () => {
                             return notification.error({ message: '功能未开放' })
-                            if (item.status === 'finished') {
+                            if (item.status === store.constant.MEDIA_STATUS.finished) {
                               return notification.error({ message: '已下载' })
                             }
-                            item.status = 'loading'
+                            item.status = store.constant.MEDIA_STATUS.loading
                             item.loading = true
                             try {
-                              await api.downloadResourceAudio(local.id, item.id, { source_name: local.data.source_name })
-                              item.status = 'finished'
+                              await api.downloadResourceAudio(local._id, item._id, { source_name: local.data.source_name })
+                              item.status = store.constant.MEDIA_STATUS.finished
                             } finally {
                               item.loading = false
                             }
@@ -1025,10 +1018,10 @@ export default function ResourceEdit() {
                 <Select style={{ width: 90 }} disabled={local.isDealUrl} value={local.tempStatus} onChange={async (status) => {
                   local.tempStatus = status;
                 }}>
-                  <Select.Option value="init">初始化</Select.Option>
-                  <Select.Option value="loading">下载中</Select.Option>
-                  <Select.Option value="finished">已下载</Select.Option>
-                  <Select.Option value="fail">失败</Select.Option>
+                  <Select.Option value={store.constant.MEDIA_STATUS.init}>初始化</Select.Option>
+                  <Select.Option value={store.constant.MEDIA_STATUS.loading}>下载中</Select.Option>
+                  <Select.Option value={store.constant.MEDIA_STATUS.finished}>已下载</Select.Option>
+                  <Select.Option value={store.constant.MEDIA_STATUS.fail}>失败</Select.Option>
                 </Select>
               </Fragment>}
               addonAfter={
@@ -1052,7 +1045,7 @@ export default function ResourceEdit() {
                     }
                     local.isDealUrl = true
                     try {
-                      const res = await api.addResourceAudio(local.id, { title: local.data.title, url: local.tempAudio, type: 'audio', status: local.tempStatus, music: local.data.music })
+                      const res = await api.addResourceAudio(local._id, { title: local.data.title, url: local.tempAudio, type: 'audio', status: local.tempStatus, music: local.data.music })
                       if (res && res.code === 0) {
                         local.data.audios.push(_.omit(res.data, ['createdAt', 'more']))
                       } else {
@@ -1062,200 +1055,12 @@ export default function ResourceEdit() {
                       local.music = null;
                       local.tempAudio = '';
                       local.isDealUrl = false;
-                      local.tempStatus = 'init';
+                      local.tempStatus = store.constant.MEDIA_STATUS.init;
                     }
                   }} />
                 </div>
               }
             />
-          </Form.Item>
-        </VisualBox>
-        <VisualBox visible={['video', 'music', 'movie', 'short', "animation"].includes(local.data.source_type) && _.isArray(local.data.captions)}>
-          {/* name,path,url,nth,lang,status,id,mid,type(subtitles,lyrics) */}
-          <Form.Item label={<span>歌词字幕</span>} labelCol={lb} wrapperCol={rb}>
-            <SortListView
-              isLoading={local.loading}
-              direction="vertical"
-              mode="edit"
-              handler={<Icon type="drag" style={{ marginRight: 10 }} />}
-              sort={async (oldIndex, newIndex) => {
-                const data = local.data.captions.map(item => ({ id: item.id, url: item.url }))
-                const id = data.splice(oldIndex, 1)
-                data.splice(newIndex, 0, ...id)
-                data.forEach((d, i) => {
-                  d.nth = i + 1
-                })
-                local.loading = false
-                try {
-                  // TODO:
-                  await api.sortResourceCaption({ id: local.id, data })
-                  const items = local.data.captions.map(item => item)
-                  const item = items.splice(oldIndex, 1);
-                  items.splice(newIndex, 0, ...item)
-                  local.data.captions = items
-                } finally {
-                  local.loading = false
-                }
-              }}
-              items={local.data.captions}
-              droppableId={local.id}
-              listStyle={{ boxSizing: 'border-box' }}
-              itemStyle={{ display: 'flex', alignItems: 'center', lineHeight: 1, marginBottom: 5, backgroundColor: 'transparent' }}
-              renderItem={({ item, index }) => (
-                <Observer>{() => (
-                  <FullHeight style={{ flex: 1 }}>
-                    <Input
-                      key={index}
-                      value={item.nth + ' ' + item.path}
-                      disabled
-                      className="custom"
-                      style={item.status === 'finished' ? { backgroundColor: '#00b578', color: 'white' } : { backgroundColor: '#ff8f1f' }}
-                      addonBefore={<Observer>{() => (
-                        <Fragment>
-                          <Select style={{ width: 90 }} value={item.status} onChange={async (status) => {
-                            item.loading = true
-                            try {
-                              await api.updateResourceCaption(local.id, { id: item.id, status, source_name: local.data.source_name })
-                              item.status = status
-                            } finally {
-                              item.loading = false
-                            }
-                          }}>
-                            <Select.Option value="init">初始化</Select.Option>
-                            <Select.Option value="loading">下载中</Select.Option>
-                            <Select.Option value="finished">已下载</Select.Option>
-                            <Select.Option value="fail">失败</Select.Option>
-                          </Select>
-                          <Divider type="vertical" />
-                          <Select style={{ width: 80 }} value={item.type} onChange={async (type) => {
-                            item.loading = true
-                            try {
-                              await api.updateResourceCaption(local.id, { id: item.id, type })
-                              item.type = type
-                            } finally {
-                              item.loading = false
-                            }
-                          }}>
-                            <Select.Option value="lyrics">歌词</Select.Option>
-                            <Select.Option value="subtitles">字幕</Select.Option>
-                          </Select>
-                        </Fragment>
-                      )}</Observer>}
-                      suffix={<CloseOutlined disabled={item.loading || item.status === 'loading'} onClick={async () => {
-                        item.loading = true
-                        try {
-                          await api.removeResourceCaption({ id: item.id, mid: local.id })
-                          local.data.captions = local.data.captions.filter(t => t.url !== item.url)
-                        } finally {
-                          item.loading = false
-                        }
-                      }} />}
-                      addonAfter={<Observer>{() => (<FullWidth>
-                        <Icon type="upload" disabled={item.loading} />
-                      </FullWidth>)}</Observer>}
-                    />
-                    <Input
-                      value={item.url}
-                      onChange={(e) => {
-                        item.url = e.target.value;
-                      }}
-                      addonAfter={<Observer>{() => (
-                        <FullWidth>
-                          <Icon type="check" onClick={async () => {
-                            item.loading = true
-                            try {
-                              await api.updateResourceCaption(local.id, { id: item.id, url: item.url })
-                            } finally {
-                              item.loading = false
-                            }
-                          }} />
-                          <div style={{ width: 12 }}></div>
-                          <Icon type={item.loading || item.status === 'loading' ? 'loading' : 'download'} disabled={item.loading} onClick={async () => {
-                            if (item.status === 'finished') {
-                              return notification.error({ message: '已下载' })
-                            }
-                            item.status = 'loading'
-                            item.loading = true
-                            try {
-                              await api.downloadResourceCaption(local.id, item.id, { source_name: local.data.source_name })
-                              item.status = 'finished'
-                            } finally {
-                              item.loading = false
-                            }
-                          }} />
-
-                        </FullWidth>
-                      )}</Observer>}
-                    />
-                  </FullHeight>
-                )}</Observer>
-              )}
-            />
-            {local.captionAddVisible && (
-              <Input
-                ref={inputCaption}
-                type="text"
-                size="small"
-                style={{ margin: '10px 5px' }}
-                value={local.tempCaption}
-                autoFocus
-                disabled={local.isDealUrl}
-                onChange={e => local.tempCaption = e.target.value}
-                addonBefore={<Fragment>
-                  <Select style={{ width: 90 }} disabled={local.isDealUrl} value={local.tempCaptionStatus} onChange={async (status) => {
-                    local.tempCaptionStatus = status;
-                  }}>
-                    <Select.Option value="init">初始化</Select.Option>
-                    <Select.Option value="loading">下载中</Select.Option>
-                    <Select.Option value="finished">已下载</Select.Option>
-                    <Select.Option value="fail">失败</Select.Option>
-                  </Select>
-                  <Divider type="vertical" />
-                  <Select style={{ width: 80 }} disabled={local.isDealUrl} value={local.tempCaptionType} onChange={async (type) => {
-                    local.tempCaptionType = type;
-                  }}>
-                    <Select.Option value="lyrics">歌词</Select.Option>
-                    <Select.Option value="subtitles">字幕</Select.Option>
-                  </Select>
-                </Fragment>}
-                addonAfter={<Icon type="check" onClick={async () => {
-                  if (local.isDealUrl) {
-                    return;
-                  }
-                  let caption = local.tempCaption.trim()
-                  if ('' === caption) {
-                    local.captionAddVisible = false
-                    return;
-                  }
-                  local.isDealUrl = true
-                  try {
-                    if (-1 !== local.data.captions.findIndex(t => t.url === caption)) {
-                      return notification.info('exists')
-                    }
-                    const res = await api.addResourceCaption({ id: local.id, title: local.data.title, url: caption, type: local.tempCaptionType, status: local.tempCaptionStatus })
-                    if (res && res.code === 0) {
-                      local.data.captions.push({ url: res.data.url, id: res.data.id, status: local.tempCaptionStatus, type: local.tempCaptionType, nth: local.data.captions.length + 1 })
-                      local.captionAddVisible = false
-                    } else {
-                      notification.info('fail')
-                    }
-
-                  } finally {
-                    local.tempCaption = '';
-                    local.isDealUrl = false;
-                    local.tempCaptionStatus = 'init';
-                    local.tempCaptionType = 'subtitles';
-                  }
-                }} />}
-              />
-            )}
-            {!local.captionAddVisible && (
-              <Fragment>
-                <Tag style={{ margin: '10px 5px', background: '#fff', borderStyle: 'dashed' }}>
-                  <PlusCircleOutlined onClick={() => local.captionAddVisible = true} />
-                </Tag>
-              </Fragment>
-            )}
           </Form.Item>
         </VisualBox>
         <VisualBox visible={['article', 'post'].includes(local.data.source_type)}>
@@ -1277,21 +1082,21 @@ export default function ResourceEdit() {
       bodyStyle={{ height: 500, overflow: 'auto' }}
       onCancel={local.cancelFormat}
       onOk={async () => {
-        const videoItem = local.video_formats.find(item => item.id === local.video_format_id)
-        const audioItem = local.audio_formats.find(item => item.id === local.audio_format_id)
+        const videoItem = local.video_formats.find(item => item._id === local.video_format_id)
+        const audioItem = local.audio_formats.find(item => item._id === local.audio_format_id)
         if (videoItem && audioItem) {
           if (local.isDealUrl) {
             return;
           }
-          let url = 'https://googlevideo.com/' + videoItem.id + '+' + audioItem.id + '.' + videoItem.ext
+          let url = 'https://googlevideo.com/' + videoItem._id + '+' + audioItem._id + '.' + videoItem.ext
           local.isDealUrl = true
           try {
             local.loading = true
             const size = videoItem.size + audioItem.size;
             const more = { size, width: videoItem.width, height: videoItem.height };
-            const res = await api.addResourceVideo({ id: local.id, title: '', url, type: 'normal', status: 'init', more, ext: videoItem.ext, more: videoItem })
+            const res = await api.addResourceVideo({ _id: local._id, title: '', url, type: store.constant.VIDEO_TYPE.normal, status: store.constant.MEDIA_STATUS.init, more, ext: videoItem.ext, more: videoItem })
             if (res && res.code === 0) {
-              local.data.videos.push({ url: res.data.url, path: res.data.path, id: res.data.id, status: 'init', type: 'normal', more, nth: local.data.videos.length, })
+              local.data.videos.push({ url: res.data.url, path: res.data.path, _id: res.data._id, status: store.constant.MEDIA_STATUS.init, type: store.constant.VIDEO_TYPE.normal, more, nth: local.data.videos.length, })
               local.urlAddVisible = false
             } else {
               notification.info('fail')
@@ -1300,8 +1105,8 @@ export default function ResourceEdit() {
             local.loading = false;
             local.tempUrl = '';
             local.isDealUrl = false;
-            local.tempStatus = 'init';
-            local.tempUrlType = 'normal';
+            local.tempStatus = store.constant.MEDIA_STATUS.init;
+            local.tempUrlType = store.constant.VIDEO_TYPE.normal;
           }
         } else {
           console.log('select emptyp!')

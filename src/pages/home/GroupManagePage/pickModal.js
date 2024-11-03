@@ -10,7 +10,7 @@ export default function ResourcePick({ cancel, save }) {
   const local = useLocalStore(() => ({
     page: 1,
     size: 10,
-    id: '',
+    _id: '',
     title: '',
     type: '',
     tag: '',
@@ -31,7 +31,7 @@ export default function ResourcePick({ cancel, save }) {
       onCancel={cancel}
     >
       <div style={{ display: 'flex', alignItems: 'center', padding: 5 }}>
-        <div style={{ display: 'flex', alignItems: 'center', }}>id<Divider type="vertical" /><Input value={local.id} autoFocus onChange={e => local.id = e.target.value} /></div>
+        <div style={{ display: 'flex', alignItems: 'center', }}>_id<Divider type="vertical" /><Input value={local._id} autoFocus onChange={e => local._id = e.target.value} /></div>
         <Divider type="vertical" />
         <div style={{ display: 'flex', alignItems: 'center', }}>title<Divider type="vertical" /><Input value={local.title} autoFocus onChange={e => local.title = e.target.value} /></div>
         <Divider type="vertical" />
@@ -46,8 +46,8 @@ export default function ResourcePick({ cancel, save }) {
         <Divider type="vertical" />
         <Button type="primary" loading={local.loader.isLoading} onClick={async () => {
           const query = {}
-          if (local.id) {
-            query.id = local.id;
+          if (local._id) {
+            query._id = local._id;
           }
           if (local.title) {
             query.title = local.title;
@@ -61,7 +61,7 @@ export default function ResourcePick({ cancel, save }) {
           local.loader.refresh({ query })
         }}>查询</Button>
       </div>
-      <Table className="box" dataSource={local.loader.items.map(item => getSnapshot(item))} rowKey="id" scroll={{ y: 600 }} loading={local.loader.isLoading} pagination={{
+      <Table className="box" dataSource={local.loader.items.map(item => getSnapshot(item))} rowKey="_id" scroll={{ y: 600 }} loading={local.loader.isLoading} pagination={{
         pageSize: local.size,
         current: local.page,
         total: local.count,
@@ -69,7 +69,7 @@ export default function ResourcePick({ cancel, save }) {
         local.page = page.current
         local.loader.loadMore()
       }}>
-        <Column title="id" width={100} dataIndex="id" key="id" />
+        <Column title="_id" width={100} dataIndex="_id" key="_id" />
         <Column title="title" width={100} dataIndex="title" key="title" />
         <Column dataIndex="action" key="action" align="center" render={(text, record) => (
           <span onClick={() => { save(JSON.parse(JSON.stringify(record))); cancel(); }}>+</span>

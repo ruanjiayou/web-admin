@@ -65,7 +65,7 @@ function App() {
   return <Observer>{() => (
     <StoreContext.Provider value={store}>
       {
-        state.loading ? <div>loading</div> : (state.error ? <div>error</div> : <Router />)
+        state.loading ? <div style={{ width: "100vw", height: "100vh", display: "flex", justifyContent: "center", alignItems: "center" }}>loading</div> : (state.error ? <div>error</div> : <Router />)
       }
     </StoreContext.Provider>
   )}</Observer>

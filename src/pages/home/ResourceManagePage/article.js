@@ -20,7 +20,7 @@ export default function ResourceEdit() {
     data: {},
     initData() {
       this.data = {
-        id: query.id || '',
+        _id: query._id || '',
         title: '',
         alias: '',
         poster: '',
@@ -55,7 +55,7 @@ export default function ResourceEdit() {
       const data = toJS(local.data);
       data.content = content
       data.publishedAt = new Date(local.data.publishedAt)
-      const api = data.id ? apis.updateResource : apis.createResource
+      const api = data._id ? apis.updateResource : apis.createResource
       api(data).then(res => {
         if (res.code === 0) {
           notification.info({ message: '操作成功' })
@@ -86,9 +86,9 @@ export default function ResourceEdit() {
 
   }, [])
   useEffect(() => {
-    if (local.data.id) {
+    if (local.data._id) {
       local.data.fetching = true
-      apis.getResource({ id: local.data.id }).then(res => {
+      apis.getResource({ _id: local.data._id }).then(res => {
         if (res && res.status === 'success' && res.code === 0) {
           const data = res.data
           local.data = data;
@@ -145,9 +145,9 @@ export default function ResourceEdit() {
           </Select>
         </Form.Item>
         <Form.Item label="状态" labelCol={lb} wrapperCol={rb}>
-          <Switch checked={local.data.status === 'finished'} onClick={e => {
-            apis.updateResource({ id: local.data.id, status: local.data.status === 'finished' ? 'loading' : 'finished' }).then(() => {
-              local.data.status = local.data.status === 'finished' ? 'loading' : 'finished'
+          <Switch checked={local.data.status === store.constant.RESOURCE_STATUS.finished} onClick={e => {
+            apis.updateResource({ _id: local.data._id, status: local.data.status === store.constant.RESOURCE_STATUS.finished ? store.constant.RESOURCE_STATUS.loading : store.constant.RESOURCE_STATUS.finished }).then(() => {
+              local.data.status = local.data.status === store.constant.RESOURCE_STATUS.finished ? store.constant.RESOURCE_STATUS.loading : store.constant.RESOURCE_STATUS.finished
             })
           }} /> {local.data.status}
         </Form.Item>

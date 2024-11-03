@@ -5,11 +5,8 @@ import * as group from './group'
 import * as resource from './resource'
 import * as rule from './rule'
 import * as sync from './sync'
-import * as task from './task'
-import * as trade from './trade'
 import * as user from './user'
 import * as schedule from './schedule'
-import * as examine from './examine'
 import * as link from './link'
 import * as line from './line'
 import * as pub from './public'
@@ -60,8 +57,6 @@ const loadingInfo = async (filepath) => {
 
 export default {
   boot,
-  analyise,
-  getTradeBalance,
   excuteTemplate,
   loadingInfo,
   ...app,
@@ -71,11 +66,8 @@ export default {
   ...resource,
   ...rule,
   ...sync,
-  ...task,
-  ...trade,
   ...user,
   ...schedule,
-  ...examine,
   ...link,
   ...line,
   ...pub,

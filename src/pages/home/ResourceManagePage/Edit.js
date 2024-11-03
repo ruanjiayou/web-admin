@@ -9,7 +9,7 @@ import { VisualBox } from '../../../component'
 export default function ResourceEdit({ data, cancel, save, }) {
   const lb = { span: 3 }, rb = { span: 18 }
   const local = useLocalStore(() => ({
-    data: data.id ? _.cloneDeep(data) : { tags: [], types: [], poster: '', urls: [], open: false, status: 'finished' },
+    data: data._id ? _.cloneDeep(data) : { tags: [], types: [], poster: '', urls: [], open: false, status: store.constant.RESOURCE_STATUS.finished },
     loading: false,
     ref: '',
     poster: data.poster || '',
@@ -31,7 +31,7 @@ export default function ResourceEdit({ data, cancel, save, }) {
         style={{ overflow: 'auto', padding: 0 }}
         width={700}
         bodyStyle={{ height: 500, overflow: 'auto' }}
-        title={local.data.id ? '编辑组件' : '添加组件'}
+        title={local.data._id ? '编辑组件' : '添加组件'}
         visible={true}
         onCancel={cancel}
         onOk={async () => {
@@ -155,16 +155,6 @@ export default function ResourceEdit({ data, cancel, save, }) {
               {store.regions.map(city => <Select.Option value={city.name} key={city.name}>{city.title}</Select.Option>)}
             </Select>
           </Form.Item>
-          <Form.Item label="open" labelCol={lb} wrapperCol={rb}>
-            <Switch checked={local.data.open} onClick={e => {
-              local.data.open = !local.data.open
-            }} /> {local.data.open}
-          </Form.Item>
-          <Form.Item label="status" labelCol={lb} wrapperCol={rb}>
-            <Switch checked={local.data.status === 'finished'} onClick={e => {
-              local.data.status = local.data.status === 'finished' ? 'loading' : 'finished'
-            }} /> {local.data.status}
-          </Form.Item>
           <Form.Item label="poster" labelCol={lb} wrapperCol={rb}>
             <Upload
               style={{ position: 'relative' }}
@@ -195,7 +185,7 @@ export default function ResourceEdit({ data, cancel, save, }) {
               </Button>
             </Upload>
           </Form.Item>
-          <VisualBox visible={local.data.source_type === 'video' && !local.data.id}>
+          <VisualBox visible={local.data.source_type === 'video' && !local.data._id}>
             <Form.Item label="urls" labelCol={lb} wrapperCol={rb}>
               {local.data.urls && local.data.urls.map((url, index) => <div key={index}><Tag closable onClose={() => { local.data.urls = local.data.urls.filter(t => t !== url) }}>{url}</Tag></div>)}
               {local.urlAddVisible && (

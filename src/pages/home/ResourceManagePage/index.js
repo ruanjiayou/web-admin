@@ -142,10 +142,10 @@ export default function ResourceManagePage() {
             onSearch()
           }}>
             <Select.Option value="">全部</Select.Option>
-            <Select.Option value="init">初始化</Select.Option>
-            <Select.Option value="loading">loading</Select.Option>
-            <Select.Option value="finished">成功</Select.Option>
-            <Select.Option value="fail">失败</Select.Option>
+            <Select.Option value={store.constant.RESOURCE_STATUS.init}>初始化</Select.Option>
+            <Select.Option value={store.constant.RESOURCE_STATUS.loading}>loading</Select.Option>
+            <Select.Option value={store.constant.RESOURCE_STATUS.finished}>成功</Select.Option>
+            <Select.Option value={store.constant.RESOURCE_STATUS.fail}>失败</Select.Option>
           </Select>
           <Divider type="vertical" />
           资源类型
@@ -353,7 +353,7 @@ export default function ResourceManagePage() {
               <Button type="primary" loading={local.isLoading} onClick={async () => {
                 local.isLoading = true
                 try {
-                  await updateResource(_.pick(local.temp, ['title', 'types', 'series', 'open', 'status', 'source_type', 'thumbnail', 'id']))
+                  await updateResource(_.pick(local.temp, ['title', 'types', 'series', 'status', 'source_type', 'thumbnail', '_id']))
                   local.showFastEdit = false
                   local.thumbnail = ''
                 } catch (e) {
@@ -404,19 +404,14 @@ export default function ResourceManagePage() {
               <Form.Item label="系列" labelCol={lb} wrapperCol={rb}>
                 <Input value={local.temp.series} onChange={e => local.temp.series = e.target.value} />
               </Form.Item>
-              <Form.Item label="公开" labelCol={lb} wrapperCol={rb}>
-                <Switch checked={local.temp.open} onClick={e => {
-                  local.temp.open = !local.temp.open
-                }} /> {local.temp.open}
-              </Form.Item>
               <Form.Item label="连载" labelCol={lb} wrapperCol={rb}>
                 <Select value={local.temp.status} onChange={v => {
                   local.temp.status = v;
                 }}>
-                  <Select.Option value='init'>初始化</Select.Option>
-                  <Select.Option value='loading'>下载中</Select.Option>
-                  <Select.Option value='finished'>已成功</Select.Option>
-                  <Select.Option value='fail'>失败</Select.Option>
+                  <Select.Option value={store.constant.RESOURCE_STATUS.init}>初始化</Select.Option>
+                  <Select.Option value={store.constant.RESOURCE_STATUS.loading}>下载中</Select.Option>
+                  <Select.Option value={store.constant.RESOURCE_STATUS.finished}>已成功</Select.Option>
+                  <Select.Option value={store.constant.RESOURCE_STATUS.fail}>失败</Select.Option>
                 </Select>
               </Form.Item>
             </Form>

@@ -13,10 +13,10 @@ import styled from 'styled-components';
 
 const { Column } = Table;
 const StatusMap = {
-  init: 'plus',
-  loading: 'sync-horizon',
-  finished: 'check',
-  fail: 'close'
+  1: 'plus',
+  2: 'sync-horizon',
+  3: 'close',
+  4: 'check',
 }
 const Label = styled.span`
   color: red;
@@ -30,7 +30,7 @@ export default function ResourceList({ items, children, categories, search, loca
     resource: null,
   }));
   const getDetail = useCallback(async () => {
-    const resp = await apis.getResource({ id: state.resource_id });
+    const resp = await apis.getResource({ _id: state.resource_id });
     if (resp.code === 0) {
       state.resource = resp.data;
       state.loading = false;
@@ -39,7 +39,7 @@ export default function ResourceList({ items, children, categories, search, loca
   return <Observer>{() => (
     <FullWidth style={{ alignItems: 'flex-start', height: '100%' }}>
       <FullWidthAuto style={{ overflowX: 'auto' }}>
-        <Table dataSource={items} rowKey="id" scroll={{ y: 'calc(100vh - 233px)' }} loading={local.isLoading} pagination={{
+        <Table dataSource={items} rowKey="_id" scroll={{ y: 'calc(100vh - 233px)' }} loading={local.isLoading} pagination={{
           pageSize: 20,
           current: local.search_page,
           total: local.count,
@@ -47,7 +47,7 @@ export default function ResourceList({ items, children, categories, search, loca
           local.search_page = page.current
           search()
         }}>
-          <Column title="封面" width={70} dataIndex="poster" key="id" align="center" render={(text, record) => (
+          <Column title="封面" width={70} dataIndex="poster" key="_id" align="center" render={(text, record) => (
             <Observer>{() => (
               <div style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
                 <img src={record.poster.startsWith('http') || record.thumbnail.startsWith('http') ? record.thumbnail || record.poster : store.app.imageLine + (record.thumbnail || record.poster || '/images/poster/nocover.jpg')}
@@ -58,14 +58,14 @@ export default function ResourceList({ items, children, categories, search, loca
                   if (record.poster === '' && record.thumbnail === '') {
                     const poster = prompt('请输入封面地址');
                     if (poster) {
-                      await apis.updateResource({ id: record.id, poster })
-                      await apis.downloadResourceCover({ id: record.id, })
+                      await apis.updateResource({ _id: record._id, poster })
+                      await apis.downloadResourceCover({ _id: record._id, })
                       search()
                       notification.info({ message: '下载成功' })
                     }
                   } else if (record.poster.startsWith('http') || record.thumbnail.startsWith('http')) {
                     try {
-                      await apis.downloadResourceCover({ id: record.id, })
+                      await apis.downloadResourceCover({ _id: record._id, })
                       search()
                       notification.info({ message: '下载成功' })
                     } catch (e) {
@@ -82,7 +82,7 @@ export default function ResourceList({ items, children, categories, search, loca
             return <CenterXY>
               {url && <a href={url} target='_blank'><LinkOutlined /></a>}
               &nbsp;&nbsp;
-              <Clipboard data-clipboard-text={record.id} component={'a'}>
+              <Clipboard data-clipboard-text={record._id} component={'a'}>
                 <SwitcherOutlined />
               </Clipboard>
             </CenterXY>
@@ -91,15 +91,15 @@ export default function ResourceList({ items, children, categories, search, loca
             let isDev = window.origin.includes('localhost') ? true : false;
             let url = isDev ? 'https://192.168.0.124' : window.origin;
             if (['video', 'movie', 'short', 'animation'].includes(record.source_type)) {
-              url += ('/novel/groups/GroupTree/VideoInfo?GroupTree.name=video&VideoInfo.id=' + record.id)
+              url += ('/novel/groups/GroupTree/VideoInfo?GroupTree.name=video&VideoInfo._id=' + record._id)
             } else if (record.source_type === 'novel') {
-              url += ('/novel/home/BookInfo?home.tab=&BookInfo.id=' + record.id)
+              url += ('/novel/home/BookInfo?home.tab=&BookInfo._id=' + record._id)
             } else if (['article', 'private'].includes(record.source_type)) {
-              url += ('/novel/home/Article?home.tab=QD7vNfJCU&Article.id=' + record.id)
+              url += ('/novel/home/Article?home.tab=QD7vNfJCU&Article._id=' + record._id)
             } else if (['image'].includes(record.source_type)) {
-              url += ('/novel/groups/GroupTree/Image?GroupTree.name=image&Image.id=' + record.id)
+              url += ('/novel/groups/GroupTree/Image?GroupTree.name=image&Image._id=' + record._id)
             } else if (record.source_type === 'post') {
-              url += ('/novel/home/Post?home.tab=QD7vNfJCU&Post.id=' + record.id)
+              url += ('/novel/home/Post?home.tab=QD7vNfJCU&Post._id=' + record._id)
             }
             return <a style={{ color: '#1890ff', cursor: 'pointer' }} title={url} href={url} onClick={(e) => {
               e.preventDefault()
@@ -115,7 +115,7 @@ export default function ResourceList({ items, children, categories, search, loca
               <Select value={record.source_type} onChange={async (v) => {
                 try {
                   state.updating = true
-                  await apis.updateResource({ id: record.id, source_type: v })
+                  await apis.updateResource({ _id: record._id, source_type: v })
                   record.source_type = v
                   notification.info({ message: '修改成功' })
                 } catch (e) {
@@ -137,7 +137,7 @@ export default function ResourceList({ items, children, categories, search, loca
                 {record.types.map(type => <Tag key={type} style={{ marginBottom: 5 }} closable={true} onClose={async () => {
                   try {
                     const types = record.types.filter(item => item !== type)
-                    await apis.updateResource({ id: record.id, types })
+                    await apis.updateResource({ _id: record._id, types })
                     record.types = types
                     notification.info({ message: '修改成功' })
                   } catch (e) {
@@ -151,7 +151,7 @@ export default function ResourceList({ items, children, categories, search, loca
                     return notification.info('类型已存在')
                   }
                   try {
-                    await apis.updateResource({ id: record.id, types: [...types, type] })
+                    await apis.updateResource({ _id: record._id, types: [...types, type] })
                     record.types = [...types, type]
                     notification.info({ message: '修改成功' })
                   } catch (e) {
@@ -170,7 +170,7 @@ export default function ResourceList({ items, children, categories, search, loca
 								try {
 									state.updating = true
 									const tags = record.tags.filter(item => item !== tag)
-									await apis.updateResource({ id: record.id, tags })
+									await apis.updateResource({ _id: record._id, tags })
 									record.tags = tags
 									notification.info({ message: '修改成功' })
 								} catch (e) {
@@ -187,7 +187,7 @@ export default function ResourceList({ items, children, categories, search, loca
 								return notification.info('类型已存在')
 							}
 							try {
-								await apis.updateResource({ id: record.id, tags: [...tags, tag] })
+								await apis.updateResource({ _id: record._id, tags: [...tags, tag] })
 								record.tags = [...tags, tag]
 								notification.info({ message: '修改成功' })
 							} catch (e) {
@@ -204,7 +204,7 @@ export default function ResourceList({ items, children, categories, search, loca
 					try {
 						if (res) {
 							state.updating = true
-							await apis.updateResource({ id: record.id, series: res })
+							await apis.updateResource({ _id: record._id, series: res })
 							record.series = res
 							notification.info({ message: '修改成功' })
 						}
@@ -220,11 +220,11 @@ export default function ResourceList({ items, children, categories, search, loca
 			)} /> */}
           {/* <Column title="连载" width={100} dataIndex="status" key="status" render={(text, record) => (
 				<Observer>{() => (
-					<Switch checked={record.status === 'loading'} onClick={async (e) => {
+					<Switch checked={record.status === store.constant.MEDIA_STATUS.loading} onClick={async (e) => {
 						try {
 							state.updating = true
-							await apis.updateResource({ id: record.id, status: record.status === 'loading' ? 'finished' : 'loading' })
-							record.status = record.status === 'loading' ? 'finished' : 'loading'
+							await apis.updateResource({ _id: record._id, status: record.status === store.constant.RESOURCE_STATUS.loading ? store.constant.RESOURCE_STATUS.finished : store.constant.RESOURCE_STATUS.loading })
+							record.status = record.status === store.constant.RESOURCE_STATUS.loading ? store.constant.RESOURCE_STATUS.finished : store.constant.RESOURCE_STATUS.loading
 							notification.info({ message: '修改成功' })
 						} catch (e) {
 							notification.info({ message: '修改失败' })
@@ -235,50 +235,35 @@ export default function ResourceList({ items, children, categories, search, loca
 				)}
 				</Observer>
 			)} />
-			<Column title="公开" width={100} dataIndex="open" key="open" render={(text, record) => (
-				<Observer>{() => (
-					<Switch checked={record.open} onClick={async (e) => {
-						try {
-							state.updating = true
-							await apis.updateResource({ id: record.id, open: !record.open })
-							record.open = !record.open
-							notification.info({ message: '修改成功' })
-						} catch (e) {
-							notification.info({ message: '修改失败' })
-						} finally {
-							state.updating = false
-						}
-					}} />)}
-				</Observer>
-			)} /> */}
+			 */}
           <Column title="操作" width={100} dataIndex="action" key="action" align="center" render={(text, record) => (
             <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly' }}>
               <FormOutlined title="快速编辑" onClick={() => { props.fastEdit(record) }} />
               <Divider type="vertical" />
               <Popconfirm title="确定同步到es?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={async () => {
-                if (state.syncItems[record.id]) {
+                if (state.syncItems[record._id]) {
                   alert('正在同步中...')
                 } else {
-                  state.syncItems[record.id] = true
-                  apis.sync2es([record.id]).catch(() => {
+                  state.syncItems[record._id] = true
+                  apis.sync2es([record._id]).catch(() => {
                     alert('同步失败')
                   }).finally(() => {
-                    state.syncItems[record.id] = false
+                    state.syncItems[record._id] = false
                   })
                 }
               }}>
-                <SyncOutlined title='同步es' spin={state.syncItems[record.id] ? true : false} />
+                <SyncOutlined title='同步es' spin={state.syncItems[record._id] ? true : false} />
               </Popconfirm>
               <Divider type="vertical" />
               <VisualBox visible={['article', 'post'].includes(record.source_type)}>
-                <Link title="编辑" style={{ display: 'inherit' }} to={'/admin/home/resource-manage/edit-multi?id=' + record.id} target="_blank"><FormOutlined /></Link>
+                <Link title="编辑" style={{ display: 'inherit' }} to={'/admin/home/resource-manage/edit-multi?_id=' + record._id} target="_blank"><FormOutlined /></Link>
               </VisualBox>
               <Divider type="vertical" />
               <VisualBox visible={['video', 'image', 'music', 'movie', 'animation'].includes(record.source_type)}>
-                <Link title="编辑" style={{ display: 'inherit' }} target="_blank" to={'/admin/home/resource-manage/edit-multi?id=' + record.id} ><FormOutlined /></Link>
+                <Link title="编辑" style={{ display: 'inherit' }} target="_blank" to={'/admin/home/resource-manage/edit-multi?_id=' + record._id} ><FormOutlined /></Link>
               </VisualBox>
               <Divider type="vertical" />
-              <VisualBox visible={record.source_type === 'movie' && record.status === 'loading'}>
+              <VisualBox visible={record.source_type === 'movie' && record.status === store.constant.MEDIA_STATUS.loading}>
                 <DownloadOutlined onClick={() => {
                   const url = new URL(record.origin);
                   url.searchParams.set('crawl', '1')
@@ -291,7 +276,7 @@ export default function ResourceList({ items, children, categories, search, loca
               </VisualBox>
               <VisualBox visible={record.source_type === 'article'}>
                 <CloudSyncOutlined title="抓取image" onClick={() => {
-                  apis.grabImages({ id: record.id }).then(res => {
+                  apis.grabImages({ _id: record._id }).then(res => {
                     notification.info({ message: `success:${res.data.success} fail:${res.data.fail}` })
                   })
                 }} />
@@ -305,7 +290,7 @@ export default function ResourceList({ items, children, categories, search, loca
               <Button type="text" onClick={() => {
                 state.loading = true;
                 state.resource = null;
-                state.resource_id = record.id;
+                state.resource_id = record._id;
                 getDetail();
               }}>详情</Button>
             </div>

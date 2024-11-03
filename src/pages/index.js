@@ -6,15 +6,9 @@ import ResourceManagePage from './home/ResourceManagePage'
 import BackupPage from './home/DataManagePage/backup'
 import FilePage from './home/DataManagePage/file'
 import SyncPage from './home/DataManagePage/sync'
-import RulePage from './home/SpiderManagePage/rule'
-import Rule2Page from './home/SpiderManagePage/rule2'
-import TaskPage from './home/SpiderManagePage/task'
 import DownloadPage from './home/DownloadManagePage'
 import SchedulePage from './home/ScheduleManagePage'
 import ResourceEdit from './home/ResourceManagePage/article'
-import TradePage from './home/StockManagePage/trade'
-import ExamineListPage from './home/ExamineManagePage/List'
-import ExamineDetailPage from './home/ExamineManagePage/Detail'
 import LinkManagePage from './home/LinkManagePage'
 import LineManagePage from './home/LineManagePage'
 import ConfigPage from './home/ConfigPage'
@@ -56,14 +50,8 @@ const page_map = {
   'BackupPage': BackupPage,
   'FilePage': FilePage,
   'SyncPage': SyncPage,
-  'RulePage': RulePage,
-  'Rule2Page': Rule2Page,
-  'TaskPage': TaskPage,
   'SchedulePage': SchedulePage,
   'ResourceEdit': ResourceEdit,
-  'TradePage': TradePage,
-  'ExamineListPage': ExamineListPage,
-  'ExamineDetailPage': ExamineDetailPage,
   'LinkManagePage': LinkManagePage,
   'LineManagePage': LineManagePage,
   'ConfigPage': ConfigPage,

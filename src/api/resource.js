@@ -15,7 +15,7 @@ export function getResources(query) {
 
 export function getResource(query) {
   return shttp({
-    url: `/v1/admin/resource/${query.id}`,
+    url: `/v1/admin/resource/${query._id}`,
     method: 'GET'
   })
 }
@@ -54,7 +54,7 @@ export function updateResource(data, sync = false) {
     }
   }
   return shttp({
-    url: `/v1/admin/resource/${data.id}${sync ? '?sync=true' : ''}`,
+    url: `/v1/admin/resource/${data._id}${sync ? '?sync=true' : ''}`,
     method: 'PUT',
     data: form
   })
@@ -62,106 +62,104 @@ export function updateResource(data, sync = false) {
 
 export function destroyResource(params) {
   return shttp({
-    url: `/v1/admin/resource/${params.id}`,
+    url: `/v1/admin/resource/${params._id}`,
     method: 'DELETE',
   })
 }
 
-export function addResourceVideo({ id, ...data }) {
+export function addResourceVideo({ _id, ...data }) {
   return shttp({
-    url: `/v1/admin/resource/${id}/video`,
+    url: `/v1/admin/resource/${_id}/video`,
     method: 'POST',
     data,
   })
 }
 
-export function updateResourceVideo(id, data) {
+export function updateResourceVideo(_id, data) {
   return shttp({
-    url: `/v1/admin/resource/${id}/video/${data.id}`,
+    url: `/v1/admin/resource/${_id}/video/${data._id}`,
     method: 'PUT',
     data,
   })
 }
 
-export function downloadResourceVideo(mid, id) {
+export function downloadResourceVideo(mid, _id) {
   return shttp({
-    url: `/v1/admin/resource/${mid}/video/${id}`,
+    url: `/v1/admin/resource/${mid}/video/${_id}`,
     method: 'PATCH',
   })
 }
 
-export function downloadVideoSubtitles({ id, mid, subtitles }) {
+export function downloadVideoSubtitles({ _id, mid, subtitles }) {
   return shttp({
-    url: `/v1/admin/resource/${mid}/video/${id}/subtitles`,
+    url: `/v1/admin/resource/${mid}/video/${_id}/subtitles`,
     data: { subtitles },
     method: 'PATCH',
   })
 }
 
-export function downloadResourceCover({ id }) {
+export function downloadResourceCover({ _id }) {
   return shttp({
-    url: `/v1/admin/resource/${id}/cover`,
+    url: `/v1/admin/resource/${_id}/cover`,
     method: 'PATCH',
   })
 }
-export function removeResourceVideo({ id, mid }) {
+export function removeResourceVideo({ _id, mid }) {
   return shttp({
-    url: `/v1/admin/resource/${mid}/video`,
+    url: `/v1/admin/resource/${mid}/video/${_id}`,
     method: 'DELETE',
-    data: { id }
   })
 }
 
-export function sortResourceVideo({ id, data }) {
+export function sortResourceVideo({ _id, data }) {
   return shttp({
-    url: `/v1/admin/resource/${id}/video`,
+    url: `/v1/admin/resource/${_id}/video`,
     method: 'PUT',
     data,
   })
 }
 
 
-export function addResourceImage({ id, ...data }) {
+export function addResourceImage({ _id, ...data }) {
   return shttp({
-    url: `/v1/admin/resource/${id}/image`,
+    url: `/v1/admin/resource/${_id}/image`,
     method: 'POST',
     data,
   })
 }
 
-export function updateResourceImage(id, data) {
+export function updateResourceImage(_id, data) {
   return shttp({
-    url: `/v1/admin/resource/${id}/image/${data.id}`,
+    url: `/v1/admin/resource/${_id}/image/${data._id}`,
     method: 'PUT',
     data,
   })
 }
 
-export function downloadResourceImage(mid, id, data) {
+export function downloadResourceImage(mid, _id, data) {
   return shttp({
-    url: `/v1/admin/resource/${mid}/image/${id}`,
+    url: `/v1/admin/resource/${mid}/image/${_id}`,
     method: 'PATCH',
     data,
   })
 }
 
-export function removeResourceImage({ id, mid }) {
+export function removeResourceImage({ _id, mid }) {
   return shttp({
-    url: `/v1/admin/resource/${mid}/image`,
+    url: `/v1/admin/resource/${mid}/image/${_id}`,
     method: 'DELETE',
-    data: { id }
   })
 }
 
-export function sortResourceImage({ id, data }) {
+export function sortResourceImage({ _id, data }) {
   return shttp({
-    url: `/v1/admin/resource/${id}/image`,
+    url: `/v1/admin/resource/${_id}/image`,
     method: 'PUT',
     data,
   })
 }
 
-export function addResourceAudio(id, data) {
+export function addResourceAudio(_id, data) {
   const form = new FormData()
   for (let k in data) {
     if (data[k] instanceof Array) {
@@ -173,13 +171,13 @@ export function addResourceAudio(id, data) {
     }
   }
   return shttp({
-    url: `/v1/admin/resource/${id}/audio`,
+    url: `/v1/admin/resource/${_id}/audio`,
     method: 'POST',
     data: form,
   })
 }
 
-export function updateResourceAudio(id, data) {
+export function updateResourceAudio(_id, data) {
   const form = new FormData()
   for (let k in data) {
     if (data[k] instanceof Array) {
@@ -191,65 +189,22 @@ export function updateResourceAudio(id, data) {
     }
   }
   return shttp({
-    url: `/v1/admin/resource/${id}/audio/${data.id}`,
+    url: `/v1/admin/resource/${_id}/audio/${data._id}`,
     method: 'PUT',
     data: form,
   })
 }
 
-export function removeResourceAudio({ id, mid }) {
+export function removeResourceAudio({ _id, mid }) {
   return shttp({
-    url: `/v1/admin/resource/${mid}/audio`,
+    url: `/v1/admin/resource/${mid}/audio/${_id}`,
     method: 'DELETE',
-    data: { id },
   })
 }
-
-
-export function addResourceCaption({ id, ...data }) {
-  return shttp({
-    url: `/v1/admin/resource/${id}/caption`,
-    method: 'POST',
-    data,
-  })
-}
-
-export function updateResourceCaption(id, data) {
-  return shttp({
-    url: `/v1/admin/resource/${id}/caption/${data.id}`,
-    method: 'PUT',
-    data,
-  })
-}
-
-export function downloadResourceCaption(mid, id, data) {
-  return shttp({
-    url: `/v1/admin/resource/${mid}/caption/${id}`,
-    method: 'PATCH',
-    data,
-  })
-}
-
-export function removeResourceCaptione({ id, mid }) {
-  return shttp({
-    url: `/v1/admin/resource/${mid}/caption`,
-    method: 'DELETE',
-    data: { id }
-  })
-}
-
-export function sortResourceCaption({ id, data }) {
-  return shttp({
-    url: `/v1/admin/resource/${id}/caption`,
-    method: 'PUT',
-    data,
-  })
-}
-
 
 export function grabImages(params) {
   return shttp({
-    url: `/v1/admin/resource-grab-images/${params.id}`,
+    url: `/v1/admin/resource-grab-images/${params._id}`,
     method: 'GET',
   })
 }

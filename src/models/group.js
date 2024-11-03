@@ -105,14 +105,14 @@ const GroupModel = types.model('Group', {
   sortChildren(data) {
     const mapping = {};
     data.forEach((it, i) => {
-      mapping[data.id] = i
+      mapping[data._id] = i
     })
     const children = self.children.map(child => { child.nth = mapping[child.id]; return child })
     self.children = children
   },
   appendData(data) {
     self.data.push(data);
-    self.refs.push(data.id)
+    self.refs.push(data._id)
   },
   sortRefsByIndex(oldIndex, newIndex) {
     const [child] = self.data.splice(oldIndex, 1)
@@ -126,8 +126,8 @@ const GroupModel = types.model('Group', {
   addChild(child) {
     self.children.push(child)
   },
-  removeChild(id) {
-    const i = self.children.findIndex(item => item.id === id)
+  removeChild(_id) {
+    const i = self.children.findIndex(item => item._id === _id)
     self.children.splice(i, 1);
     self.children.forEach((child, i) => child.nth = i)
   },
