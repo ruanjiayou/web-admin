@@ -19,16 +19,20 @@ import Axios from 'axios';
 import Ueditor from '../../../component/Ueditor'
 import StreamInfo from '../../../utils/stream';
 
-function deepEqual(a, b) {
+const omit_keys = ['images', 'videos', 'counter'];
+function deepEqual(a, b, omits) {
   const keys = Array.from(new Set([...Object.keys(a), ...Object.keys(b)]));
   for (let i = 0; i < keys.length; i++) {
     const k = keys[i]
     let equal = true;
+    if (omits.includes(k)) {
+      continue;
+    }
     if (_.isPlainObject(a[k])) {
       if (_.isEmpty(a[k]) && !_.isEmpty(b[k])) {
         return false
       }
-      equal = deepEqual(a[k], b[k]);
+      equal = deepEqual(a[k], b[k], []);
     } else {
       equal = _.isEqual(a[k], b[k]);
     }
@@ -100,15 +104,16 @@ export default function ResourceEdit() {
     }
   }))
   const onEdit = useCallback(async (sync = true) => {
-    const changed = !deepEqual(toJS(local.origin), toJS(local.data));
+    const changed = !deepEqual(toJS(local.origin), toJS(local.data), omit_keys);
     if (!changed) {
       notification.info({ message: '数据未改动' })
       return;
     }
     local.loading = true
     const resp = local.data._id ? await apis.updateResource(local.data, sync) : await api.createResource(local.data);
-    if (resp && resp.data.code === 0) {
-      notification.info('编辑成功')
+    if (resp && resp.code === 0) {
+      notification.info({ message: '编辑成功' })
+      local.origin = resp.data;
     }
     local.loading = false;
   }, []);
@@ -207,7 +212,7 @@ export default function ResourceEdit() {
               style={{ backgroundColor: '#eee', padding: '4px 0 4px 10px', borderRadius: 5 }}
               value={local.data.status}
               onChange={e => {
-                local.data.status = e.target.value
+                local.data.status = parseInt(e.target.value)
                 onEdit()
               }}>
               <Radio value={store.constant.RESOURCE_STATUS.init}>待下载</Radio>
