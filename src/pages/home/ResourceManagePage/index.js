@@ -93,7 +93,7 @@ export default function ResourceManagePage() {
     function resource_change(data) {
       if (data.resource_type === 'resource') {
         local.resources.forEach(resource => {
-          if (resource.id === data.resource_id) {
+          if (resource._id === data.resource_id) {
             resource.status = data.status;
           }
         })
