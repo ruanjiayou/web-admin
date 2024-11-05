@@ -38,7 +38,7 @@ export default function ResourceManagePage() {
     search_name: '',
     search_type: '',
     search_status: '',
-    search_key: 'q',
+    search_key: 'search',
     search_page: 1,
     categories: {},
     resources: [],
@@ -59,7 +59,7 @@ export default function ResourceManagePage() {
       spider_id: local.spider_id,
       page: local.search_page,
     }
-    const fn = local.search_key === 'q' && local.search_name ? search : getResources;
+    const fn = local.search_key === 'search' && local.search_name ? search : getResources;
     fn(query).then(res => {
       console.log(res)
       local.isLoading = false
@@ -114,7 +114,7 @@ export default function ResourceManagePage() {
             addonBefore={<Select value={local.search_key} onChange={value => {
               local.search_key = value;
             }}>
-              <Select.Option value="q">es搜索</Select.Option>
+              <Select.Option value="search">es搜索</Select.Option>
               <Select.Option value="id">id</Select.Option>
               <Select.Option value="source_id">source_id</Select.Option>
               <Select.Option value="source_name">source_name</Select.Option>
