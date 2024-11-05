@@ -497,6 +497,7 @@ export default function ResourceEdit() {
                           item.loading = true
                           try {
                             await api.removeResourceVideo({ _id: item._id, mid: local._id })
+                            await Axios.delete(`https://192.168.0.124/gw/download/tasks/${item._id}`)
                             local.data.videos = local.data.videos.filter(t => t.url !== item.url)
                           } finally {
                             item.loading = false
@@ -717,7 +718,7 @@ export default function ResourceEdit() {
                         <Select style={{ width: 90 }} value={item.status} onChange={async (status) => {
                           item.loading = true
                           try {
-                            await api.updateResourceImage(local._id, { _id: item._id, status, source_name: local.data.source_name })
+                            await api.updateResourceImage(local._id, { _id: item._id, status })
                             item.status = status
                           } finally {
                             item.loading = false
@@ -749,6 +750,7 @@ export default function ResourceEdit() {
                       item.loading = true
                       try {
                         await api.removeResourceImage({ _id: item._id, mid: local._id })
+                        await Axios.delete(`https://192.168.0.124/gw/download/tasks/${item._id}`)
                         local.data.images = local.data.images.filter(t => t.url !== item.url)
                       } finally {
                         item.loading = false
@@ -785,8 +787,8 @@ export default function ResourceEdit() {
                           item.status = store.constant.MEDIA_STATUS.loading
                           item.loading = true
                           try {
-                            await api.downloadResourceImage(local._id, item._id, { source_name: local.data.source_name })
-                            item.status = store.constant.RESOURCE_STATUS.finished
+                            await api.downloadResourceImage(local._id, item._id)
+                            item.status = store.constant.MEDIA_STATUS.finished
                           } finally {
                             item.loading = false
                           }

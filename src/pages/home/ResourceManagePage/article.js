@@ -34,8 +34,7 @@ export default function ResourceEdit() {
         tags: [],
         series: '',
         origin: '',
-        // words: 0,
-        open: true,
+        words: 0,
       }
     },
     // 临时
