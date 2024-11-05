@@ -545,7 +545,7 @@ export default function ResourceEdit() {
                         try {
                           const type = item.url.includes('.m3u8') ? 'm3u8' : 'mp4';
                           const data = {
-                            _id: item.id,
+                            _id: item._id,
                             url: item.url,
                             filepath: item.path,
                             type,
