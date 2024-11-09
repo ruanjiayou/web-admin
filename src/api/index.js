@@ -3,7 +3,7 @@ import * as backup from './backup'
 import * as channel from './channel'
 import * as group from './group'
 import * as resource from './resource'
-import * as rule from './rule'
+import * as spider from './spider'
 import * as sync from './sync'
 import * as user from './user'
 import * as schedule from './schedule'
@@ -24,20 +24,6 @@ const boot = function () {
     method: 'GET'
   })
 };
-
-const analyise = function () {
-  return shttp({
-    url: '/v1/admin/analyise/trade',
-    method: 'GET'
-  })
-};
-
-const getTradeBalance = function () {
-  return shttp({
-    url: '/v1/admin/analyise/trade-balance',
-    method: 'GET'
-  })
-}
 
 const excuteTemplate = async (id, data) => {
   return shttp({
@@ -64,7 +50,7 @@ export default {
   ...channel,
   ...group,
   ...resource,
-  ...rule,
+  ...spider,
   ...sync,
   ...user,
   ...schedule,

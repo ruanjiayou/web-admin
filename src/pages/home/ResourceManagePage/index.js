@@ -13,9 +13,9 @@ import CodeEditor from '../../../component/CodeEditor'
 import { match } from 'path-to-regexp'
 import { events } from '../../../utils/events';
 import * as _ from 'lodash'
-import { getSpiders } from '../../../api/rule';
+import { getSpiders } from '../../../api/spider';
 
-const { getResources, search, createResource, updateResource, destroyResource, getGroupTypes, v2getRules, v2GetResourceByRule, v2previewRule } = apis
+const { getResources, search, createResource, updateResource, destroyResource, getGroupTypes } = apis
 
 async function destroy(data) {
   return await destroyResource(data)
@@ -42,10 +42,9 @@ export default function ResourceManagePage() {
     search_page: 1,
     categories: {},
     resources: [],
-    rules: store.rules,
     spider_id: '',
     spiders: [],
-    rule: {}
+    tempSpider: '',
   }))
   const urlRef = useRef(null)
   const originRef = useRef(null)
@@ -70,21 +69,16 @@ export default function ResourceManagePage() {
     })
   }, [])
   const init = useCallback(async () => {
-    local.rule = {};
     local.isLoading = true
-    const result = await v2getRules({ page: local.search_page })
+    const resp = await getSpiders();
     local.isLoading = false
-    local.rules = result.data
-    store.rules = result.data
-    const spider = await getSpiders();
-    local.spiders = spider.data;
-    store.spiders = spider.data;
+    local.spiders = resp.data;
   }, [])
   useEffect(() => {
     onSearch()
   }, [])
   useEffectOnce(() => {
-    if (local.rules.length === 0) {
+    if (local.spiders.length === 0) {
       init();
     }
     getGroupTypes().then(result => {
@@ -177,31 +171,22 @@ export default function ResourceManagePage() {
                   <Col span={18}>
                     <Select style={{ width: '100%' }} value={local.tempId} onSelect={value => {
                       local.tempId = value
-                      local.rules.forEach(rule => {
-                        if (rule.id === value) {
-                          local.tempRule = rule
-                        }
-                      })
                     }}>
                       <Select.Option value="">自动选择规则</Select.Option>
-                      {local.rules.map(rule => <Select.Option key={rule.id} value={rule.id}>{rule.name}</Select.Option>)}
+                      {local.spiders.map(spider => <Select.Option key={spider._id} value={spider._id}>{spider.name}</Select.Option>)}
                     </Select>
                   </Col>
                   <Col span={6}>
-                    <Input disabled value={local.tempRule ? local.tempRule.type : ''} />
+                    <Input disabled value={local.tempSpider ? local.tempSpider.title : ''} />
                   </Col>
                 </Row>
                 <Input ref={ref => originRef.current = ref} onPaste={e => {
                   const url = e.clipboardData.getData('text/plain');
                   try {
                     const u = new URL(url);
-                    local.rules.forEach(rule => {
-                      const fn = match(rule.route, { decode: decodeURIComponent });
+                    local.spiders.forEach(spider => {
+                      const fn = match(spider.pattern, { decode: decodeURIComponent });
                       const m = fn(u.pathname)
-                      if (url.startsWith(rule.host) && ((rule.route && m.params) || !rule.route)) {
-                        local.tempId = rule.id
-                        local.tempRule = rule
-                      }
                     })
                   } catch (e) {
                     notification.warn({ message: e.message });
@@ -214,36 +199,7 @@ export default function ResourceManagePage() {
                 if (originRef.current) {
                   const id = originRef.current.state.value
                   let found = false
-                  local.rules.forEach(rule => {
-                    if (id.startsWith(rule.host)) {
-                      found = true
-                    }
-                  })
-                  if (found === false) {
-                    return notification.error({ message: '没有匹配的rule' })
-                  }
-                  if (local.tempRule.type === 'pixiv') {
-                    return window.open(`${store.app.baseUrl}/v1/admin/pixiv-preview?id=${id}`)
-                  }
-                  v2previewRule(local.tempId, { origin: id }).then(res => {
-                    if (res.code === 0) {
-                      notification.success({ message: 'success' })
-                      Modal.confirm({
-                        title: '预览结果',
-                        okText: '确定',
-                        cancelButtonProps: { hidden: true },
-                        width: 700,
-                        content: <CodeEditor
-                          value={JSON.stringify(res.data, null, 2)}
-                          onChange={value => {
-                            local.code = value;
-                          }}
-                        />
-                      })
-                    } else {
-                      notification.error({ message: res.message })
-                    }
-                  })
+
                 } else {
                   notification.error({ message: 'ref fail' })
                 }
@@ -267,19 +223,16 @@ export default function ResourceManagePage() {
               content: <Observer>{() => (<Fragment>
                 <Select value={local.tempId} onSelect={value => { local.tempId = value }}>
                   <Select.Option value="">自动选择规则</Select.Option>
-                  {local.rules.map(rule => <Select.Option key={rule.id} value={rule.id}>{rule.name}</Select.Option>)}
+                  {local.spiders.map(spider => <Select.Option key={spider._id} value={spider._id}>{spider.name}</Select.Option>)}
                 </Select>
                 <Input style={{ marginTop: 10 }} ref={ref => urlRef.current = ref} onPaste={e => {
                   const url = e.clipboardData.getData('text/plain');
                   try {
                     const u = new URL(url);
-                    local.rules.forEach(rule => {
-                      const fn = match(rule.route, { decode: decodeURIComponent });
+                    local.spiders.forEach(spider => {
+                      const fn = match(spider.pattern, { decode: decodeURIComponent });
                       const m = fn(u.pathname)
-                      if (url.startsWith(rule.host) && ((rule.route && m.params) || !rule.route)) {
-                        local.tempId = rule.id
-                        local.tempRule = rule
-                      }
+
                     })
                   } catch (e) {
                     notification.warn({ message: e.message });
@@ -290,13 +243,11 @@ export default function ResourceManagePage() {
               cancelText: '取消',
               onOk: () => {
                 if (urlRef.current) {
-                  v2GetResourceByRule(local.tempId, urlRef.current.state.value).then(res => {
-                    if (res.code === 0) {
-                      notification.success({ message: 'success', placement: 'bottomRight' })
-                    } else {
-                      notification.error({ message: res.message })
-                    }
-                  })
+                  // if (res.code === 0) {
+                  //   notification.success({ message: 'success', placement: 'bottomRight' })
+                  // } else {
+                  //   notification.error({ message: res.message })
+                  // }
                 } else {
                   notification.error({ message: 'ref fail' })
                 }
