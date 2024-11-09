@@ -99,7 +99,7 @@ export default function ResourceManagePage() {
     }
   }, [])
   return (<Observer>{() => {
-    return <div className={'box'}>
+    return <div className={'box'} style={{ height: '100%' }}>
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         <div style={{ margin: 10 }}>
           <Input
@@ -267,7 +267,7 @@ export default function ResourceManagePage() {
           </Button>
           <Divider type="vertical" />
         </div>
-        <div style={{ flex: '1 0 0%', overflow: 'auto' }}>
+        <div style={{ flex: '1 0 0%', overflow: 'auto', height: '100%' }}>
           <ResourceList
             items={local.resources}
             openEdit={(data) => { local.temp = data; local.showEdit = true; }}

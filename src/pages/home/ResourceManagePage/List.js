@@ -297,15 +297,15 @@ export default function ResourceList({ items, children, categories, search, loca
           )} />
         </Table>
       </FullWidthAuto>
-      <FullWidthFix style={{ display: state.resource_id ? 'flex' : 'none', width: 300, height: '100%' }}>
-        {state.loading || !state.resource ? <CenterXY style={{ width: '100%' }}><LoadingOutlined /></CenterXY> : <div style={{ position: 'relative', width: '100%', boxSizing: 'border-box', padding: '20px 0 0 10px' }}>
+      <FullWidthFix style={{ display: state.resource_id ? 'flex' : 'none', width: 300, height: '100%', overflow: 'auto' }}>
+        {state.loading || !state.resource ? <CenterXY style={{ width: '100%' }}><LoadingOutlined /></CenterXY> : <div style={{ position: 'relative', width: '100%', boxSizing: 'border-box', padding: '20px 0 0 10px', }}>
           <Icon type="close" style={{ position: 'absolute', right: 5, top: 5 }} onClick={() => { state.loading = false; state.resource = null; state.resource_id = '' }} />
           <div><Label>标题</Label></div>
           <h2 style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{state.resource.title}</h2>
           <div><Label>内容</Label></div>
           <p style={{ maxHeight: '250px', overflowY: 'auto' }}>{state.resource.content}</p>
           <div><Label>创建时间:</Label> {new Date(state.resource.createdAt).toISOString()}</div>
-          <div><Label>发布时间:</Label> {new Date(state.resource.publishedAt).toISOString()}</div>
+          <div><Label>发布时间:</Label> {state.resource.publishedAt ? new Date(state.resource.publishedAt).toISOString() : state.resource.publishedAt}</div>
           <div><Label>时长:</Label> {state.resource.words}</div>
           <div><Label>图片({state.resource.images.length})</Label></div>
           {state.resource.images.map(m => <img src={m.path} style={{ width: '100%' }} />)}
