@@ -4,12 +4,13 @@ import { Link } from 'react-router-dom'
 // import LoadingView from '../HolderView/LoadingView'
 import apis from '../../../api';
 import { Table, Popconfirm, notification, Select, Tag, Divider, Button } from 'antd';
-import { FormOutlined, DeleteOutlined, WarningOutlined, CloudServerOutlined, SyncOutlined, CloudSyncOutlined, LinkOutlined, SwitcherOutlined, DownloadOutlined, LoadingOutlined, } from '@ant-design/icons'
+import { FormOutlined, DeleteOutlined, WarningOutlined, CloudServerOutlined, SyncOutlined, FieldTimeOutlined, CloudSyncOutlined, LinkOutlined, SwitcherOutlined, DownloadOutlined, LoadingOutlined, } from '@ant-design/icons'
 import { Icon, VisualBox, EditTag } from '../../../component'
 import { CenterXY, FullWidth, FullWidthAuto, FullWidthFix } from '../../../component/style'
 import store from '../../../store'
 import Clipboard from 'react-clipboard.js';
 import styled from 'styled-components';
+import moment from 'moment';
 
 const { Column } = Table;
 const StatusMap = {
@@ -101,14 +102,17 @@ export default function ResourceList({ items, children, categories, search, loca
             } else if (record.source_type === 'post') {
               url += ('/novel/home/Post?home.tab=QD7vNfJCU&Post._id=' + record._id)
             }
-            return <a style={{ color: '#1890ff', cursor: 'pointer' }} title={url} href={url} onClick={(e) => {
-              e.preventDefault()
-              if (url) {
-                window.open(url)
-              } else {
-                notification.info({ message: '类型不可预览' })
-              }
-            }}>{record.source_type === 'post' ? record.title || record.desc || record.content : text}</a>
+            return <Fragment>
+              <a style={{ color: '#1890ff', cursor: 'pointer' }} className='line2' title={url} href={url} onClick={(e) => {
+                e.preventDefault()
+                if (url) {
+                  window.open(url)
+                } else {
+                  notification.info({ message: '类型不可预览' })
+                }
+              }}>{record.source_type === 'post' ? record.title || record.desc || record.content : text}</a>
+              <span><FieldTimeOutlined /> {moment(record.createdAt).format('YYYY-MM-DD HH:mm:ss')}</span>
+            </Fragment>
           }} />
           <Column title="类型" width={100} dataIndex="source_type" key="source_type" render={(text, record) => (
             <Observer>{() => (
