@@ -8,7 +8,6 @@ import { FullHeight, FullHeightFix, FullHeightAuto, Right, padding, FullWidth, F
 import { Icon, VisualBox } from '../../../component'
 import Modal from 'antd/lib/modal/Modal';
 import { Link } from 'react-router-dom';
-import { QRCode } from 'react-qrcode'
 import { HoverTitle } from './file.style'
 import { useRouter } from '../../../contexts';
 import TextArea from 'antd/lib/input/TextArea';
@@ -366,7 +365,7 @@ export default function TaskList() {
                       <SwitcherOutlined />
                     </Clipboard>
                     <Divider type='vertical' />
-                    <Popconfirm icon={null} title={<QRCode style={{ marginLeft: -22 }} value={filepath} />} okText='打开' cancelText='取消' onConfirm={() => {
+                    <Popconfirm icon={null} title={'fuck qrcode'} okText='打开' cancelText='取消' onConfirm={() => {
                       window.open(filepath, '_blank');
                     }}>
                       <ScanOutlined />

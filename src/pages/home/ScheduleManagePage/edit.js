@@ -53,8 +53,8 @@ export default function RuleEdit({ data, cancel, save }) {
           <Radio value={3}>禁用</Radio>
         </Radio.Group>
       </Item>
-      <Item>
-        <CodeEditor value={local.data.script} onChange={v => local.data.script = v} />
+      <Item style={{ marginBottom: 0 }}>
+        <CodeEditor style={{ height: 400 }} value={local.data.script} onChange={v => local.data.script = v} />
       </Item>
     </Form>
   </Modal>)}</Observer>;
