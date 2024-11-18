@@ -19,6 +19,7 @@ import AppManagePage from './home/AppManagePage'
 import ComponentManagePage from './home/ComponentManagePage'
 import FeedbackPage from './home/FeedbackPage'
 import SpiderPage from './home/SpiderManagePage/spider'
+import VideoChapterPage from './home/ResourceManagePage/video-chapter'
 
 import {
   LinkOutlined,
@@ -63,6 +64,7 @@ const page_map = {
   'FeedbackPage': FeedbackPage,
   'SpiderPage': SpiderPage,
   'DownloadPage': DownloadPage,
+  'VideoChapterPage': VideoChapterPage,
 }
 export const icon_map = {
   LinkOutlined,

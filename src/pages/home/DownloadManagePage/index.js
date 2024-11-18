@@ -18,6 +18,7 @@ export default function Page() {
   const local = useLocalStore(() => ({
     tasks: [],
     page: 1,
+    page_size: 15,
     headers_list: JSON.parse(localStorage.getItem('headers_history') || '[]'),
     loading: false,
     edit_id: '',
@@ -71,7 +72,7 @@ export default function Page() {
   const onSearch = useCallback(async () => {
     try {
       local.loading = true;
-      const resp = await axios.get(`${download_api_url}/tasks?page=${local.page}&status=${local.status}&type=${local.type}&search=${local.search}&search_type=${local.search_type}`);
+      const resp = await axios.get(`${download_api_url}/tasks?page=${local.page}&page_size=${local.page_size}&status=${local.status}&type=${local.type}&search=${local.search}&search_type=${local.search_type}`);
       if (resp.status === 200) {
         const result = resp.data;
         if (result.code === 0) {
@@ -171,12 +172,9 @@ export default function Page() {
           }}>添加</Button>
         </Button.Group>
       </AlignAside>
-      <div style={{ padding: 10, textAlign: 'right' }}>
-
-      </div>
       <Table dataSource={toJS(local.tasks)} rowKey="_id" scroll={{ y: 'calc(100vh - 273px)' }} loading={local.loading} pagination={{
-        pageSize: 10,
         current: local.page,
+        pageSize: local.page_size,
         total: local.total,
       }} onChange={(page) => {
         local.page = page.current
@@ -191,12 +189,12 @@ export default function Page() {
             {task.type === 'image' ? <FileImageOutlined /> : <VideoCameraOutlined />}
           </Fragment>
         )} />
-        <Column title="名称" width={150} dataIndex={'name'} render={(name, task) => (
+        <Column title="名称" width={200} dataIndex={'name'} render={(name, task) => (
           <Tooltip title={task._id}>
             <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</div>
           </Tooltip>
         )} />
-        <Column title="进度" dataIndex={'_id'} render={(id, task) => (
+        <Column title="进度" dataIndex={'_id'} width={200} render={(id, task) => (
           <div style={{ position: 'relative' }}>
             {task.params && task.params.total && <div style={{ position: 'absolute', top: -10, width: '100%', zIndex: 1, height: 22, backgroundColor: 'grey', color: 'white' }}>
               {task.params.finished * 2 > task.params.total ? <div style={{ backgroundColor: '#54c77d', color: 'white', maxWidth: '100%', textAlign: 'right', width: `${Math.round(100 * task.params.finished / task.params.total)}%` }}>{task.type === 'm3u8' ? task.params.finished + '/' + task.params.total : formatNumber(task.params.finished) + '/' + formatNumber(task.params.total)}&nbsp;</div> : (
@@ -273,7 +271,10 @@ export default function Page() {
 
           </Fragment>
         )} />
-        <Column dataIndex={'_id'} render={(id, task) => (
+        <Column title="创建时间" dataIndex={'createdAt'} width={150} render={t => {
+          return new Date(t).toLocaleString();
+        }} />
+        <Column title="操作" width={150} dataIndex={'_id'} render={(id, task) => (
           <div>
             <Popconfirm
               title="确认"
@@ -311,7 +312,6 @@ export default function Page() {
             }} />
           </div>
         )} />
-        <Column title='创建时间' dataIndex={'createdAt'} render={t => new Date(t).toLocaleString()} />
       </Table>
       <Modal
         width={750}

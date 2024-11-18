@@ -126,7 +126,7 @@ export default function ResourceManagePage() {
             local.spider_id = v;
           }}>
             <Select.Option value="">全部</Select.Option>
-            {local.spiders.map(spider => <Select.Option value={spider._id}>{spider.name}</Select.Option>)}
+            {local.spiders.map(spider => <Select.Option key={spider._id} value={spider._id}>{spider.name}</Select.Option>)}
           </Select>
           <Divider type="vertical" />
           状态

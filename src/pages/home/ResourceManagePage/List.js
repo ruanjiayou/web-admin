@@ -1,7 +1,6 @@
 import React, { Fragment, useCallback } from 'react'
 import { Observer, useLocalStore, } from 'mobx-react-lite'
 import { Link } from 'react-router-dom'
-// import LoadingView from '../HolderView/LoadingView'
 import apis from '../../../api';
 import { Table, Popconfirm, notification, Select, Tag, Divider, Button } from 'antd';
 import { FormOutlined, DeleteOutlined, WarningOutlined, CloudServerOutlined, SyncOutlined, FieldTimeOutlined, CloudSyncOutlined, LinkOutlined, SwitcherOutlined, DownloadOutlined, LoadingOutlined, } from '@ant-design/icons'
@@ -13,12 +12,6 @@ import styled from 'styled-components';
 import moment from 'moment';
 
 const { Column } = Table;
-const StatusMap = {
-  1: 'plus',
-  2: 'sync-horizon',
-  3: 'close',
-  4: 'check',
-}
 const Label = styled.span`
   color: red;
 `
@@ -48,38 +41,13 @@ export default function ResourceList({ items, children, categories, search, loca
           local.search_page = page.current
           search()
         }}>
-          <Column title="封面" width={70} dataIndex="poster" key="_id" align="center" render={(text, record) => (
-            <Observer>{() => (
-              <div style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
-                <img src={record.poster.startsWith('http') || record.thumbnail.startsWith('http') ? record.thumbnail || record.poster : store.app.imageLine + (record.thumbnail || record.poster || '/images/poster/nocover.jpg')}
-                  style={{ width: 60, height: 60, borderRadius: '50%', marginRight: 10, }}
-                  alt=""
-                />
-                <Icon type={'download'} style={{ position: 'absolute', display: record.poster.startsWith('/') || record.thumbnail.startsWith('/') ? 'none' : 'block', left: '50%', top: '50%', transform: 'translate(-50%,-50%)' }} onClick={async (e) => {
-                  if (record.poster === '' && record.thumbnail === '') {
-                    const poster = prompt('请输入封面地址');
-                    if (poster) {
-                      await apis.updateResource({ _id: record._id, poster })
-                      await apis.downloadResourceCover({ _id: record._id, })
-                      search()
-                      notification.info({ message: '下载成功' })
-                    }
-                  } else if (record.poster.startsWith('http') || record.thumbnail.startsWith('http')) {
-                    try {
-                      await apis.downloadResourceCover({ _id: record._id, })
-                      search()
-                      notification.info({ message: '下载成功' })
-                    } catch (e) {
-                      notification.info({ message: '下载失败' })
-                    }
-                  }
-                }} />
-                <Icon type={StatusMap[record.status] || 'plus'} style={{ position: 'absolute', bottom: 0, left: '50%', marginLeft: 20 }} />
-              </div>
-            )}
-            </Observer>
+          <Column title="封面" width={50} dataIndex="poster" key="_id" align="center" render={(text, record) => (
+            <img src={record.poster.startsWith('http') || record.thumbnail.startsWith('http') ? record.thumbnail || record.poster : store.app.imageLine + (record.thumbnail || record.poster || '/images/poster/nocover.jpg')}
+              style={{ width: 60, height: 60, borderRadius: '50%', marginRight: 10, }}
+              alt=""
+            />
           )} />
-          <Column title="" width={20} dataIndex="origin" key="origin" render={(url, record) => {
+          <Column title="" width={25} dataIndex="origin" key="origin" render={(url, record) => {
             return <CenterXY>
               {url && <a href={url} target='_blank'><LinkOutlined /></a>}
               &nbsp;&nbsp;
@@ -114,7 +82,7 @@ export default function ResourceList({ items, children, categories, search, loca
               <span><FieldTimeOutlined /> {moment(record.createdAt).format('YYYY-MM-DD HH:mm:ss')}</span>
             </Fragment>
           }} />
-          <Column title="类型" width={100} dataIndex="source_type" key="source_type" render={(text, record) => (
+          <Column title="类型" width={40} dataIndex="source_type" key="source_type" render={(text, record) => (
             <Observer>{() => (
               <Select value={record.source_type} onChange={async (v) => {
                 try {
@@ -135,7 +103,7 @@ export default function ResourceList({ items, children, categories, search, loca
             )}
             </Observer>
           )} />
-          <Column title="分类" width={120} dataIndex="types" key="types" render={(text, record) => (
+          <Column title="分类" width={60} dataIndex="types" key="types" render={(text, record) => (
             <Observer>{() => (
               <Fragment>
                 {record.types.map(type => <Tag key={type} style={{ marginBottom: 5 }} closable={true} onClose={async () => {
@@ -148,6 +116,7 @@ export default function ResourceList({ items, children, categories, search, loca
                     notification.info({ message: '修改失败' })
                   }
                 }}>{type}</Tag>)}
+                <br />
                 <EditTag save={async (type) => {
                   type = type.trim();
                   const types = record.types.map(item => item)
@@ -166,42 +135,42 @@ export default function ResourceList({ items, children, categories, search, loca
             )}
             </Observer>
           )} />
-          {/* <Column title="标签" dataIndex="types" key="types" width={150} render={(text, record) => (
-				<Observer>{() => (
-					<Fragment>
-						<div style={{ maxHeight: 150, overflow: 'auto' }}>
-							{record.tags.map((tag, i) => <Tag key={i} style={{ marginBottom: 5 }} closable={!state.updating} onClose={async () => {
-								try {
-									state.updating = true
-									const tags = record.tags.filter(item => item !== tag)
-									await apis.updateResource({ _id: record._id, tags })
-									record.tags = tags
-									notification.info({ message: '修改成功' })
-								} catch (e) {
-									notification.info({ message: '修改失败' })
-								} finally {
-									state.updating = false
-								}
-							}}>{tag}</Tag>)}
-						</div>
-						<EditTag save={async (tag) => {
-							tag = tag.trim();
-							const tags = record.tags.map(item => item)
-							if (tags.includes(tag)) {
-								return notification.info('类型已存在')
-							}
-							try {
-								await apis.updateResource({ _id: record._id, tags: [...tags, tag] })
-								record.tags = [...tags, tag]
-								notification.info({ message: '修改成功' })
-							} catch (e) {
-								notification.info({ message: '修改失败' })
-							}
-						}} />
-					</Fragment>
-				)}
-				</Observer>
-			)} /> */}
+          <Column title="标签" dataIndex="types" key="types" width={150} render={(text, record) => (
+            <Observer>{() => (
+              <Fragment>
+                <div style={{ maxHeight: 150, overflow: 'auto' }}>
+                  {record.tags.map((tag, i) => <Tag key={i} style={{ marginBottom: 5 }} closable={!state.updating} onClose={async () => {
+                    try {
+                      state.updating = true
+                      const tags = record.tags.filter(item => item !== tag)
+                      await apis.updateResource({ _id: record._id, tags })
+                      record.tags = tags
+                      notification.info({ message: '修改成功' })
+                    } catch (e) {
+                      notification.info({ message: '修改失败' })
+                    } finally {
+                      state.updating = false
+                    }
+                  }}>{tag}</Tag>)}
+                </div>
+                <EditTag save={async (tag) => {
+                  tag = tag.trim();
+                  const tags = record.tags.map(item => item)
+                  if (tags.includes(tag)) {
+                    return notification.info('类型已存在')
+                  }
+                  try {
+                    await apis.updateResource({ _id: record._id, tags: [...tags, tag] })
+                    record.tags = [...tags, tag]
+                    notification.info({ message: '修改成功' })
+                  } catch (e) {
+                    notification.info({ message: '修改失败' })
+                  }
+                }} />
+              </Fragment>
+            )}
+            </Observer>
+          )} />
           {/* <Column title="系列" width={100} dataIndex="series" key="series" render={(text, record) => (
 				<Observer>{() => (<span style={{ backgroundColor: '#eee', border: '1px solid #eee', borderRadius: 4, padding: '3px 5px' }} onClick={async () => {
 					const res = prompt('请输入系列名')
@@ -222,25 +191,7 @@ export default function ResourceList({ items, children, categories, search, loca
 				)}
 				</Observer>
 			)} /> */}
-          {/* <Column title="连载" width={100} dataIndex="status" key="status" render={(text, record) => (
-				<Observer>{() => (
-					<Switch checked={record.status === store.constant.MEDIA_STATUS.loading} onClick={async (e) => {
-						try {
-							state.updating = true
-							await apis.updateResource({ _id: record._id, status: record.status === store.constant.RESOURCE_STATUS.loading ? store.constant.RESOURCE_STATUS.finished : store.constant.RESOURCE_STATUS.loading })
-							record.status = record.status === store.constant.RESOURCE_STATUS.loading ? store.constant.RESOURCE_STATUS.finished : store.constant.RESOURCE_STATUS.loading
-							notification.info({ message: '修改成功' })
-						} catch (e) {
-							notification.info({ message: '修改失败' })
-						} finally {
-							state.updating = false
-						}
-					}} />
-				)}
-				</Observer>
-			)} />
-			 */}
-          <Column title="操作" width={100} dataIndex="action" key="action" align="center" render={(text, record) => (
+          <Column title="操作" width={120} dataIndex="action" key="action" align="center" render={(text, record) => (
             <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly' }}>
               <FormOutlined title="快速编辑" onClick={() => { props.fastEdit(record) }} />
               <Divider type="vertical" />
@@ -258,12 +209,12 @@ export default function ResourceList({ items, children, categories, search, loca
               }}>
                 <SyncOutlined title='同步es' spin={state.syncItems[record._id] ? true : false} />
               </Popconfirm>
-              <Divider type="vertical" />
               <VisualBox visible={['article', 'post'].includes(record.source_type)}>
+                <Divider type="vertical" />
                 <Link title="编辑" style={{ display: 'inherit' }} to={'/admin/home/resource-manage/edit-multi?_id=' + record._id} target="_blank"><FormOutlined /></Link>
               </VisualBox>
-              <Divider type="vertical" />
               <VisualBox visible={['video', 'image', 'music', 'movie', 'animation'].includes(record.source_type)}>
+                <Divider type="vertical" />
                 <Link title="编辑" style={{ display: 'inherit' }} target="_blank" to={'/admin/home/resource-manage/edit-multi?_id=' + record._id} ><FormOutlined /></Link>
               </VisualBox>
               <Divider type="vertical" />
@@ -273,6 +224,7 @@ export default function ResourceList({ items, children, categories, search, loca
                   url.searchParams.set('crawl', '1')
                   window.open(url.href, '_blank');
                 }} />
+                <Divider type="vertical" />
               </VisualBox>
               <VisualBox visible={record.source_type === 'novel'}>
                 <Divider type="vertical" />

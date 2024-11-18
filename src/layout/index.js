@@ -25,56 +25,57 @@ export default function Layout({ children, single }) {
   return single ? <Fragment>
     {children}
   </Fragment> : (
-      <Observer>{() => (
-        <LayoutH>
-          <Sider style={{ flexBasis: local.collapsed ? 80 : store.config.siderWidth }}>
-            <Header style={hs}>
-              <Avatar size={store.config.logoSize} src={logo} style={{ margin: '0 10px' }} alt="logo" />
-              <Dropdown
-                visible={local.appsVisible}
-                onVisibleChange={flag => local.appsVisible = flag}
-                overlay={
-                  <AMenu style={{ minWidth: 100 }}>
-                    {store.apps.map(app => (<AMenu.Item key={app.id}>{app.title}</AMenu.Item>))}
-                  </AMenu>
-                }
-              >
-                <div style={{ display: 'inline-block' }}>
-                  {store.app.title}
-                </div>
-              </Dropdown>
-            </Header>
-            <Menu collapsed={local.collapsed} />
-          </Sider>
-          <LayoutV>
-            <Header style={{ ...hs, borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Button type="ghost" onClick={local.toggleCollapsed} style={{ marginLeft: 10 }}>
-                {React.createElement(local.collapsed ? MenuUnfoldOutlined : MenuFoldOutlined)}
-              </Button>
-              <Dropdown
-                visible={local.avatarVisible}
-                onVisibleChange={flag => local.avatarVisible = flag}
-                overlay={
-                  <AMenu onClick={e => {
-                    if (e.key === "sign-out") {
-                      store.user.signOut()
-                      router.goRoot()
-                    }
-                  }}>
-                    <AMenu.Item key="sign-out">退出</AMenu.Item>
-                  </AMenu>
-                }
-              >
-                <div style={{ margin: '0 20px' }}>
-                  {store.user.username}
-                  <Avatar style={{ margin: '0 5px' }} icon={<UserOutlined />} /><DownOutlined />
-                </div>
-              </Dropdown>
-            </Header>
-            <Content style={{ flex: 1, overflow: 'auto' }}>{children}</Content>
-          </LayoutV>
-        </LayoutH>
-      )}</Observer>
+    <Observer>{() => (
+      <LayoutH>
+        <Sider style={{ flexBasis: local.collapsed ? 80 : store.config.siderWidth }}>
+          <Header style={hs}>
+            <Avatar size={store.config.logoSize} src={logo} style={{ margin: '0 10px' }} alt="logo" />
+            <Dropdown
+              open={local.appsVisible}
+              onOpenChange={flag => local.appsVisible = flag}
+              menu={
+                <AMenu style={{ minWidth: 100 }}>
+                  {store.apps.map(app => (<AMenu.Item key={app.id}>{app.title}</AMenu.Item>))}
+                </AMenu>
+              }
+            >
+              <div style={{ display: 'inline-block' }}>
+                {store.app.title}
+              </div>
+            </Dropdown>
+          </Header>
+          <Menu collapsed={local.collapsed} />
+        </Sider>
+        <LayoutV>
+          <Header style={{ ...hs, borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Button type="ghost" onClick={local.toggleCollapsed} style={{ marginLeft: 10 }}>
+              {React.createElement(local.collapsed ? MenuUnfoldOutlined : MenuFoldOutlined)}
+            </Button>
+            <Dropdown
+              open={local.avatarVisible}
+              onOpenChange={flag => local.avatarVisible = flag}
+              menu={
+                <AMenu onClick={e => {
+                  if (e.key === "sign-out") {
+                    store.user.signOut()
+                    router.goRoot()
+                  }
+                }}
+                >
+                  <AMenu.Item key="sign-out">退出</AMenu.Item>
+                </AMenu>
+              }
+            >
+              <div style={{ margin: '0 20px' }}>
+                {store.user.username}
+                <Avatar style={{ margin: '0 5px' }} icon={<UserOutlined />} /><DownOutlined />
+              </div>
+            </Dropdown>
+          </Header>
+          <Content style={{ flex: 1, overflow: 'auto' }}>{children}</Content>
+        </LayoutV>
+      </LayoutH>
+    )}</Observer>
 
-    )
+  )
 }

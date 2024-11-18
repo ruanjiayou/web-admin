@@ -1,6 +1,7 @@
 import React, { useCallback, Fragment, useRef } from 'react';
 import { useEffectOnce } from 'react-use'
 import { Observer, useLocalStore } from 'mobx-react-lite'
+import { Link } from 'react-router-dom';
 import apis from '../../../api'
 import { Button, notification, Input, Form, Tag, Upload, Select, Divider, Switch, message, Modal, Radio, Row, Col, Popover } from 'antd';
 import { SortListView, VisualBox } from '../../../component'
@@ -9,7 +10,7 @@ import qs from 'qs'
 import * as _ from 'lodash'
 import store from '../../../store'
 import { toJS } from 'mobx';
-import { PlusCircleOutlined, CloseOutlined, UploadOutlined, LinkOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
+import { PlusCircleOutlined, CloseOutlined, UploadOutlined, LinkOutlined, ExclamationCircleOutlined, BarsOutlined } from '@ant-design/icons'
 import api from '../../../api';
 import { formatNumber } from '../../../utils/helper'
 import { FullWidth, FullHeightAuto, AlignVertical, FullWidthFix, FullHeight } from '../../../component/style';
@@ -509,23 +510,20 @@ export default function ResourceEdit() {
                   <Input className="path" addonBefore={'文件:' + item.nth} defaultValue={item.path} />
                 </FullHeightAuto>
                 <FullHeight>
-                  <AlignVertical style={{ padding: '0 10px' }}>
-                    {local.fullEditVideo && (
-                      <Fragment>
-                        <Observer>{() => (
-                          <CloseOutlined disabled={item.loading || item.status === store.constant.MEDIA_STATUS.loading} onClick={async () => {
-                            item.loading = true
-                            try {
-                              await api.removeResourceVideo({ _id: item._id, mid: local._id })
-                              local.data.videos = local.data.videos.filter(t => t.url !== item.url)
-                            } finally {
-                              item.loading = false
-                            }
-                          }} />
-                        )}</Observer>
-                      </Fragment>
-
-                    )}
+                  <AlignVertical style={{ padding: '0 10px', height: 120 }}>
+                    <Fragment>
+                      <Observer>{() => (
+                        <CloseOutlined disabled={item.loading || item.status === store.constant.MEDIA_STATUS.loading} onClick={async () => {
+                          item.loading = true
+                          try {
+                            await api.removeResourceVideo({ _id: item._id, mid: local._id })
+                            local.data.videos = local.data.videos.filter(t => t.url !== item.url)
+                          } finally {
+                            item.loading = false
+                          }
+                        }} />
+                      )}</Observer>
+                    </Fragment>
                     <Icon type="check" onClick={async (e) => {
                       const container = e.target.closest('.container');
                       const otitle = container.querySelector('.title input');
@@ -603,6 +601,7 @@ export default function ResourceEdit() {
                       </Upload>
                     )}</Observer>
                     <ExclamationCircleOutlined onClick={() => local.stream_path = item.path} />
+                    <Link target="_blank" to={'/admin/home/resource-manage/video-chapter?_id=' + item._id} ><BarsOutlined /></Link>
                   </AlignVertical>
                 </FullHeight>
               </FullWidth>
