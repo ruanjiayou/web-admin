@@ -92,15 +92,15 @@ export default function ResourceList({ items, children, categories, search, loca
             let isDev = window.origin.includes('localhost') ? true : false;
             let url = isDev ? 'https://192.168.0.124' : window.origin;
             if (['video', 'movie', 'short', 'animation'].includes(record.source_type)) {
-              url += ('/novel/groups/GroupTree/VideoInfo?GroupTree.name=video&VideoInfo._id=' + record._id)
+              url += ('/novel/groups/GroupTree/VideoInfo?GroupTree.name=video&VideoInfo.id=' + record._id)
             } else if (record.source_type === 'novel') {
-              url += ('/novel/home/BookInfo?home.tab=&BookInfo._id=' + record._id)
+              url += ('/novel/home/BookInfo?home.tab=&BookInfo.id=' + record._id)
             } else if (['article', 'private'].includes(record.source_type)) {
-              url += ('/novel/home/Article?home.tab=QD7vNfJCU&Article._id=' + record._id)
+              url += ('/novel/home/Article?home.tab=QD7vNfJCU&Article.id=' + record._id)
             } else if (['image'].includes(record.source_type)) {
-              url += ('/novel/groups/GroupTree/Image?GroupTree.name=image&Image._id=' + record._id)
+              url += ('/novel/groups/GroupTree/Image?GroupTree.name=image&Image.id=' + record._id)
             } else if (record.source_type === 'post') {
-              url += ('/novel/home/Post?home.tab=QD7vNfJCU&Post._id=' + record._id)
+              url += ('/novel/home/Post?home.tab=QD7vNfJCU&Post.id=' + record._id)
             }
             return <Fragment>
               <a style={{ color: '#1890ff', cursor: 'pointer' }} className='line2' title={url} href={url} onClick={(e) => {
