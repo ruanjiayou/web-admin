@@ -6,6 +6,7 @@ import { useEffectOnce } from 'react-use';
 import { Table, Popconfirm, notification, Select, Tag, Divider, message, Tooltip, Button, Form, Input, Radio, Modal, } from 'antd';
 import { LinkOutlined, PoweroffOutlined, PlayCircleOutlined, PlusCircleOutlined, SyncOutlined, FormOutlined, DeleteOutlined, CheckOutlined, BarcodeOutlined, FileImageOutlined, VideoCameraOutlined } from '@ant-design/icons'
 import { events } from '../../../utils/events';
+import { AlignAside } from '../../../component//style'
 import shortid from 'shortid';
 import { formatNumber } from '../../../utils/helper';
 
@@ -20,6 +21,8 @@ export default function Page() {
     headers_list: JSON.parse(localStorage.getItem('headers_history') || '[]'),
     loading: false,
     edit_id: '',
+    search_type: 'id',
+    search: '',
     status: '',
     type: '',
     total: 0,
@@ -68,7 +71,7 @@ export default function Page() {
   const onSearch = useCallback(async () => {
     try {
       local.loading = true;
-      const resp = await axios.get(`${download_api_url}/tasks?page=${local.page}&status=${local.status}&type=${local.type}`);
+      const resp = await axios.get(`${download_api_url}/tasks?page=${local.page}&status=${local.status}&type=${local.type}&search=${local.search}&search_type=${local.search_type}`);
       if (resp.status === 200) {
         const result = resp.data;
         if (result.code === 0) {
@@ -118,39 +121,58 @@ export default function Page() {
 
   return <Observer>{() => (
     <Fragment>
+      <AlignAside style={{ margin: 10 }}>
+        <Input.Group>
+          <Button.Group>
+            <Button type='text'>类型</Button>
+            <Select defaultValue={local.type} onChange={(type) => {
+              local.page = 1;
+              local.type = type;
+              onSearch();
+            }}>
+              <Select.Option value="">全部</Select.Option>
+              <Select.Option value="image">图片</Select.Option>
+              <Select.Option value="m3u8">m3u8</Select.Option>
+              <Select.Option value="mp4">mp4</Select.Option>
+            </Select>
+          </Button.Group>
+          <Button.Group>
+            <Button type='text'>状态</Button>
+            <Select defaultValue={local.status} onChange={(status) => {
+              local.page = 1;
+              local.status = status;
+              onSearch();
+            }}>
+              <Select.Option value="">全部</Select.Option>
+              <Select.Option value="1,2,3">未完成</Select.Option>
+              <Select.Option value="1">已解析</Select.Option>
+              <Select.Option value="2">下载中</Select.Option>
+              <Select.Option value="3">已下载</Select.Option>
+              <Select.Option value="4">失败</Select.Option>
+              <Select.Option value="5">已完成</Select.Option>
+            </Select>
+          </Button.Group>
+          <Divider type='vertical' />
+          <Input style={{ width: 300, display: 'inline-block', float: 'none' }} onChange={e => { local.search = e.target.value; }}
+            onPressEnter={() => onSearch()}
+            addonBefore={<Select defaultValue={local.search_type}>
+              <Select.Option value='id'>id</Select.Option>
+              <Select.Option value='name'>name</Select.Option>
+            </Select>}
+          />
+          <Divider type='vertical' />
+          <Button type='primary' onClick={() => { onSearch() }}>查询</Button>
+        </Input.Group>
+        <Button.Group>
+          <Button type='primary' onClick={() => {
+            local.edit_id = ''
+            local.data = { type: 'm3u8', status: 1, name: '', url: '', proxy: true, transcode: 1, filepath: '', params: {} };
+            local.showDialog = true;
+          }}>添加</Button>
+        </Button.Group>
+      </AlignAside>
       <div style={{ padding: 10, textAlign: 'right' }}>
-        <Select defaultValue={local.type} onChange={(type) => {
-          local.page = 1;
-          local.type = type;
-          onSearch();
-        }}>
-          <Select.Option value="">全部</Select.Option>
-          <Select.Option value="image">图片</Select.Option>
-          <Select.Option value="m3u8">m3u8</Select.Option>
-          <Select.Option value="mp4">mp4</Select.Option>
-        </Select>
-        &nbsp;&nbsp;
-        <Select defaultValue={local.status} onChange={(status) => {
-          local.page = 1;
-          local.status = status;
-          onSearch();
-        }}>
-          <Select.Option value="">全部</Select.Option>
-          <Select.Option value="1,2,3">未完成</Select.Option>
-          <Select.Option value="1">已解析</Select.Option>
-          <Select.Option value="2">下载中</Select.Option>
-          <Select.Option value="3">已下载</Select.Option>
-          <Select.Option value="4">失败</Select.Option>
-          <Select.Option value="5">已完成</Select.Option>
-        </Select>
-        <Divider type='vertical' />
-        <Button type='primary' onClick={() => {
-          local.edit_id = ''
-          local.data = { type: 'm3u8', status: 1, name: '', url: '', proxy: true, transcode: 1, filepath: '', params: {} };
-          local.showDialog = true;
-        }}>添加</Button>
-        <Divider type='vertical' />
-        <Button type='primary' onClick={() => { onSearch() }}>刷新</Button>
+
       </div>
       <Table dataSource={toJS(local.tasks)} rowKey="_id" scroll={{ y: 'calc(100vh - 273px)' }} loading={local.loading} pagination={{
         pageSize: 10,
