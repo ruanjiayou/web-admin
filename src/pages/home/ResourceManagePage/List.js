@@ -15,6 +15,13 @@ const { Column } = Table;
 const Label = styled.span`
   color: red;
 `
+const StatusMap = {
+  1: 'plus',
+  2: 'sync-horizon',
+  3: 'close',
+  4: 'check',
+};
+
 export default function ResourceList({ items, children, categories, search, local, ...props }) {
   const state = useLocalStore(() => ({
     updating: false,
@@ -42,10 +49,13 @@ export default function ResourceList({ items, children, categories, search, loca
           search()
         }}>
           <Column title="封面" width={50} dataIndex="poster" key="_id" align="center" render={(text, record) => (
-            <img src={record.poster.startsWith('http') || record.thumbnail.startsWith('http') ? record.thumbnail || record.poster : store.app.imageLine + (record.thumbnail || record.poster || '/images/poster/nocover.jpg')}
-              style={{ width: 60, height: 60, borderRadius: '50%', marginRight: 10, }}
-              alt=""
-            />
+            <div style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
+              <img src={record.poster.startsWith('http') || record.thumbnail.startsWith('http') ? record.thumbnail || record.poster : store.app.imageLine + (record.thumbnail || record.poster || '/images/poster/nocover.jpg')}
+                style={{ width: 60, height: 60, borderRadius: '50%', }}
+                alt=""
+              />
+              <Icon type={StatusMap[record.status] || 'close'} style={{ position: 'absolute', left: '50%', bottom: -5, transform: 'translate(20px, 0)' }} />
+            </div>
           )} />
           <Column title="" width={25} dataIndex="origin" key="origin" render={(url, record) => {
             return <CenterXY>
@@ -191,7 +201,7 @@ export default function ResourceList({ items, children, categories, search, loca
 				)}
 				</Observer>
 			)} /> */}
-          <Column title="操作" width={120} dataIndex="action" key="action" align="center" render={(text, record) => (
+          <Column title="操作" width={90} dataIndex="action" key="action" align="center" render={(text, record) => (
             <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly' }}>
               <FormOutlined title="快速编辑" onClick={() => { props.fastEdit(record) }} />
               <Divider type="vertical" />

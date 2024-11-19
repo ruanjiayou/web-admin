@@ -20,6 +20,12 @@ export function getResource(query) {
   })
 }
 
+export function getVideo(_id) {
+  return shttp({
+    url: `/v1/admin/video/${_id}`
+  })
+}
+
 export function createResource(data) {
   const form = new FormData()
   for (let k in data) {
