@@ -527,7 +527,7 @@ export default function ResourceEdit() {
                       <Clipboard data-clipboard-text={item._id} component={'a'}>
                         <CopyOutlined />
                       </Clipboard>
-                      :{item.nth + 1}
+                      :{item.nth}
                     </Fragment>
                   } defaultValue={item.path} addonAfter={<Observer>{() => (
                     <Upload
