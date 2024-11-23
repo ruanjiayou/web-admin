@@ -48,7 +48,7 @@ export default function SortList({ isLoading, handler, items, droppableId, mode,
               style={listStyle}
             >
               {items.map((item, index) => (
-                <Draggable key={item.id} draggableId={item.id} isDragDisabled={mode === 'preview'} index={index}>
+                <Draggable key={item.id} draggableId={item.id || item._id} isDragDisabled={mode === 'preview'} index={index}>
                   {(provided, snapshot) => (
                     <div
                       ref={provided.innerRef}

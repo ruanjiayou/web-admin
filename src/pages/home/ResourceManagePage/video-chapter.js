@@ -8,6 +8,10 @@ import { CenterXY, FullHeight, FullHeightAuto, FullHeightFix, FullWidth } from '
 import { Button, Divider, Input, InputNumber, Modal, Select, Space } from 'antd';
 import { CloseOutlined, PictureOutlined, ScissorOutlined, CheckOutlined, AimOutlined, CameraOutlined, ColumnWidthOutlined, VerticalAlignMiddleOutlined } from '@ant-design/icons';
 
+function to_p2(d) {
+  return Math.floor(100 * d) / 100;
+}
+
 export default function VideoChapter() {
   const query = qs.parse(window.location.search.substr(1));
   const local = useLocalStore(() => ({
@@ -20,6 +24,22 @@ export default function VideoChapter() {
     temp_chapter: null,
     time: 0,
     disabled: true,
+    autoSaveChapter: async (chapter) => {
+      try {
+        local.disabled = true;
+        const result = await apis.putVideoChapter(chapter);
+        if (result.code === 0) {
+          if (!chapter._id) {
+            chapter._id = result.data._id;
+          }
+          return result.data;
+        }
+      } catch (e) {
+
+      } finally {
+        local.disabled = false;
+      }
+    }
   }));
   const videoRef = useRef(null);
   useEffectOnce(() => {
@@ -68,6 +88,28 @@ export default function VideoChapter() {
           onSeeked={() => {
             local.disabled = false;
           }}
+          onKeyDownCapture={e => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!videoRef.current) {
+              return
+            }
+            switch (e.key) {
+              case 'ArrowRight':
+                videoRef.current.currentTime = local.time + 10;
+                break;
+              case 'ArrowLeft':
+                videoRef.current.currentTime = local.time - 5;
+                break;
+              case 'ArrowUp':
+                videoRef.current.volume += 0.05
+                break;
+              case 'ArrowDown':
+                videoRef.current.volume -= 0.05
+                break;
+              default: break;
+            }
+          }}
           style={{ width: 480, height: 270 }}
           controls></video>
         <div style={{ display: 'flex', alignItems: 'flex-end', flexDirection: 'column', width: 480 }}>
@@ -75,56 +117,52 @@ export default function VideoChapter() {
             <ScissorOutlined style={{ fontSize: 24 }} disabled={local.disabled} onClick={() => {
 
             }} />
-
             <div style={{ width: 100 }}></div>
-            <VerticalAlignMiddleOutlined style={{ fontSize: 32, transform: 'rotate(90deg)' }} disabled={local.disabled} onClick={() => {
-              local.chapters.push({
+            <VerticalAlignMiddleOutlined style={{ fontSize: 32, transform: 'rotate(90deg)' }} disabled={local.disabled} onClick={async () => {
+              const data = await local.autoSaveChapter({
                 type: 3,
                 title: '',
                 uid: '',
                 mid: local.id,
                 mtype: 'video',
                 status: 4,
-                more: { starttime: local.time },
+                more: { starttime: to_p2(local.time) },
                 nth: local.chapters.length,
-              })
+              });
+              if (data) {
+                local.chapters.push(data);
+              }
             }} />
-            <ColumnWidthOutlined style={{ fontSize: 28 }} disabled={local.disabled} onClick={() => {
-              local.chapters.push({
+            <ColumnWidthOutlined style={{ fontSize: 28 }} disabled={local.disabled} onClick={async () => {
+              const data = await local.autoSaveChapter({
                 type: 4,
                 title: '',
                 uid: '',
                 mid: local.id,
                 mtype: 'video',
                 status: 4,
-                more: { starttime: local.time, endtime: local.time },
+                more: { starttime: to_p2(local.time), endtime: to_p2(local.time) },
                 nth: local.chapters.length,
-              })
-            }} />
-            <PictureOutlined style={{ fontSize: 24 }} disabled={local.disabled} onClick={async () => {
-              try {
-                local.disabled = true;
-                const data = {
-                  type: 5,
-                  title: '',
-                  uid: '',
-                  mid: local.id,
-                  mtype: 'video',
-                  status: 4,
-                  more: { starttime: local.time },
-                  nth: local.chapters.length,
-                };
-                const result = await apis.putVideoChapter(data);
-                if (result.code === 0) {
-                  local.chapters.push(result.data)
-                }
-              } catch (e) {
-
-              } finally {
-                local.disabled = false;
+              });
+              if (data) {
+                local.chapters.push(data);
               }
             }} />
-
+            <PictureOutlined style={{ fontSize: 24 }} disabled={local.disabled} onClick={async () => {
+              const data = await local.autoSaveChapter({
+                type: 5,
+                title: '',
+                uid: '',
+                mid: local.id,
+                mtype: 'video',
+                status: 4,
+                more: { starttime: to_p2(local.time) },
+                nth: local.chapters.length,
+              });
+              if (data) {
+                local.chapters.push(data);
+              }
+            }} />
           </Space>
         </div>
       </div>
@@ -134,6 +172,12 @@ export default function VideoChapter() {
             <Input
               addonBefore={<Select value={chapter.type} onChange={v => {
                 chapter.type = v;
+                if (v === 5) {
+                  chapter.more.endtime = chapter.more.starttime;
+                } else {
+                  delete chapter.more.endtime;
+                }
+                local.autoSaveChapter(chapter);
               }}>
                 <Select.Option value={3}>点</Select.Option>
                 <Select.Option value={4}>段</Select.Option>
@@ -144,33 +188,64 @@ export default function VideoChapter() {
               onCompositionEnd={e => {
                 chapter.title = e.currentTarget.value;
               }}
+              onBlur={() => {
+                local.autoSaveChapter(chapter);
+              }}
             />
             {chapter.type === 5 && <Fragment>
-              <Input defaultValue={chapter.path} onCompositionEnd={e => {
-                chapter.path = e.currentTarget.value;
-              }} addonAfter={<CameraOutlined onClick={() => {
+              <Input value={chapter.path} readOnly addonBefore={<Observer>{() => (
+                <Select style={{ width: 70 }} defaultValue={chapter.path} onSelect={v => {
+                  chapter.path = v;
+                  local.autoSaveChapter(chapter);
+                }}>
+                  <Select.Option value="/images/sex-position/kiss.svg">吻</Select.Option>
+                  <Select.Option value="/images/sex-position/roll.svg">揉</Select.Option>
+                  <Select.Option value="/images/sex-position/licking.svg">舔</Select.Option>
+                  <Select.Option value="/images/sex-position/handjob.svg">手</Select.Option>
+                  <Select.Option value="/images/sex-position/blowjob.svg">口</Select.Option>
+                  <Select.Option value="/images/sex-position/cowgirl.svg">骑乘</Select.Option>
+                  <Select.Option value="/images/sex-position/spooning.svg">侧身</Select.Option>
+                  <Select.Option value="/images/sex-position/doggy.svg">后入</Select.Option>
+                  <Select.Option value="/images/sex-position/missionary.svg">经典</Select.Option>
+                </Select>
+              )}</Observer>}
+                onPaste={e => {
+                  chapter.path = e.target.value;
+                }}
+                onBlur={() => {
+                  local.autoSaveChapter(chapter);
+                }}
+                addonAfter={<CameraOutlined onClick={() => {
 
-              }} />} />
+                }} />} />
             </Fragment>}
             <Divider type='vertical' />
             <Space>
               <Input value={chapter.more.starttime} style={{ minWidth: 120, width: 120 }} onChange={e => {
                 chapter.more.starttime = e.currentTarget.value;
+                local.autoSaveChapter(chapter);
               }} onBlur={() => {
                 chapter.more.starttime = parseFloat(chapter.more.starttime);
+                local.autoSaveChapter(chapter);
               }} addonAfter={<AimOutlined onClick={() => {
                 if (videoRef.current) {
                   videoRef.current.currentTime = chapter.more.starttime;
                 }
               }} />} />
-              <CheckOutlined disabled={local.disabled} onClick={async () => {
-                const result = await apis.putVideoChapter(chapter);
-                if (result.code === 0) {
-                  if (!chapter._id) {
-                    chapter._id = result.data._id;
-                  }
+              <Input value={chapter.more.endtime} style={{ minWidth: 120, width: 120 }} onChange={e => {
+                chapter.more.endtime = e.currentTarget.value;
+                local.autoSaveChapter(chapter);
+              }} onBlur={() => {
+                chapter.more.endtime = parseFloat(chapter.more.endtime);
+                local.autoSaveChapter(chapter);
+              }} addonAfter={<AimOutlined onClick={() => {
+                if (videoRef.current) {
+                  videoRef.current.currentTime = chapter.more.endtime;
                 }
-              }} />
+              }} />} />
+              {/* <CheckOutlined disabled={local.disabled} onClick={async () => {
+                local.autoSaveChapter(chapter)
+              }} /> */}
               <CloseOutlined disabled={local.disabled} onClick={async () => {
                 if (chapter._id) {
                   await apis.delVideoChapter(chapter.mid, chapter._id);

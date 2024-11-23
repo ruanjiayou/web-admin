@@ -10,15 +10,16 @@ import qs from 'qs'
 import * as _ from 'lodash'
 import store from '../../../store'
 import { toJS } from 'mobx';
-import { PlusCircleOutlined, CloseOutlined, UploadOutlined, LinkOutlined, ExclamationCircleOutlined, BarsOutlined } from '@ant-design/icons'
+import { PlusCircleOutlined, CloseOutlined, UploadOutlined, LinkOutlined, ExclamationCircleOutlined, BarsOutlined, CopyOutlined } from '@ant-design/icons'
 import api from '../../../api';
 import { formatNumber } from '../../../utils/helper'
-import { FullWidth, FullHeightAuto, AlignVertical, FullWidthFix, FullHeight } from '../../../component/style';
+import { FullWidth, FullHeightAuto, AlignVertical, FullWidthFix, FullHeight, CenterXY } from '../../../component/style';
 import TextArea from 'antd/lib/input/TextArea';
 import { events } from '../../../utils/events';
 import Axios from 'axios';
 import Ueditor from '../../../component/Ueditor'
 import StreamInfo from '../../../utils/stream';
+import Clipboard from 'react-clipboard.js';
 
 const omit_keys = ['images', 'videos', 'counter'];
 function deepEqual(a, b, omits) {
@@ -208,7 +209,7 @@ export default function ResourceEdit() {
           <Col span={3} style={{ textAlign: 'right' }}>
             状态：
           </Col>
-          <Col className="gutter-row" span={6}>
+          <Col className="gutter-row" span={9}>
             <Radio.Group
               style={{ backgroundColor: '#eee', padding: '4px 0 4px 10px', borderRadius: 5 }}
               value={local.data.status}
@@ -346,15 +347,14 @@ export default function ResourceEdit() {
               }} beforeUpload={(f) => {
                 return false
               }}>
-              <img width="100%" src={local.tempThumbnailImg || (store.app.imageLine + (local.data.thumbnail || '/images/poster/nocover.jpg'))} alt="" />
-              <Button style={{ marginTop: 10 }}>
-                <Icon type="arrow-up-line" /> 编辑
-              </Button>
+              <CenterXY style={{ height: '100%', overflow: 'hidden' }}>
+                <img width="100%" src={local.tempThumbnailImg || (store.app.imageLine + (local.data.thumbnail || '/images/poster/nocover.jpg'))} alt="" />
+              </CenterXY>
             </Upload>
             <span>poster</span>
             <Divider type="vertical" />
             <Upload
-              style={{ position: 'relative', minWidth: 300, minHeight: 60 }}
+              style={{ overflow: 'hidden' }}
               listType="picture-card"
               className="avatar-uploader"
               showUploadList={false} ref={picture} name="poster" onChange={e => {
@@ -367,10 +367,9 @@ export default function ResourceEdit() {
               }} beforeUpload={(f) => {
                 return false
               }}>
-              <img width="100%" src={local.tempPosterImg || (store.app.imageLine + (local.data.poster || '/images/poster/nocover.jpg'))} alt="" />
-              <Button style={{ marginTop: 10 }}>
-                <Icon type="arrow-up-line" /> 编辑
-              </Button>
+              <CenterXY style={{ height: '100%', overflow: 'hidden' }}>
+                <img width="100%" src={local.tempPosterImg || (store.app.imageLine + (local.data.poster || '/images/poster/nocover.jpg'))} alt="" />
+              </CenterXY>
             </Upload>
           </FullWidth>
         </Form.Item>
@@ -453,61 +452,117 @@ export default function ResourceEdit() {
                       onChange={(e) => {
                         item.url = e.target.value;
                       }}
-                      addonBefore={
+                      addonBefore={<Observer>{() => (
+                        <Fragment>
+                          <Select style={{ width: 90 }} value={item.status} onChange={async (status) => {
+                            item.loading = true
+                            try {
+                              const result = await api.updateResourceVideo(local._id, { _id: item._id, status })
+                              if (result.code === 0) {
+                                item.status = status
+                              } else {
+                                message.error(result.message)
+                              }
+                            } finally {
+                              item.loading = false
+                            }
+                          }}>
+                            <Select.Option value={store.constant.RESOURCE_STATUS.init}>初始化</Select.Option>
+                            <Select.Option value={store.constant.RESOURCE_STATUS.loading}>下载中</Select.Option>
+                            <Select.Option value={store.constant.RESOURCE_STATUS.finished}>已下载</Select.Option>
+                            <Select.Option value={store.constant.RESOURCE_STATUS.transcoding}>转码中</Select.Option>
+                            <Select.Option value={store.constant.RESOURCE_STATUS.fail}>失败</Select.Option>
+                          </Select>
+                          <Divider type="vertical" />
+                          <Select style={{ width: 80 }} value={item.type} onChange={async (type) => {
+                            item.loading = true
+                            try {
+                              await api.updateResourceVideo(local._id, { _id: item._id, type })
+                              item.type = type
+                            } finally {
+                              item.loading = false
+                            }
+                          }}>
+                            <Select.Option value={store.constant.VIDEO_TYPE.normal}>正片</Select.Option>
+                            <Select.Option value={store.constant.VIDEO_TYPE.content}>正文</Select.Option>
+                            <Select.Option value={store.constant.VIDEO_TYPE.trailer}>预告</Select.Option>
+                            <Select.Option value={store.constant.VIDEO_TYPE.tidbits}>花絮</Select.Option>
+                          </Select>
+                        </Fragment>
+                      )}</Observer>}
+                      addonAfter={
                         <Observer>{() => (
-                          <Fragment>
-                            <Select style={{ width: 90 }} value={item.status} onChange={async (status) => {
-                              item.loading = true
-                              try {
-                                const result = await api.updateResourceVideo(local._id, { _id: item._id, status })
-                                if (result.code === 0) {
-                                  item.status = status
-                                } else {
-                                  message.error(result.message)
-                                }
-                              } finally {
-                                item.loading = false
+                          <Icon type={item.loading && item.status === store.constant.MEDIA_STATUS.loading ? 'loading' : 'download'} disabled={item.loading} onClick={async (e) => {
+                            item.loading = true
+                            try {
+                              const type = item.url.includes('.m3u8') ? 'm3u8' : 'mp4';
+                              const data = {
+                                _id: item._id,
+                                url: item.url,
+                                filepath: item.path,
+                                type,
+                                params: { total: _.get(item, 'more.size', 0), finished: 0 }
                               }
-                            }}>
-                              <Select.Option value={store.constant.RESOURCE_STATUS.init}>初始化</Select.Option>
-                              <Select.Option value={store.constant.RESOURCE_STATUS.loading}>下载中</Select.Option>
-                              <Select.Option value={store.constant.RESOURCE_STATUS.finished}>已下载</Select.Option>
-                              <Select.Option value={store.constant.RESOURCE_STATUS.transcoding}>转码中</Select.Option>
-                              <Select.Option value={store.constant.RESOURCE_STATUS.fail}>失败</Select.Option>
-                            </Select>
-                            <Divider type="vertical" />
-                            <Select style={{ width: 80 }} value={item.type} onChange={async (type) => {
-                              item.loading = true
-                              try {
-                                await api.updateResourceVideo(local._id, { _id: item._id, type })
-                                item.type = type
-                              } finally {
-                                item.loading = false
+                              const resp = await Axios.post(`https://192.168.0.124/gw/download/tasks?auto=1`, data)
+                              if (resp.status === 200 && resp.data.code === 0) {
+                                await api.updateResourceVideo(local._id, { _id: item._id, status: store.constant.MEDIA_STATUS.loading })
+                                item.status = store.constant.MEDIA_STATUS.loading
+                              } else {
+                                message.error('失败：' + resp.body.message)
                               }
-                            }}>
-                              <Select.Option value={store.constant.VIDEO_TYPE.normal}>正片</Select.Option>
-                              <Select.Option value={store.constant.VIDEO_TYPE.content}>正文</Select.Option>
-                              <Select.Option value={store.constant.VIDEO_TYPE.trailer}>预告</Select.Option>
-                              <Select.Option value={store.constant.VIDEO_TYPE.tidbits}>花絮</Select.Option>
-                            </Select>
-                          </Fragment>
+                              // }
+                            } catch (e) {
+                              console.log(e)
+                            } finally {
+                              item.loading = false
+                            }
+                          }}
+                          />
                         )}</Observer>
                       }
-                      addonAfter={!local.fullEditVideo ? <Observer>{() => (
-                        <CloseOutlined disabled={item.loading || item.status === store.constant.MEDIA_STATUS.loading} onClick={async () => {
-                          item.loading = true
-                          try {
-                            await api.removeResourceVideo({ _id: item._id, mid: local._id })
-                            await Axios.delete(`https://192.168.0.124/gw/download/tasks/${item._id}`)
-                            local.data.videos = local.data.videos.filter(t => t.url !== item.url)
-                          } finally {
-                            item.loading = false
-                          }
-                        }} />
-                      )}</Observer> : null}
                     />
                   )}</Observer>
-                  <Input className="path" addonBefore={'文件:' + item.nth} defaultValue={item.path} />
+                  <Input className="path" addonBefore={
+                    <Fragment>
+                      <Clipboard data-clipboard-text={item._id} component={'a'}>
+                        <CopyOutlined />
+                      </Clipboard>
+                      :{item.nth + 1}
+                    </Fragment>
+                  } defaultValue={item.path} addonAfter={<Observer>{() => (
+                    <Upload
+                      showUploadList={false}
+                      name="file"
+                      disabled={item.loading && item.status === 'upload'}
+                      onChange={async (e) => {
+                        item.loading = true
+                        const segs = item.path.split('/');
+                        const name = segs.pop()
+                        const dirs = segs.join('/')
+                        try {
+                          const res = await apis.createFile({
+                            isDir: 0,
+                            param: dirs,
+                            name: name,
+                            upfile: e.file
+                          })
+                          if (res.code === 0) {
+                            message.info('上传成功')
+                            await api.updateResourceVideo(local._id, { _id: item._id, status: store.constant.RESOURCE_STATUS.finished })
+                            item.status = store.constant.RESOURCE_STATUS.finished
+                          } else {
+                            message.info(res.message || '上传失败')
+                          }
+                        } catch (e) {
+                          message.error(e.message)
+                        } finally {
+                          item.loading = false
+                        }
+                      }}
+                      beforeUpload={() => false}>
+                      <UploadOutlined />
+                    </Upload>
+                  )}</Observer>} />
                 </FullHeightAuto>
                 <FullHeight>
                   <AlignVertical style={{ padding: '0 10px', height: 120 }}>
@@ -538,68 +593,6 @@ export default function ResourceEdit() {
                         item.loading = false
                       }
                     }} />
-                    <Observer>{() => (
-                      <Icon type={item.loading && item.status === store.constant.MEDIA_STATUS.loading ? 'loading' : 'download'} disabled={item.loading} onClick={async (e) => {
-                        item.loading = true
-                        try {
-                          const type = item.url.includes('.m3u8') ? 'm3u8' : 'mp4';
-                          const data = {
-                            _id: item._id,
-                            url: item.url,
-                            filepath: item.path,
-                            type,
-                            params: { total: _.get(item, 'more.size', 0), finished: 0 }
-                          }
-                          const resp = await Axios.post(`https://192.168.0.124/gw/download/tasks`, data)
-                          if (resp.status === 200 && resp.data.code === 0) {
-                            await api.updateResourceVideo(local._id, { _id: item._id, status: store.constant.MEDIA_STATUS.loading })
-                            item.status = store.constant.MEDIA_STATUS.loading
-                          } else {
-                            message.error('失败：' + resp.body.message)
-                          }
-                          // }
-                        } catch (e) {
-                          console.log(e)
-                        } finally {
-                          item.loading = false
-                        }
-                      }}
-                      />
-                    )}</Observer>
-                    <Observer>{() => (
-                      <Upload
-                        showUploadList={false}
-                        name="file"
-                        disabled={item.loading && item.status === 'upload'}
-                        onChange={async (e) => {
-                          item.loading = true
-                          const segs = item.path.split('/');
-                          const name = segs.pop()
-                          const dirs = segs.join('/')
-                          try {
-                            const res = await apis.createFile({
-                              isDir: 0,
-                              param: dirs,
-                              name: name,
-                              upfile: e.file
-                            })
-                            if (res.code === 0) {
-                              message.info('上传成功')
-                              await api.updateResourceVideo(local._id, { _id: item._id, status: store.constant.RESOURCE_STATUS.finished })
-                              item.status = store.constant.RESOURCE_STATUS.finished
-                            } else {
-                              message.info(res.message || '上传失败')
-                            }
-                          } catch (e) {
-                            message.error(e.message)
-                          } finally {
-                            item.loading = false
-                          }
-                        }}
-                        beforeUpload={() => false}>
-                        <UploadOutlined />
-                      </Upload>
-                    )}</Observer>
                     <ExclamationCircleOutlined onClick={() => local.stream_path = item.path} />
                     <Link target="_blank" to={'/admin/home/resource-manage/video-chapter?_id=' + item._id} ><BarsOutlined /></Link>
                   </AlignVertical>
