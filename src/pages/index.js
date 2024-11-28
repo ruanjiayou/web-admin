@@ -1,3 +1,4 @@
+import React from 'react'
 import SignInPage from './auth/SignInPage'
 import DashboardPage from './home/DashboardPage'
 import ChannelManagePage from './home/ChannelManagePage'
@@ -40,6 +41,7 @@ import {
   QuestionCircleOutlined,
   FolderOutlined,
   DownloadOutlined,
+  CloseOutlined,
 } from '@ant-design/icons'
 
 const page_map = {
@@ -160,19 +162,39 @@ export function adjustMenu2(tree) {
     if (!page.pathname.startsWith('/admin/home') || page.hide === true) {
       return;
     }
-    page.children = page.children.map(child => ({
-      title: child.title,
-      path: child.pathname,
-      name: child.pathname,
-      icon: child.icon,
-    }))
-    data.push({
-      title: page.title,
-      path: page.pathname,
-      name: page.pathname,
-      icon: page.icon,
-      children: page.children,
+    // page.children = page.children.map(child => ({
+    //   title: child.title,
+    //   path: child.pathname,
+    //   name: child.pathname,
+    //   icon: child.icon,
+    // }))
+    // data.push({
+    //   title: page.title,
+    //   path: page.pathname,
+    //   name: page.pathname,
+    //   icon: page.icon,
+    //   children: page.children,
+    // })
+    page.children = page.children.map(child => {
+      const Icon = icon_map[child.icon]
+      return {
+        label: child.title,
+        // path: child.pathname,
+        key: child.pathname,
+        icon: Icon ? <Icon /> : null,
+      }
     })
+    const Icon = icon_map[page.icon]
+    const menu = {
+      label: page.title,
+      // path: page.pathname,
+      key: page.pathname,
+      icon: Icon ? <Icon /> : null,
+    }
+    if (page.children.length) {
+      menu.children = page.children;
+    }
+    data.push(menu)
   })
   return data;
 }

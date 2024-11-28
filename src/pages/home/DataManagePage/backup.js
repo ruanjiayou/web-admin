@@ -46,7 +46,7 @@ export default function TaskList() {
         </Right>
       </FullHeightFix>
       <Modal
-        visible={local.showModal}
+        open={local.showModal}
         okText="创建"
         cancelText="取消"
         style={{ top: window.screen.height / 2 + 'px', transform: 'translate(0, -50%)' }}

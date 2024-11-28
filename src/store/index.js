@@ -104,6 +104,7 @@ const store = {
 
 storage.prefix = store.app.storagePrefix
 store.app.set('menuKey', storage.getValue('menu-key') || '/admin/home/resource-manage/list')
+store.app.set('openKeys', storage.getValue('open-keys') || [])
 // store.app.set('baseUrl', '/gw/admin')
 // store.app.set('baseUrl', 'http://127.0.0.1:8097')
 store.app.set('baseUrl', 'https://192.168.0.124/gw/novel')

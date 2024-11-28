@@ -1,11 +1,12 @@
-import React, { Fragment } from 'react'
+import React, { Fragment, useCallback, useEffect } from 'react'
 import { Avatar, Button, Dropdown, Menu as AMenu } from 'antd'
 import { MenuUnfoldOutlined, MenuFoldOutlined, DownOutlined, UserOutlined } from '@ant-design/icons'
 import { useLocalStore, Observer } from 'mobx-react-lite'
 import { LayoutV, LayoutH, Sider, Header, Content } from './style'
 import logo from '../logo.svg'
-import Menu from './Menu'
 import { useStore, useRouter } from '../contexts'
+import storage from '../utils/storage'
+import { toJS } from 'mobx'
 
 export default function Layout({ children, single }) {
   const store = useStore()
@@ -14,14 +15,23 @@ export default function Layout({ children, single }) {
     avatarVisible: false,
     appsVisible: false,
     collapsed: false,
+    tree: toJS(store.menus),
+    menuKey: store.app.menuKey,
+    selectedKeys: [store.app.menuKey],
+    openKeys: toJS(store.app.openKeys),
     toggleCollapsed: () => {
       local.collapsed = !local.collapsed
-    }
+    },
   }))
   const hs = {
     height: store.config.headerHeight,
     lineHeight: store.config.headerHeight + 'px'
   }
+  useEffect(() => {
+    store.app.set('openKeys', local.openKeys)
+    store.app.set('selectedKeys', local.selectedKeys[0])
+  }, [, local.openKeys, local.selectedKeys])
+
   return single ? <Fragment>
     {children}
   </Fragment> : (
@@ -44,7 +54,23 @@ export default function Layout({ children, single }) {
               </div>
             </Dropdown>
           </Header>
-          <Menu collapsed={local.collapsed} />
+          <AMenu
+            style={{ flex: 'auto', overflowY: 'auto', overflowX: 'hidden' }}
+            items={local.tree}
+            selectedKeys={local.selectedKeys}
+            openKeys={local.openKeys}
+            mode="inline"
+            onOpenChange={keys => {
+              local.openKeys = keys;
+              storage.setValue('open-keys', keys);
+            }}
+            onSelect={e => {
+              local.selectedKeys = [e.key];
+              storage.setValue('menu-key', e.key)
+              store.app.set('menuKey', e.key);
+              router.goPage(e.key)
+            }}
+          />
         </Sider>
         <LayoutV>
           <Header style={{ ...hs, borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

@@ -21,6 +21,7 @@ import Ueditor from '../../../component/Ueditor'
 import StreamInfo from '../../../utils/stream';
 import Clipboard from 'react-clipboard.js';
 
+const Option = Select.Option;
 const omit_keys = ['images', 'videos', 'counter'];
 function deepEqual(a, b, omits) {
   const keys = Array.from(new Set([...Object.keys(a), ...Object.keys(b)]));
@@ -58,7 +59,7 @@ export default function ResourceEdit() {
   const query = qs.parse(window.location.search.substr(1))
   const local = useLocalStore(() => ({
     _id: query._id,
-    data: { tags: [], types: [], children: [], videos: [], images: [], audios: [], captions: [], content: '', source_type: '' },
+    data: { tags: [], types: [], children: [], videos: [], images: [], audios: [], captions: [], content: '', source_type: '', country: '', status: 1, },
     origin: {},
     stream_path: '',
     // 临时
@@ -231,7 +232,7 @@ export default function ResourceEdit() {
                 local.data.source_type = value
               }}>
                 {store.resource_types.map(type => (
-                  <Select.Option key={type.name} value={type.name}>{type.title}</Select.Option>
+                  <Option key={type.name} value={type.name}>{type.title}</Option>
                 ))}
               </Select>
             </FullWidthFix>
@@ -244,7 +245,7 @@ export default function ResourceEdit() {
                 local.data.country = value
               }}>
                 {store.regions.map(region => (
-                  <Select.Option key={region.name} value={region.name}>{region.title}</Select.Option>
+                  <Option key={region.name} value={region.name}>{region.title}</Option>
                 ))}
               </Select>
             </FullWidthFix>
@@ -438,7 +439,7 @@ export default function ResourceEdit() {
               }
             }}
             items={local.data.videos}
-            droppableId={local._id}
+            droppableId={'video'}
             listStyle={{ boxSizing: 'border-box' }}
             itemStyle={{ display: 'flex', alignItems: 'center', lineHeight: 1 }}
             renderItem={({ item, index }) => (
@@ -467,11 +468,10 @@ export default function ResourceEdit() {
                               item.loading = false
                             }
                           }}>
-                            <Select.Option value={store.constant.RESOURCE_STATUS.init}>初始化</Select.Option>
-                            <Select.Option value={store.constant.RESOURCE_STATUS.loading}>下载中</Select.Option>
-                            <Select.Option value={store.constant.RESOURCE_STATUS.finished}>已下载</Select.Option>
-                            <Select.Option value={store.constant.RESOURCE_STATUS.transcoding}>转码中</Select.Option>
-                            <Select.Option value={store.constant.RESOURCE_STATUS.fail}>失败</Select.Option>
+                            <Option value={store.constant.RESOURCE_STATUS.init}>初始化</Option>
+                            <Option value={store.constant.RESOURCE_STATUS.loading}>下载中</Option>
+                            <Option value={store.constant.RESOURCE_STATUS.finished}>已下载</Option>
+                            <Option value={store.constant.RESOURCE_STATUS.fail}>失败</Option>
                           </Select>
                           <Divider type="vertical" />
                           <Select style={{ width: 80 }} value={item.type} onChange={async (type) => {
@@ -483,10 +483,10 @@ export default function ResourceEdit() {
                               item.loading = false
                             }
                           }}>
-                            <Select.Option value={store.constant.VIDEO_TYPE.normal}>正片</Select.Option>
-                            <Select.Option value={store.constant.VIDEO_TYPE.content}>正文</Select.Option>
-                            <Select.Option value={store.constant.VIDEO_TYPE.trailer}>预告</Select.Option>
-                            <Select.Option value={store.constant.VIDEO_TYPE.tidbits}>花絮</Select.Option>
+                            <Option value={store.constant.VIDEO_TYPE.normal}>正片</Option>
+                            <Option value={store.constant.VIDEO_TYPE.content}>正文</Option>
+                            <Option value={store.constant.VIDEO_TYPE.trailer}>预告</Option>
+                            <Option value={store.constant.VIDEO_TYPE.tidbits}>花絮</Option>
                           </Select>
                         </Fragment>
                       )}</Observer>}
@@ -615,20 +615,20 @@ export default function ResourceEdit() {
                 <Select style={{ width: 90 }} disabled={local.isDealUrl} value={local.tempStatus} onChange={async (status) => {
                   local.tempStatus = status;
                 }}>
-                  <Select.Option value={store.constant.MEDIA_STATUS.init}>初始化</Select.Option>
-                  <Select.Option value={store.constant.MEDIA_STATUS.loading}>下载中</Select.Option>
-                  <Select.Option value={store.constant.MEDIA_STATUS.transcoding}>转码中</Select.Option>
-                  <Select.Option value={store.constant.MEDIA_STATUS.finished}>已下载</Select.Option>
-                  <Select.Option value={store.constant.MEDIA_STATUS.fail}>失败</Select.Option>
+                  <Option value={store.constant.MEDIA_STATUS.init}>初始化</Option>
+                  <Option value={store.constant.MEDIA_STATUS.loading}>下载中</Option>
+                  <Option value={store.constant.MEDIA_STATUS.transcoding}>转码中</Option>
+                  <Option value={store.constant.MEDIA_STATUS.finished}>已下载</Option>
+                  <Option value={store.constant.MEDIA_STATUS.fail}>失败</Option>
                 </Select>
                 <Divider type="vertical" />
                 <Select style={{ width: 80 }} disabled={local.isDealUrl} value={local.tempUrlType} onChange={async (type) => {
                   local.tempUrlType = type;
                 }}>
-                  <Select.Option value={store.constant.VIDEO_TYPE.normal}>正片</Select.Option>
-                  <Select.Option value={store.constant.VIDEO_TYPE.content}>正文</Select.Option>
-                  <Select.Option value={store.constant.VIDEO_TYPE.trailer}>预告</Select.Option>
-                  <Select.Option value={store.constant.VIDEO_TYPE.tidbits}>花絮</Select.Option>
+                  <Option value={store.constant.VIDEO_TYPE.normal}>正片</Option>
+                  <Option value={store.constant.VIDEO_TYPE.content}>正文</Option>
+                  <Option value={store.constant.VIDEO_TYPE.trailer}>预告</Option>
+                  <Option value={store.constant.VIDEO_TYPE.tidbits}>花絮</Option>
                 </Select>
               </Fragment>}
               addonAfter={<Icon type="check" onClick={async () => {
@@ -694,7 +694,7 @@ export default function ResourceEdit() {
               }
             }}
             items={local.data.images}
-            droppableId={local._id}
+            droppableId={'image'}
             listStyle={{ boxSizing: 'border-box' }}
             itemStyle={{ display: 'flex', alignItems: 'center', lineHeight: 1, marginBottom: 5, backgroundColor: 'transparent' }}
             renderItem={({ item, index }) => (
@@ -717,10 +717,10 @@ export default function ResourceEdit() {
                             item.loading = false
                           }
                         }}>
-                          <Select.Option value={store.constant.MEDIA_STATUS.init}>初始化</Select.Option>
-                          <Select.Option value={store.constant.MEDIA_STATUS.loading}>下载中</Select.Option>
-                          <Select.Option value={store.constant.MEDIA_STATUS.finished}>已下载</Select.Option>
-                          <Select.Option value={store.constant.MEDIA_STATUS.fail}>失败</Select.Option>
+                          <Option value={store.constant.MEDIA_STATUS.init}>初始化</Option>
+                          <Option value={store.constant.MEDIA_STATUS.loading}>下载中</Option>
+                          <Option value={store.constant.MEDIA_STATUS.finished}>已下载</Option>
+                          <Option value={store.constant.MEDIA_STATUS.fail}>失败</Option>
                         </Select>
                         <Divider type="vertical" />
                         <Select style={{ width: 80 }} value={item.type} onChange={async (type) => {
@@ -732,10 +732,10 @@ export default function ResourceEdit() {
                             item.loading = false
                           }
                         }}>
-                          <Select.Option value={store.constant.IMAGE_TYPE.poster}>封面</Select.Option>
-                          <Select.Option value={store.constant.IMAGE_TYPE.content}>正文图片</Select.Option>
-                          <Select.Option value={store.constant.IMAGE_TYPE.thumbnail}>缩略图</Select.Option>
-                          <Select.Option value={store.constant.IMAGE_TYPE.gallery}>图集</Select.Option>
+                          <Option value={store.constant.IMAGE_TYPE.poster}>封面</Option>
+                          <Option value={store.constant.IMAGE_TYPE.content}>正文图片</Option>
+                          <Option value={store.constant.IMAGE_TYPE.thumbnail}>缩略图</Option>
+                          <Option value={store.constant.IMAGE_TYPE.gallery}>图集</Option>
                         </Select>
                       </Fragment>
                     )}</Observer>}
@@ -808,19 +808,19 @@ export default function ResourceEdit() {
                 <Select style={{ width: 90 }} disabled={local.isDealUrl} value={local.tempStatus} onChange={async (status) => {
                   local.tempStatus = status;
                 }}>
-                  <Select.Option value={store.constant.RESOURCE_STATUS.init}>初始化</Select.Option>
-                  <Select.Option value={store.constant.RESOURCE_STATUS.loading}>下载中</Select.Option>
-                  <Select.Option value={store.constant.RESOURCE_STATUS.finished}>已下载</Select.Option>
-                  <Select.Option value={store.constant.RESOURCE_STATUS.fail}>失败</Select.Option>
+                  <Option value={store.constant.RESOURCE_STATUS.init}>初始化</Option>
+                  <Option value={store.constant.RESOURCE_STATUS.loading}>下载中</Option>
+                  <Option value={store.constant.RESOURCE_STATUS.finished}>已下载</Option>
+                  <Option value={store.constant.RESOURCE_STATUS.fail}>失败</Option>
                 </Select>
                 <Divider type="vertical" />
                 <Select style={{ width: 80 }} disabled={local.isDealUrl} value={local.tempImageType} onChange={async (type) => {
                   local.tempImageType = type;
                 }}>
-                  <Select.Option value={store.constant.IMAGE_TYPE.poster}>封面</Select.Option>
-                  <Select.Option value={store.constant.IMAGE_TYPE.content}>正文图片</Select.Option>
-                  <Select.Option value={store.constant.IMAGE_TYPE.thumbnail}>缩略图</Select.Option>
-                  <Select.Option value={store.constant.IMAGE_TYPE.gallery}>图集</Select.Option>
+                  <Option value={store.constant.IMAGE_TYPE.poster}>封面</Option>
+                  <Option value={store.constant.IMAGE_TYPE.content}>正文图片</Option>
+                  <Option value={store.constant.IMAGE_TYPE.thumbnail}>缩略图</Option>
+                  <Option value={store.constant.IMAGE_TYPE.gallery}>图集</Option>
                 </Select>
               </Fragment>}
               addonAfter={<Icon type="check" onClick={async () => {
@@ -908,7 +908,7 @@ export default function ResourceEdit() {
                 }
               }}
               items={local.data.audios}
-              droppableId={local._id}
+              droppableId={'audio'}
               listStyle={{ boxSizing: 'border-box' }}
               itemStyle={{ display: 'flex', alignItems: 'center', lineHeight: 1, marginBottom: 5, backgroundColor: 'transparent' }}
               renderItem={({ item, index }) => (
@@ -931,10 +931,10 @@ export default function ResourceEdit() {
                               item.loading = false
                             }
                           }}>
-                            <Select.Option value={store.constant.MEDIA_STATUS.init}>初始化</Select.Option>
-                            <Select.Option value={store.constant.MEDIA_STATUS.loading}>下载中</Select.Option>
-                            <Select.Option value={store.constant.MEDIA_STATUS.finished}>已下载</Select.Option>
-                            <Select.Option value={store.constant.MEDIA_STATUS.fail}>失败</Select.Option>
+                            <Option value={store.constant.MEDIA_STATUS.init}>初始化</Option>
+                            <Option value={store.constant.MEDIA_STATUS.loading}>下载中</Option>
+                            <Option value={store.constant.MEDIA_STATUS.finished}>已下载</Option>
+                            <Option value={store.constant.MEDIA_STATUS.fail}>失败</Option>
                           </Select>
                         </Fragment>
                       )}</Observer>}
@@ -1018,10 +1018,10 @@ export default function ResourceEdit() {
                 <Select style={{ width: 90 }} disabled={local.isDealUrl} value={local.tempStatus} onChange={async (status) => {
                   local.tempStatus = status;
                 }}>
-                  <Select.Option value={store.constant.MEDIA_STATUS.init}>初始化</Select.Option>
-                  <Select.Option value={store.constant.MEDIA_STATUS.loading}>下载中</Select.Option>
-                  <Select.Option value={store.constant.MEDIA_STATUS.finished}>已下载</Select.Option>
-                  <Select.Option value={store.constant.MEDIA_STATUS.fail}>失败</Select.Option>
+                  <Option value={store.constant.MEDIA_STATUS.init}>初始化</Option>
+                  <Option value={store.constant.MEDIA_STATUS.loading}>下载中</Option>
+                  <Option value={store.constant.MEDIA_STATUS.finished}>已下载</Option>
+                  <Option value={store.constant.MEDIA_STATUS.fail}>失败</Option>
                 </Select>
               </Fragment>}
               addonAfter={
@@ -1075,7 +1075,7 @@ export default function ResourceEdit() {
         <Button loading={local.loading} disabled={local.loading} type="primary" onClick={() => onEdit()}>保存并同步</Button>
       </Form.Item>
     </div>
-    <Observer>{() => <Modal visible={local.showFormat}
+    <Observer>{() => <Modal open={local.showFormat}
       style={{ overflow: 'auto', padding: 0, zIndex: 1201 }}
       width={700}
       confirmLoading={local.loading}

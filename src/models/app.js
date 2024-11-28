@@ -3,6 +3,7 @@ import { types } from "mobx-state-tree";
 const app = types.model('app', {
   storagePrefix: types.optional(types.string, 'novel_admin_'),
   menuKey: types.optional(types.string, ''),
+  openKeys: types.optional(types.array(types.string), []),
   groupMode: types.optional(types.string, 'edit'),
   imageLine: types.optional(types.string, ''),
   baseUrl: types.optional(types.string, ''),
