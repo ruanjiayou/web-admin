@@ -92,12 +92,12 @@ export default function RuleEdit({ data, cancel, save }) {
         </Space>
       </Item>
       <Item label="extra脚本" labelCol={{ span: 4 }} >
-        <Input.TextArea onChange={e => {
+        <Input.TextArea defaultValue={local.data.extra || ''} onChange={e => {
           local.data.extra = e.target.value
         }} />
       </Item>
-      <Item>
-        <CodeEditor value={local.data.script} onChange={v => local.data.script = v} />
+      <Item style={{ marginBottom: 0 }}>
+        <CodeEditor style={{ height: 400 }} value={local.data.script} onChange={v => local.data.script = v} />
       </Item>
     </Form>
   </Modal>)}</Observer>;
