@@ -1,6 +1,6 @@
-import models from '../models'
-import storage from '../utils/storage'
-import { ws } from '../utils/ws'
+import models from './models'
+import storage from './utils/storage'
+import { ws } from './utils/ws'
 
 const store = {
   app: models.app.create(),

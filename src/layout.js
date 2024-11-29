@@ -2,10 +2,46 @@ import React, { Fragment, useCallback, useEffect } from 'react'
 import { Avatar, Button, Dropdown, Menu as AMenu } from 'antd'
 import { MenuUnfoldOutlined, MenuFoldOutlined, DownOutlined, UserOutlined } from '@ant-design/icons'
 import { useLocalStore, Observer } from 'mobx-react-lite'
-import { LayoutV, LayoutH, Sider, Header, Content } from './style'
-import logo from '../logo.svg'
-import { useStore, useRouter } from '../contexts'
+import logo from './images/logo.svg'
+import { useStore, useRouter } from './contexts'
 import { toJS } from 'mobx'
+import styled from 'styled-components'
+
+const LayoutV = styled.div`
+  display: flex;
+  height: 100%;
+  flex: auto;
+  flex-direction: column;
+  overflow: hidden;
+`;
+
+const LayoutH = styled.div`
+  display: flex;
+  height: 100%;
+  flex: auto;
+  flex-direction: row;
+`;
+
+const Sider = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+`;
+
+const Header = styled.div`
+  height: 60px;
+  line-height: 60px;
+`;
+
+const Content = styled.div`
+  
+`;
+
+const CustomDiv = styled.div`
+  overflow-y: auto;
+  scrollbar-color: light;
+  scrollbar-width: none;
+`
 
 export default function Layout({ children, single }) {
   const store = useStore()
@@ -54,21 +90,23 @@ export default function Layout({ children, single }) {
               </div>
             </Dropdown>
           </Header>
-          <AMenu
-            style={{ flex: 'auto', overflowY: 'auto' }}
-            items={toJS(store.menus)}
-            inlineCollapsed={local.collapsed}
-            selectedKeys={local.selectedKeys}
-            openKeys={local.openKeys}
-            mode="inline"
-            onOpenChange={keys => {
-              local.setOpenKeys(keys);
-            }}
-            onSelect={e => {
-              local.setMenyKey(e.key)
-              router.goPage(e.key)
-            }}
-          />
+          <CustomDiv>
+            <AMenu
+              style={{ height: '100%' }}
+              items={toJS(store.menus)}
+              inlineCollapsed={local.collapsed}
+              selectedKeys={local.selectedKeys}
+              openKeys={local.openKeys}
+              mode="inline"
+              onOpenChange={keys => {
+                local.setOpenKeys(keys);
+              }}
+              onSelect={e => {
+                local.setMenyKey(e.key)
+                router.goPage(e.key)
+              }}
+            />
+          </CustomDiv>
         </Sider>
         <LayoutV>
           <Header style={{ ...hs, borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

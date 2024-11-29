@@ -1,7 +1,7 @@
 import React from 'react'
 import { Observer, useLocalStore } from 'mobx-react-lite'
 import { Form, Button, Input, Avatar, message } from 'antd'
-import logo from '../../../logo.svg'
+import logo from '../../../images/logo.svg'
 import apis from '../../../api'
 import store from '../../../store'
 import { useRouter } from '../../../contexts'
