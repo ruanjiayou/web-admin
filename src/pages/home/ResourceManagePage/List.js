@@ -54,7 +54,7 @@ export default function ResourceList({ items, children, categories, search, loca
                 style={{ width: 60, height: 60, borderRadius: '50%', }}
                 alt=""
               />
-              <Icon type={StatusMap[record.status] || 'close'} style={{ position: 'absolute', left: '50%', bottom: -5, transform: 'translate(20px, 0)' }} />
+              <Observer>{() => (<Icon type={StatusMap[record.status] || 'close'} style={{ position: 'absolute', left: '50%', bottom: -5, transform: 'translate(20px, 0)' }} />)}</Observer>
             </div>
           )} />
           <Column title="" width={25} dataIndex="origin" key="origin" render={(url, record) => {

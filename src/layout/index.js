@@ -5,7 +5,6 @@ import { useLocalStore, Observer } from 'mobx-react-lite'
 import { LayoutV, LayoutH, Sider, Header, Content } from './style'
 import logo from '../logo.svg'
 import { useStore, useRouter } from '../contexts'
-import storage from '../utils/storage'
 import { toJS } from 'mobx'
 
 export default function Layout({ children, single }) {
@@ -15,23 +14,24 @@ export default function Layout({ children, single }) {
     avatarVisible: false,
     appsVisible: false,
     collapsed: false,
-    tree: toJS(store.menus),
-    menuKey: store.app.menuKey,
     selectedKeys: [store.app.menuKey],
     openKeys: toJS(store.app.openKeys),
     toggleCollapsed: () => {
       local.collapsed = !local.collapsed
     },
+    setOpenKeys(keys) {
+      local.openKeys = keys;
+      store.app.setOpenKeys(keys);
+    },
+    setMenyKey(key) {
+      local.selectedKeys = [key];
+      store.app.setMenuKey(key);
+    }
   }))
   const hs = {
     height: store.config.headerHeight,
     lineHeight: store.config.headerHeight + 'px'
   }
-  useEffect(() => {
-    store.app.set('openKeys', local.openKeys)
-    store.app.set('selectedKeys', local.selectedKeys[0])
-  }, [, local.openKeys, local.selectedKeys])
-
   return single ? <Fragment>
     {children}
   </Fragment> : (
@@ -55,19 +55,17 @@ export default function Layout({ children, single }) {
             </Dropdown>
           </Header>
           <AMenu
-            style={{ flex: 'auto', overflowY: 'auto', overflowX: 'hidden' }}
-            items={local.tree}
+            style={{ flex: 'auto', overflowY: 'auto' }}
+            items={toJS(store.menus)}
+            inlineCollapsed={local.collapsed}
             selectedKeys={local.selectedKeys}
             openKeys={local.openKeys}
             mode="inline"
             onOpenChange={keys => {
-              local.openKeys = keys;
-              storage.setValue('open-keys', keys);
+              local.setOpenKeys(keys);
             }}
             onSelect={e => {
-              local.selectedKeys = [e.key];
-              storage.setValue('menu-key', e.key)
-              store.app.set('menuKey', e.key);
+              local.setMenyKey(e.key)
               router.goPage(e.key)
             }}
           />

@@ -133,7 +133,7 @@ export default function ResourceEdit() {
     }
   };
   useEffectOnce(() => {
-    events.on('resource_change', changeResource);
+    events.on('event', changeResource);
     if (local._id) {
       local.loading = true
       apis.getResource({ _id: local._id }).then(res => {
@@ -151,7 +151,7 @@ export default function ResourceEdit() {
       })
     }
     return () => {
-      // events && changeResource && events.off(changeResource);
+      events && changeResource && events.off(changeResource);
     }
   })
 

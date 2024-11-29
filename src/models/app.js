@@ -1,4 +1,5 @@
 import { types } from "mobx-state-tree";
+import storage from "../utils/storage";
 
 const app = types.model('app', {
   storagePrefix: types.optional(types.string, 'novel_admin_'),
@@ -13,6 +14,14 @@ const app = types.model('app', {
 }).actions(self => ({
   set(key, value) {
     self[key] = value
+  },
+  setMenuKey(key) {
+    self.menuKey = key;
+    storage.setValue('menu-key', key);
+  },
+  setOpenKeys(keys) {
+    self.openKeys = keys;
+    storage.setValue('open-keys', keys)
   },
   setEditGroupId(id) {
     self.currentEditGroupId = id

@@ -45,6 +45,15 @@ export default function ResourceManagePage() {
     spider_id: '',
     spiders: [],
     tempSpider: '',
+    changeResource(data) {
+      if (data.resource_type === 'resource') {
+        local.resources.forEach(resource => {
+          if (resource._id === data.resource_id) {
+            resource.status = data.status;
+          }
+        })
+      }
+    }
   }))
   const urlRef = useRef(null)
   const originRef = useRef(null)
@@ -84,18 +93,9 @@ export default function ResourceManagePage() {
     getGroupTypes().then(result => {
       local.categories = result.data
     });
-    function resource_change(data) {
-      if (data.resource_type === 'resource') {
-        local.resources.forEach(resource => {
-          if (resource._id === data.resource_id) {
-            resource.status = data.status;
-          }
-        })
-      }
-    }
-    events.on('resource_change', resource_change);
+    events.on('event', local.changeResource);
     return () => {
-      events.off('resource_change', resource_change)
+      events.off('event', local.changeResource)
     }
   }, [])
   return (<Observer>{() => {
