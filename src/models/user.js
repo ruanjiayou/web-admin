@@ -4,21 +4,24 @@ import storage from '../utils/storage'
 const user = types.model('user', {
   isSignIn: types.optional(types.boolean, false),
   token: types.optional(types.string, ''),
-  username: types.optional(types.string, ''),
+  account: types.optional(types.string, ''),
+  nickname: types.optional(types.string, ''),
 }).actions(self => ({
   signOut() {
     self.token = ''
-    self.username = ''
+    self.account = ''
     storage.removeKey('user-token')
     storage.removeKey('user-username')
     self.isSignIn = false
   },
-  signIn({ token, username }) {
+  signIn({ token, account, nickname }) {
     self.token = token
-    self.username = username
+    self.account = account
+    self.nickname = nickname
     self.isSignIn = true
     storage.setValue('user-token', token)
-    storage.setValue('user-username', username)
+    storage.setValue('user-account', account)
+    storage.setValue('user-nickname', nickname)
   },
   setToken(token) {
     self.token = token
@@ -27,9 +30,9 @@ const user = types.model('user', {
     }
     storage.setValue('user-token', token)
   },
-  setUsername(name) {
-    self.username = name
-    storage.setValue('user-username', name)
+  setAccount(name) {
+    self.account = name
+    storage.setValue('user-account', name)
   },
 }))
 

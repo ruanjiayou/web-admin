@@ -110,7 +110,7 @@ store.app.set('openKeys', storage.getValue('open-keys') || [])
 store.app.set('baseUrl', 'https://192.168.0.124/gw/novel')
 store.app.set('imageLine', '')
 store.user.setToken(storage.getValue('user-token') || '')
-store.user.setUsername(storage.getValue('user-username') || '')
+store.user.setAccount(storage.getValue('user-account') || '')
 
 // ws.on('log', function (data) {
 //   if (data.type === 'log') {

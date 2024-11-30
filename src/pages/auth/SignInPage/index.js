@@ -10,7 +10,7 @@ export default function SignInPage() {
   const router = useRouter()
   const local = useLocalStore(() => ({
     isFetch: false,
-    username: '',
+    account: '',
     password: '',
   }))
   return <Observer>{() => (
@@ -20,7 +20,7 @@ export default function SignInPage() {
           <Avatar src={logo} size={80} />
         </Form.Item>
         <Form.Item>
-          <Input name="username" onChange={e => local.username = e.target.value} placeholder="用户名" />
+          <Input name="account" onChange={e => local.account = e.target.value} placeholder="用户名" />
         </Form.Item>
         <Form.Item>
           <Input name="password" onChange={e => local.password = e.target.value} type="password" placeholder="密码" onKeyDown={e => {
@@ -33,9 +33,9 @@ export default function SignInPage() {
           <Button id="signin" type="primary" loading={local.isFetch} block onClick={async () => {
             local.isFetch = true
             try {
-              const res = await apis.signIn({ data: { name: local.username, password: local.password } })
+              const res = await apis.signIn({ data: { account: local.account, password: local.password } })
               if (res.code === 0) {
-                store.user.signIn({ token: res.data.token, username: local.username })
+                store.user.signIn({ token: res.data.token, account: local.account })
                 router.goPage('/admin/home/dashboard')
               } else {
                 message.error(res.message)

@@ -116,7 +116,7 @@ export default function Layout({ children, single }) {
             <Dropdown
               open={local.avatarVisible}
               onOpenChange={flag => local.avatarVisible = flag}
-              menu={
+              overlay={
                 <AMenu onClick={e => {
                   if (e.key === "sign-out") {
                     store.user.signOut()

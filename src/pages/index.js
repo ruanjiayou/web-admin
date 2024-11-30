@@ -7,6 +7,7 @@ import ResourceManagePage from './home/ResourceManagePage'
 import BackupPage from './home/DataManagePage/backup'
 import FilePage from './home/DataManagePage/file'
 import SyncPage from './home/DataManagePage/sync'
+import UserPage from './home/UserManagePage/index'
 import DownloadPage from './home/DownloadManagePage'
 import SchedulePage from './home/ScheduleManagePage'
 import ResourceEdit from './home/ResourceManagePage/article'
@@ -53,6 +54,7 @@ const page_map = {
   'BackupPage': BackupPage,
   'FilePage': FilePage,
   'SyncPage': SyncPage,
+  'UserPage': UserPage,
   'SchedulePage': SchedulePage,
   'ResourceEdit': ResourceEdit,
   'LinkManagePage': LinkManagePage,
