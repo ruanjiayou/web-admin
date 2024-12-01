@@ -17,10 +17,21 @@ export function getUsers(query) {
 }
 
 export function createUser(data) {
+  const form = new FormData()
+  for (let k in data) {
+    if (data[k] instanceof Array) {
+      data[k].forEach(v => {
+        form.append(k, v)
+      })
+    } else {
+      form.append(k, data[k])
+    }
+
+  }
   return shttp({
     url: `/v1/admin/users`,
     method: 'POST',
-    data
+    data: form
   })
 }
 

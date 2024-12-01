@@ -40,7 +40,8 @@ export default function ({ data, save, cancel }) {
         <Upload
           listType="picture-card"
           className="avatar-uploader"
-          showUploadList={false} ref={picture} name="avaar"
+          showUploadList={false} ref={picture}
+          name="avaar"
           onChange={e => {
             local.data.avatar = e.file
             const reader = new FileReader();

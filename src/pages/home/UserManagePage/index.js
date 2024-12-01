@@ -6,6 +6,7 @@ import apis from '../../../api'
 import { FullHeight, FullHeightFix, FullHeightAuto, Right } from '../../../component/style'
 import { useEffectOnce } from 'react-use';
 import Edit from './edit'
+import store from '../../../store'
 
 const { Column } = Table;
 
@@ -63,8 +64,10 @@ export default function UserManagePage() {
             local.search_page = page.current
             search()
           }}>
-          {/* <Column title="id" width={100} dataIndex="id" key="id" render={text => <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block', width: '100%' }}>{text}</span>} /> */}
-          <Column title="id" dataIndex="_id" key="id" />
+          <Column title="id" width={100} dataIndex="_id" key="_id" render={text => <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block', width: '100%' }}>{text}</span>} />
+          <Column title="头像" dataIndex="avatar" key="avatar" render={avatar => (
+            avatar ? <img src={store.app.imageLine + avatar} style={{ width: 50 }} /> : null
+          )} />
           <Column title="昵称" dataIndex="nickname" key="nickname" render={text => {
             return <a href={text} target="_blank">{text}</a>
           }} />
