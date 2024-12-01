@@ -36,10 +36,22 @@ export function createUser(data) {
 }
 
 export function updateUser(data) {
+  const { _id, ...info } = data;
+  const form = new FormData()
+  for (let k in info) {
+    if (info[k] instanceof Array) {
+      info[k].forEach(v => {
+        form.append(k, v)
+      })
+    } else {
+      form.append(k, info[k])
+    }
+
+  }
   return shttp({
-    url: `/v1/admin/users/${data._id}`,
+    url: `/v1/admin/users/${_id}`,
     method: 'PUT',
-    data
+    data: form
   })
 }
 
