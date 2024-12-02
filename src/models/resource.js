@@ -39,6 +39,7 @@ export default types.model('Resource', {
     path: types.string,
     title: types.optional(types.string, ''),
   })), []),
+  actors: types.array(types.model({ _id: types.string, name: types.string })),
   status: types.number,
   types: types.optional(types.array(types.string), []),
   series: types.optional(types.string, ''),

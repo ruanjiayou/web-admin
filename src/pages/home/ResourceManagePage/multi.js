@@ -1,9 +1,9 @@
-import React, { useCallback, Fragment, useRef } from 'react';
+import React, { useCallback, Fragment, useRef, useState, useMemo } from 'react';
 import { useEffectOnce } from 'react-use'
 import { Observer, useLocalStore } from 'mobx-react-lite'
 import { Link } from 'react-router-dom';
 import apis from '../../../api'
-import { Button, notification, Input, Form, Tag, Upload, Select, Divider, Switch, message, Modal, Radio, Row, Col, Popover } from 'antd';
+import { Button, notification, Input, Form, Tag, Upload, Select, Divider, Switch, message, Modal, Radio, Row, Col, Popover, Spin } from 'antd';
 import { SortListView, VisualBox } from '../../../component'
 import Icon from '../../../component/Icon'
 import qs from 'qs'
@@ -22,7 +22,8 @@ import StreamInfo from '../../../utils/stream';
 import Clipboard from 'react-clipboard.js';
 
 const Option = Select.Option;
-const omit_keys = ['images', 'videos', 'counter'];
+const omit_keys = ['images', 'videos', 'counter', 'actors'];
+const debounceTimeout = 800;
 function deepEqual(a, b, omits) {
   const keys = Array.from(new Set([...Object.keys(a), ...Object.keys(b)]));
   for (let i = 0; i < keys.length; i++) {
@@ -53,13 +54,12 @@ export default function ResourceEdit() {
   const inputType = useRef(null)
   const inputUrl = useRef(null)
   const inputImage = useRef(null)
-  const inputCaption = useRef(null)
   const inputAudio = useRef(null)
   const lb = { span: 3 }, rb = { span: 18 }
   const query = qs.parse(window.location.search.substr(1))
   const local = useLocalStore(() => ({
     _id: query._id,
-    data: { tags: [], types: [], children: [], videos: [], images: [], audios: [], captions: [], content: '', source_type: '', country: '', status: 1, },
+    data: { tags: [], types: [], children: [], videos: [], images: [], audios: [], actors: [], captions: [], content: '', source_type: '', country: '', status: 1, },
     origin: {},
     stream_path: '',
     // 临时
@@ -75,8 +75,20 @@ export default function ResourceEdit() {
     typeAddVisible: false,
     tempUrl: '',
     tempImage: '',
+    tempActor: { _id: '', name: '' },
     tempCaption: '',
     tempAudio: '',
+    options: [],
+    setOptions(arr) {
+      local.options = arr;
+    },
+    removeActor(_id) {
+      const index = local.data.actors.findIndex(a => a._id === _id);
+      if (index !== -1) {
+        local.data.actors.splice(index, 1);
+      }
+    },
+    actorVisible: false,
     urlAddVisible: false,
     imageAddVisible: false,
     captionAddVisible: false,
@@ -105,15 +117,38 @@ export default function ResourceEdit() {
         })
       }
     }
-  }))
+  }));
+  const [fetching, setFetching] = useState(false);
+
+  const debounceFetcher = useMemo(() => {
+    const loadOptions = (q) => {
+      if (fetching) {
+        return;
+      }
+      local.setOptions([])
+      setFetching(true);
+
+      apis.getUsers({ q }).then(resp => {
+        let newOptions = [];
+        if (resp.code === 0) {
+          newOptions = resp.data.map(it => ({ label: it.nickname, value: it._id }));
+        }
+        local.setOptions(newOptions)
+        setFetching(false);
+      });
+    };
+
+    return _.debounce(loadOptions, debounceTimeout);
+  }, [apis.getUsers, debounceTimeout]);
   const onEdit = useCallback(async (sync = true) => {
-    const changed = !deepEqual(toJS(local.origin), toJS(local.data), omit_keys);
+    const data = _.omit(toJS(local.data), omit_keys)
+    const changed = !deepEqual(toJS(local.origin), data, omit_keys);
     if (!changed) {
       notification.info({ message: '数据未改动' })
       return;
     }
     local.loading = true
-    const resp = local.data._id ? await apis.updateResource(local.data, sync) : await api.createResource(local.data);
+    const resp = local.data._id ? await apis.updateResource(data, sync) : await api.createResource(data);
     if (resp && resp.code === 0) {
       notification.info({ message: '编辑成功' })
       local.origin = resp.data;
@@ -373,6 +408,47 @@ export default function ResourceEdit() {
               </CenterXY>
             </Upload>
           </FullWidth>
+        </Form.Item>
+        <Form.Item label="演员" labelCol={lb} wrapperCol={rb}>
+          {local.data.actors.map(actor => (
+            <Input style={{ width: 300, marginBottom: 10 }} value={actor.name} key={actor._id} readOnly addonAfter={<CloseOutlined onClick={() => {
+              local.removeActor(actor._id);
+              apis.updateResourceActor(local._id, { actors: local.data.actors });
+            }} />} />
+          ))}
+          {local.actorVisible && (
+            <div>
+              <Select
+                showSearch
+                filterOption={false}
+                style={{ width: 300 }}
+                onSelect={(key, value) => {
+                  console.log(key, value, 'se')
+                  local.tempActor = { _id: value.value, name: value.label }
+                }}
+                onSearch={debounceFetcher}
+                loading={fetching}
+                notFoundContent={fetching ? <Spin size="small" /> : null}
+                options={local.options}
+              />
+              <Divider type='vertical' />
+              <Icon type="check" onClick={() => {
+                if (local.tempActor._id && local.data.actors.findIndex(a => a._id === local.tempActor._id) === -1) {
+                  local.data.actors.push({ ...local.tempActor });
+                  apis.updateResourceActor(local._id, { actors: local.data.actors });
+                }
+              }} />
+              <Divider type='vertical' />
+              <CloseOutlined onClick={() => { local.actorVisible = false; local.tempActor = { _id: '', name: '' } }} />
+            </div>
+          )}
+          {!local.actorVisible && (
+            <div>
+              <Tag style={{ margin: 5, background: '#fff', borderStyle: 'dashed' }}>
+                <PlusCircleOutlined onClick={() => local.actorVisible = true} />
+              </Tag>
+            </div>
+          )}
         </Form.Item>
         <VisualBox visible={local.data.source_name === 'youtube' || local.data.source_name === 'youtube_shorts' || ['youtube_short', 'youtube_video'].includes(local.data.spider_id)}>
           <Form.Item label="youtube下载设置">

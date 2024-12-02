@@ -29,14 +29,15 @@ export function getVideo(_id) {
 export function createResource(data) {
   const form = new FormData()
   for (let k in data) {
-    if (data[k] instanceof Array) {
+    if (data[k] instanceof File || data[k] instanceof Blob) {
+      form.append(k, data[k])
+    } else if (data[k] instanceof Array) {
       data[k].forEach(v => {
         form.append(k, v)
       })
     } else {
-      form.append(k, data[k])
+      form.append(k, data[k]);
     }
-
   }
   return shttp({
     url: `/v1/admin/resource`,
@@ -51,12 +52,14 @@ export function createResource(data) {
 export function updateResource(data, sync = false) {
   const form = new FormData()
   for (let k in data) {
-    if (data[k] instanceof Array) {
-      for (let i = 0; i < data[k].length; i++) {
-        form.append(k, data[k][i])
-      }
-    } else {
+    if (data[k] instanceof File || data[k] instanceof Blob) {
       form.append(k, data[k])
+    } else if (data[k] instanceof Array) {
+      data[k].forEach(v => {
+        form.append(k, v)
+      })
+    } else {
+      form.append(k, data[k]);
     }
   }
   return shttp({
@@ -70,6 +73,14 @@ export function destroyResource(params) {
   return shttp({
     url: `/v1/admin/resource/${params._id}`,
     method: 'DELETE',
+  })
+}
+
+export function updateResourceActor(_id, data) {
+  return shttp({
+    url: `/v1/admin/resource/${_id}/actors`,
+    method: 'PUT',
+    data,
   })
 }
 
