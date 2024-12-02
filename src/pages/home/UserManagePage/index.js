@@ -27,6 +27,7 @@ export default function UserManagePage() {
     apis.getUsers(query).then(res => {
       local.isLoading = false
       local.users = res.data
+      local.count = res.count;
     }).catch(() => {
       local.isLoading = false
     })
@@ -57,7 +58,7 @@ export default function UserManagePage() {
           scroll={{ y: 'calc(100vh - 240px)' }}
           loading={local.isLoading}
           pagination={{
-            pageSize: 200,
+            pageSize: 20,
             current: local.search_page,
             total: local.count,
           }} onChange={(page) => {
