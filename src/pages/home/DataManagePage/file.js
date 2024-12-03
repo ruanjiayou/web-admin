@@ -154,10 +154,7 @@ export default function TaskList() {
           </Upload>
           <Divider type="vertical" />
           <Button disabled={local.chosen_files.length === 0} loading={local.isExcuting} onClick={() => {
-            if (outputRef.current) {
-              outputRef.current.value = ''
-              outputRef.current.state.value = '';
-            }
+            local.template_data.filename = '';
             local.show_cmd = true;
           }}>执行命令</Button>
           <Divider type="vertical" />
@@ -173,7 +170,7 @@ export default function TaskList() {
         </Right>
       </FullHeightFix>
       <Modal
-        visible={local.showModal}
+        open={local.showModal}
         okText="创建"
         cancelText="取消"
         closable={false}
@@ -219,7 +216,7 @@ export default function TaskList() {
         {local.createType === 'file' && <TextArea id="txt" style={{ marginTop: 10 }} disabled={local.isLoading}></TextArea>}
       </Modal>
       <Modal
-        visible={local.show_cmd}
+        open={local.show_cmd}
         footer={<div style={{ textAlign: 'right' }}>
           <Button type="ghost" onClick={() => { local.show_cmd = false }}>取消</Button>
           <Button type="primary" disabled={local.isExcuting} onClick={async () => {
@@ -268,7 +265,7 @@ export default function TaskList() {
               <Select.Option value={tpl.name} key={tpl.name}>{tpl.title}</Select.Option>
             ))}
           </Select>}
-          defaultValue={''}
+          value={local.template_data.filename}
           disabled={local.isExcuting}
           placeholder={local.template_data.placeholder}
           ref={ref => outputRef.current = ref}
