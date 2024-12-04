@@ -44,8 +44,7 @@ export default types.model('Resource', {
   types: types.optional(types.array(types.string), []),
   series: types.optional(types.string, ''),
   publishedAt: types.maybeNull(types.optional(types.string, '')),
-  words: types.maybe(types.number),
-  duration: types.maybe(types.number),
+  size: types.maybe(types.number),
 }).actions(self => ({
   setKV(key, value) {
     self[key] = value

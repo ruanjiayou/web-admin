@@ -272,7 +272,7 @@ export default function ResourceList({ items, children, categories, search, loca
           <p style={{ maxHeight: '250px', overflowY: 'auto' }}>{state.resource.content}</p>
           <div><Label>创建时间:</Label> {new Date(state.resource.createdAt).toISOString()}</div>
           <div><Label>发布时间:</Label> {state.resource.publishedAt ? new Date(state.resource.publishedAt).toISOString() : state.resource.publishedAt}</div>
-          <div><Label>时长:</Label> {state.resource.words}</div>
+          <div><Label>时长:</Label> {state.resource.size}</div>
           <div><Label>图片({state.resource.images.length})</Label></div>
           {state.resource.images.map(m => <img src={m.path} style={{ width: '100%' }} />)}
           <div><Label>视频({state.resource.videos.length})</Label></div>
