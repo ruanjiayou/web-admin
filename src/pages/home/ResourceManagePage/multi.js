@@ -410,7 +410,7 @@ export default function ResourceEdit() {
           </FullWidth>
         </Form.Item>
         <Form.Item label="演员" labelCol={lb} wrapperCol={rb}>
-          {local.data.actors.map(actor => (
+          {(local.data.actors || []).map(actor => (
             <Input style={{ width: 300, marginBottom: 10 }} value={actor.name} key={actor._id} readOnly addonAfter={<CloseOutlined onClick={() => {
               local.removeActor(actor._id);
               apis.updateResourceActor(local._id, { actors: local.data.actors });
@@ -488,6 +488,63 @@ export default function ResourceEdit() {
             }}>选择youtube</Button>
           </Form.Item>
         </VisualBox>
+        <Form.Item label="章节列表" labelCol={lb} wrapperCol={rb}>
+          <SortListView
+            isLoading={local.loading}
+            direction="vertical"
+            mode="edit"
+            handler={<Icon type="drag" style={{ marginRight: 10 }} />}
+            sort={async (oldIndex, newIndex) => {
+              local.loading = false
+              try {
+                const items = local.data.chapters.map(item => item)
+                const item = items.splice(oldIndex, 1);
+                items.splice(newIndex, 0, ...item)
+                local.data.chapters = items
+                local.data.chapters.forEach((t, i) => t.nth = i + 1)
+                await api.sortSubResource(local._id, 'chapter', local.data.chapters.map((t, i) => ([{ mid: local._id, _id: t._id }, { nth: t.nth }])));
+              } finally {
+                local.loading = false
+              }
+            }}
+            items={local.data.chapters}
+            droppableId={'image'}
+            listStyle={{ boxSizing: 'border-box' }}
+            itemStyle={{ display: 'flex', alignItems: 'center', lineHeight: 1, marginBottom: 5, backgroundColor: 'transparent' }}
+            renderItem={({ item, index }) => (
+              <Observer>{() => (
+                <FullHeight style={{ flex: 1 }}>
+                  <Input
+                    key={index}
+                    value={item.title}
+                    disabled
+                    className="custom"
+                    style={item.status === store.constant.RESOURCE_STATUS.finished ? { backgroundColor: '#00b578', color: 'white' } : { backgroundColor: '#ff8f1f' }}
+                    addonBefore={<Observer>{() => (
+                      <Fragment>
+                        <Select style={{ width: 90 }} value={item.status} onChange={async (status) => {
+                          item.loading = true
+                          try {
+                            await api.updateResourceImage(local._id, { _id: item._id, status })
+                            item.status = status
+                          } finally {
+                            item.loading = false
+                          }
+                        }}>
+                          <Option value={store.constant.MEDIA_STATUS.init}>初始化</Option>
+                          <Option value={store.constant.MEDIA_STATUS.loading}>下载中</Option>
+                          <Option value={store.constant.MEDIA_STATUS.finished}>已下载</Option>
+                          <Option value={store.constant.MEDIA_STATUS.fail}>失败</Option>
+                        </Select>
+                        <span style={{ padding: 5 }}>{item.nth}</span>
+                      </Fragment>
+                    )}</Observer>}
+                  />
+                </FullHeight>
+              )}</Observer>
+            )}
+          />
+        </Form.Item>
         <Form.Item label={<span>视频列表<br /><Switch checked={local.fullEditVideo} onClick={e => {
           local.fullEditVideo = !local.fullEditVideo;
         }} /></span>} labelCol={lb} wrapperCol={rb}>
@@ -497,19 +554,14 @@ export default function ResourceEdit() {
             mode="edit"
             handler={<Icon type="drag" style={{ marginRight: 10 }} />}
             sort={async (oldIndex, newIndex) => {
-              const data = local.data.videos.map(item => ({ _id: item._id, url: item.url }))
-              const _id = data.splice(oldIndex, 1)
-              data.splice(newIndex, 0, ..._id)
-              data.forEach((d, i) => {
-                d.nth = i + 1
-              })
               local.loading = false
               try {
-                await api.sortResourceVideo({ _id: local._id, data })
                 const items = local.data.videos.map(item => item)
                 const item = items.splice(oldIndex, 1);
                 items.splice(newIndex, 0, ...item)
                 local.data.videos = items
+                local.data.videos.forEach((t, i) => t.nth = i + 1)
+                await api.sortSubResource(local._id, 'video', local.data.videos.map((t, i) => ([{ mid: local._id, _id: t._id }, { nth: t.nth }])));
               } finally {
                 local.loading = false
               }
@@ -752,19 +804,14 @@ export default function ResourceEdit() {
             mode="edit"
             handler={<Icon type="drag" style={{ marginRight: 10 }} />}
             sort={async (oldIndex, newIndex) => {
-              const data = local.data.images.map(item => ({ _id: item._id, url: item.url }))
-              const _id = data.splice(oldIndex, 1)
-              data.splice(newIndex, 0, ..._id)
-              data.forEach((d, i) => {
-                d.nth = i + 1
-              })
               local.loading = false
               try {
-                await api.sortResourceImage({ _id: local._id, data })
                 const items = local.data.images.map(item => item)
                 const item = items.splice(oldIndex, 1);
                 items.splice(newIndex, 0, ...item)
                 local.data.images = items
+                local.data.images.forEach((t, i) => t.nth = i + 1);
+                await api.sortSubResource(local._id, 'image', local.data.images.map((t, i) => ([{ mid: local._id, _id: t._id }, { nth: t.nth }])));
               } finally {
                 local.loading = false
               }
@@ -966,19 +1013,14 @@ export default function ResourceEdit() {
               mode="edit"
               handler={<Icon type="drag" style={{ marginRight: 10 }} />}
               sort={async (oldIndex, newIndex) => {
-                const data = local.data.audios.map(item => ({ _id: item._id, url: item.url }))
-                const _id = data.splice(oldIndex, 1)
-                data.splice(newIndex, 0, ..._id)
-                data.forEach((d, i) => {
-                  d.nth = i + 1
-                })
                 local.loading = false
                 try {
-                  await api.sortResourceAudio({ _id: local._id, data })
                   const items = local.data.audios.map(item => item)
                   const item = items.splice(oldIndex, 1);
                   items.splice(newIndex, 0, ...item)
                   local.data.audios = items
+                  local.data.audios.forEach((t, i) => t.nth = i + 1);
+                  await api.sortSubResource(local._id, 'audio', local.data.audios.map((t, i) => ([{ mid: local._id, _id: t._id }, { nth: t.nth }])));
                 } finally {
                   local.loading = false
                 }
@@ -1170,13 +1212,13 @@ export default function ResourceEdit() {
             local.loading = true
             const size = videoItem.size + audioItem.size;
             const more = { size, width: videoItem.width, height: videoItem.height };
-            const res = await api.addResourceVideo({ _id: local._id, title: '', url, type: store.constant.VIDEO_TYPE.normal, status: store.constant.MEDIA_STATUS.init, more, ext: videoItem.ext, more: videoItem })
-            if (res && res.code === 0) {
-              local.data.videos.push({ url: res.data.url, path: res.data.path, _id: res.data._id, status: store.constant.MEDIA_STATUS.init, type: store.constant.VIDEO_TYPE.normal, more, nth: local.data.videos.length, })
-              local.urlAddVisible = false
-            } else {
-              notification.info('fail')
-            }
+            // const res = await api.addResourceVideo({ _id: local._id, title: '', url, type: store.constant.VIDEO_TYPE.normal, status: store.constant.MEDIA_STATUS.init, more, ext: videoItem.ext, more: videoItem })
+            // if (res && res.code === 0) {
+            //   local.data.videos.push({ url: res.data.url, path: res.data.path, _id: res.data._id, status: store.constant.MEDIA_STATUS.init, type: store.constant.VIDEO_TYPE.normal, more, nth: local.data.videos.length, })
+            //   local.urlAddVisible = false
+            // } else {
+            //   notification.info('fail')
+            // }
           } finally {
             local.loading = false;
             local.tempUrl = '';

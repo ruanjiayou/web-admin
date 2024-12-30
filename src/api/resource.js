@@ -128,6 +128,14 @@ export function removeResourceVideo({ _id, mid }) {
   })
 }
 
+export function sortSubResource(_id, type, batch) {
+  return shttp({
+    url: `/v1/admin/resource/${_id}/sort/${type}`,
+    method: 'PUT',
+    data: batch,
+  });
+}
+
 export function sortResourceVideo({ _id, data }) {
   return shttp({
     url: `/v1/admin/resource/${_id}/video`,

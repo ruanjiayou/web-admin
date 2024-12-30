@@ -79,6 +79,8 @@ export default function ResourceList({ items, children, categories, search, loca
               url += ('/novel/groups/GroupTree/Image?GroupTree.name=image&Image.id=' + record._id)
             } else if (record.source_type === 'post') {
               url += ('/novel/home/Post?home.tab=QD7vNfJCU&Post.id=' + record._id)
+            } else if(record.source_type === 'comic') {
+              url += ('/novel/home/ComicInfo?home.tab=QD7vNfJCU&ComicInfo.id=' + record._id)
             }
             return <Fragment>
               <a style={{ color: '#1890ff', cursor: 'pointer' }} className='line2' title={url} href={url} onClick={(e) => {
@@ -203,8 +205,6 @@ export default function ResourceList({ items, children, categories, search, loca
 			)} /> */}
           <Column title="操作" width={90} dataIndex="action" key="action" align="center" render={(text, record) => (
             <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly' }}>
-              <FormOutlined title="快速编辑" onClick={() => { props.fastEdit(record) }} />
-              <Divider type="vertical" />
               <Popconfirm title="确定同步到es?" okText="确定" cancelText="取消" icon={<WarningOutlined />} onConfirm={async () => {
                 if (state.syncItems[record._id]) {
                   alert('正在同步中...')
@@ -219,14 +219,8 @@ export default function ResourceList({ items, children, categories, search, loca
               }}>
                 <SyncOutlined title='同步es' spin={state.syncItems[record._id] ? true : false} />
               </Popconfirm>
-              <VisualBox visible={['article', 'post'].includes(record.source_type)}>
-                <Divider type="vertical" />
-                <Link title="编辑" style={{ display: 'inherit' }} to={'/admin/home/resource-manage/edit-multi?_id=' + record._id} target="_blank"><FormOutlined /></Link>
-              </VisualBox>
-              <VisualBox visible={['video', 'image', 'music', 'movie', 'animation'].includes(record.source_type)}>
-                <Divider type="vertical" />
-                <Link title="编辑" style={{ display: 'inherit' }} target="_blank" to={'/admin/home/resource-manage/edit-multi?_id=' + record._id} ><FormOutlined /></Link>
-              </VisualBox>
+              <Divider type="vertical" />
+              <Link title="编辑" style={{ display: 'inherit' }} to={'/admin/home/resource-manage/edit-multi?_id=' + record._id} target="_blank"><FormOutlined /></Link>
               <Divider type="vertical" />
               <VisualBox visible={record.source_type === 'movie' && record.status === store.constant.MEDIA_STATUS.loading}>
                 <DownloadOutlined onClick={() => {
