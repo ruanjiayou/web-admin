@@ -132,9 +132,7 @@ export default function TaskList() {
             onChange={async (e) => {
               local.uploading = true
               try {
-                const res = await createFile({
-                  isdir: 0,
-                  param: local.dirpath,
+                const res = await createFile(local.dirpath, {
                   name: e.file.name,
                   upfile: e.file
                 })
@@ -159,7 +157,6 @@ export default function TaskList() {
           }}>执行命令</Button>
           <Divider type="vertical" />
           <Button onClick={() => {
-            ;
             local.showModal = true
             setTimeout(() => {
               nameRef.current && nameRef.current.input.focus()
@@ -187,7 +184,7 @@ export default function TaskList() {
               if (otxt) {
                 txt = otxt.value;
               }
-              const res = await createFile({ isDir: local.createType === 'dir' ? 1 : 0, param: local.dirpath, name: dirname, content: txt })
+              const res = await createFile(local.dirpath + dirname, { content: txt })
               if (res && res.code === 0) {
                 oinput.value = ''
                 nameRef.current.state.value = ''

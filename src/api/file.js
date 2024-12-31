@@ -7,20 +7,19 @@ export function getFiles({ param = '/' }) {
     })
 }
 // dirpath isdir name
-export function createFile(data) {
-    const { param, ...fileds } = data
+export function createFile(filepath, fields) {
     const form = new FormData()
-    for (let k in fileds) {
-        if (fileds[k] instanceof Array) {
-            fileds[k].forEach(v => {
+    for (let k in fields) {
+        if (fields[k] instanceof Array) {
+            fields[k].forEach(v => {
                 form.append(k, v)
             })
         } else {
-            form.append(k, fileds[k])
+            form.append(k, fields[k])
         }
     }
     return shttp({
-        url: `/v1/admin/file${param}`,
+        url: `/v1/admin/file${filepath}`,
         method: 'POST',
         headers: {
             'Content-Type': 'multipart/form-data;charset=UTF-8'
