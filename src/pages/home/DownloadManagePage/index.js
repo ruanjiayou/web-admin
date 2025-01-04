@@ -133,6 +133,7 @@ export default function Page() {
             }}>
               <Select.Option value="">全部</Select.Option>
               <Select.Option value="image">图片</Select.Option>
+              <Select.Option value="gallery">图集</Select.Option>
               <Select.Option value="m3u8">m3u8</Select.Option>
               <Select.Option value="mp4">mp4</Select.Option>
             </Select>
@@ -186,7 +187,7 @@ export default function Page() {
               <LinkOutlined />
             </a>
             &nbsp;&nbsp;
-            {task.type === 'image' ? <FileImageOutlined /> : <VideoCameraOutlined />}
+            {['image', 'gallery'].includes(task.type) ? <FileImageOutlined /> : <VideoCameraOutlined />}
           </Fragment>
         )} />
         <Column title="名称" width={200} dataIndex={'name'} render={(name, task) => (
@@ -213,7 +214,7 @@ export default function Page() {
             return <div>已解析&nbsp;<PlayCircleOutlined onClick={async () => {
               try {
                 local.loading = true;
-                await axios.post(`${download_api_url}/excute/start`, { id: task._id });
+                await axios.post(`${download_api_url}/excute/start`, { _id: task._id });
                 local.setById(task._id, { status: 2 })
               } catch (e) {
                 message.error('启动下载失败')

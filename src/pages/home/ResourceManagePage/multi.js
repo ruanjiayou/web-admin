@@ -22,7 +22,7 @@ import StreamInfo from '../../../utils/stream';
 import Clipboard from 'react-clipboard.js';
 
 const Option = Select.Option;
-const omit_keys = ['images', 'videos', 'counter', 'actors'];
+const omit_keys = ['images', 'audios', 'videos', 'counter', 'actors', 'original', 'chapters'];
 const debounceTimeout = 800;
 function deepEqual(a, b, omits) {
   const keys = Array.from(new Set([...Object.keys(a), ...Object.keys(b)]));
@@ -453,7 +453,7 @@ export default function ResourceEdit() {
         <VisualBox visible={local.data.source_name === 'youtube' || local.data.source_name === 'youtube_shorts' || ['youtube_short', 'youtube_video'].includes(local.data.spider_id)}>
           <Form.Item label="youtube下载设置">
             <Button onClick={e => {
-              local.video_formats = local.data.original.formats.filter(item => item.video_ext !== 'none' && item.filesize).sort((a, b) => b.filesize - a.filesize).map(item => ({
+              local.video_formats = local.data.original.formats.filter(item => item.video_ext !== 'none' && item.filesize && item.height >= 720).sort((a, b) => b.filesize - a.filesize).map(item => ({
                 ext: item.ext,
                 url: item.url,
                 quality: item.format_note,
@@ -623,18 +623,17 @@ export default function ResourceEdit() {
                           <Icon type={item.loading && item.status === store.constant.MEDIA_STATUS.loading ? 'loading' : 'download'} disabled={item.loading} onClick={async (e) => {
                             item.loading = true
                             try {
-                              const type = item.url.includes('.m3u8') ? 'm3u8' : 'mp4';
+                              const type = item.url.includes('.m3u8') ? 'm3u8' : (['youtube_short', 'youtube_video'].includes(local.data.spider_id) ? 'youtube' : 'mp4');
                               const data = {
                                 _id: item._id,
                                 url: item.url,
                                 filepath: item.path,
                                 type,
-                                params: { total: _.get(item, 'more.size', 0), finished: 0 },
+                                params: { total: _.get(item, 'more.size', 0), finished: 0, format: type === 'youtube' ? item.more.format : undefined },
                                 transcode: type === 'm3u8' ? 1 : 0,
                               }
                               const resp = await Axios.post(`https://192.168.0.124/gw/download/tasks?auto=1`, data)
                               if (resp.status === 200 && resp.data.code === 0) {
-                                await api.updateResourceVideo(local._id, { _id: item._id, status: store.constant.MEDIA_STATUS.loading })
                                 item.status = store.constant.MEDIA_STATUS.loading
                               } else {
                                 message.error('失败：' + resp.body.message)
@@ -795,7 +794,7 @@ export default function ResourceEdit() {
             </Tag>
           )}
         </Form.Item>
-        <Form.Item label={<span>图片列表<br /><Switch checked={local.fullEditVideo} onClick={e => {
+        <Form.Item label={<span>图片列表<br /><Switch checked={local.fullEditImage} onClick={e => {
           local.fullEditImage = !local.fullEditImage;
         }} /></span>} labelCol={lb} wrapperCol={rb}>
           <SortListView
@@ -1200,25 +1199,26 @@ export default function ResourceEdit() {
       bodyStyle={{ height: 500, overflow: 'auto' }}
       onCancel={local.cancelFormat}
       onOk={async () => {
-        const videoItem = local.video_formats.find(item => item._id === local.video_format_id)
-        const audioItem = local.audio_formats.find(item => item._id === local.audio_format_id)
+        const videoItem = local.video_formats.find(item => item.id === local.video_format_id)
+        const audioItem = local.audio_formats.find(item => item.id === local.audio_format_id)
         if (videoItem && audioItem) {
           if (local.isDealUrl) {
             return;
           }
-          let url = 'https://googlevideo.com/' + videoItem._id + '+' + audioItem._id + '.' + videoItem.ext
+          const format = videoItem.id + '+' + audioItem.id;
+          let url = 'https://googlevideo.com/' + format + '.' + videoItem.ext
           local.isDealUrl = true
           try {
             local.loading = true
             const size = videoItem.size + audioItem.size;
-            const more = { size, width: videoItem.width, height: videoItem.height };
-            // const res = await api.addResourceVideo({ _id: local._id, title: '', url, type: store.constant.VIDEO_TYPE.normal, status: store.constant.MEDIA_STATUS.init, more, ext: videoItem.ext, more: videoItem })
-            // if (res && res.code === 0) {
-            //   local.data.videos.push({ url: res.data.url, path: res.data.path, _id: res.data._id, status: store.constant.MEDIA_STATUS.init, type: store.constant.VIDEO_TYPE.normal, more, nth: local.data.videos.length, })
-            //   local.urlAddVisible = false
-            // } else {
-            //   notification.info('fail')
-            // }
+            const more = { size, width: videoItem.width, height: videoItem.height, format };
+            const res = await api.addResourceVideo({ _id: local._id, title: '', url, type: store.constant.VIDEO_TYPE.normal, status: store.constant.MEDIA_STATUS.init, more, nth: local.data.videos.length })
+            if (res && res.code === 0) {
+              local.data.videos.push({ url: res.data.url, path: res.data.path, _id: res.data._id, status: store.constant.MEDIA_STATUS.init, type: store.constant.VIDEO_TYPE.normal, more, nth: local.data.videos.length, })
+              local.urlAddVisible = false
+            } else {
+              notification.info('fail')
+            }
           } finally {
             local.loading = false;
             local.tempUrl = '';
@@ -1238,10 +1238,10 @@ export default function ResourceEdit() {
       <Radio.Group style={{ width: '100%' }} name="video" defaultValue="" onChange={e => {
         local.video_format_id = e.target.value
       }}>
-        {local.video_formats.map(item => (<FullWidth key={item.id}>
+        {local.video_formats.map(item => (<FullWidth key={item.id} style={{ fontSize: 12 }}>
           <FullWidthFix><Radio name="video" value={item.id} /></FullWidthFix>
           <FullWidthFix style={{ width: '15%' }}>{item.ext}</FullWidthFix>
-          <FullWidthFix style={{ width: '20%' }}>{item.quality}</FullWidthFix>
+          <FullWidthFix style={{ width: '30%' }}>{item.quality}</FullWidthFix>
           <FullWidthFix style={{ width: '20%' }}>{item.resolution}</FullWidthFix>
           <FullWidthFix style={{ width: '20%' }}>{item.filesize}</FullWidthFix>
         </FullWidth>))}
@@ -1250,15 +1250,15 @@ export default function ResourceEdit() {
       <Radio.Group style={{ width: '100%' }} name="audio" defaultValue="" onChange={e => {
         local.audio_format_id = e.target.value
       }}>
-        {local.audio_formats.map(item => (<FullWidth key={item.id}>
+        {local.audio_formats.map(item => (<FullWidth key={item.id} style={{ fontSize: 12 }}>
           <FullWidthFix><Radio name="audio" value={item.id} /></FullWidthFix>
           <FullWidthFix style={{ width: '15%' }}>{item.ext}</FullWidthFix>
-          <FullWidthFix style={{ width: '20%' }}>{item.quality}</FullWidthFix>
+          <FullWidthFix style={{ width: '30%' }}>{item.quality}</FullWidthFix>
           <FullWidthFix style={{ width: '20%' }}>{item.resolution}</FullWidthFix>
           <FullWidthFix style={{ width: '20%' }}>{item.filesize}</FullWidthFix>
         </FullWidth>))}
       </Radio.Group>
-      <span>subtitle</span>
+      {/* <span>subtitle</span>
       <Radio.Group style={{ width: '100%' }} name="subtitles" defaultValue="" onChange={e => {
         local.subtitle_url = e.target.value
       }}>
@@ -1269,7 +1269,7 @@ export default function ResourceEdit() {
           <FullWidthFix style={{ width: '60%', overflow: 'hidden' }}>{item.url}</FullWidthFix>
         </FullWidth>))
         }
-      </Radio.Group>
+      </Radio.Group> */}
     </Modal>}</Observer>
     <div style={{ display: local.stream_path ? 'block' : 'none', position: 'absolute', top: '50%', transform: 'translate(0, -50%)', right: 17, backgroundColor: 'wheat' }}>
       <StreamInfo filepath={local.stream_path} onClose={() => local.stream_path = ''} />
