@@ -36,7 +36,7 @@ export default function Filter({ self, ...props }) {
       </VisualBox>}
       renderItem={({ item }) => <FilterRow self={item} {...props} />}
     />
-    <div style={{ maxHeight: 400, overflowY: 'auto', overflowX: 'hidden', }}>
+    <div style={{ maxHeight: 640, overflowY: 'auto', overflowX: 'hidden', }}>
       {self.data.map(item => <ItemView key={item.id} item={item} />)}
     </div>
   </div>}</Observer>

@@ -152,7 +152,7 @@ export default function GroupEdit({ group, onClose, openPick }) {
                     let params = {}
                     if (jsoneditor.current) {
                       try {
-                        params = JSON.parse(jsoneditor.current.state.value)
+                        params = JSON.parse(jsoneditor.current.resizableTextArea.textArea.value)
                         local.paramsError = false
                         group.setKey('params', params)
                       } catch (err) {
