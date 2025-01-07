@@ -525,7 +525,7 @@ export default function ResourceEdit() {
                         <Select style={{ width: 90 }} value={item.status} onChange={async (status) => {
                           item.loading = true
                           try {
-                            await api.updateResourceImage(local._id, { _id: item._id, status })
+                            await api.updateResourceChapter(local._id, { _id: item._id, status })
                             item.status = status
                           } finally {
                             item.loading = false

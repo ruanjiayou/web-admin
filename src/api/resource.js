@@ -76,6 +76,14 @@ export function destroyResource(params) {
   })
 }
 
+export function updateResourceChapter(_id, data) {
+  return shttp({
+    url: `/v1/admin/resource/${_id}/chapter/${data._id}`,
+    method: 'PUT',
+    data,
+  })
+}
+
 export function updateResourceActor(_id, data) {
   return shttp({
     url: `/v1/admin/resource/${_id}/actors`,
