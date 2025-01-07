@@ -22,6 +22,7 @@ import ComponentManagePage from './home/ComponentManagePage'
 import FeedbackPage from './home/FeedbackPage'
 import SpiderPage from './home/SpiderManagePage/spider'
 import VideoChapterPage from './home/ResourceManagePage/video-chapter'
+import MediaManagePage from './home/MediaManagePage'
 
 import {
   LinkOutlined,
@@ -69,6 +70,13 @@ const page_map = {
   'SpiderPage': SpiderPage,
   'DownloadPage': DownloadPage,
   'VideoChapterPage': VideoChapterPage,
+  'MediaChapterPage': MediaManagePage,
+  'MediaImagePage': MediaManagePage,
+  'MediaPixivPage': MediaManagePage,
+  'MediaGalleryPage': MediaManagePage,
+  'MediaVideoPage': MediaManagePage,
+  'MediaFilePage': MediaManagePage,
+  'MediaMusicPage': MediaManagePage,
 }
 export const icon_map = {
   LinkOutlined,

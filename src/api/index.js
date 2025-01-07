@@ -18,6 +18,7 @@ import * as search from './search'
 import * as component from './component'
 import * as feedback from './feedback'
 import * as videoChapter from './video-chapter'
+import * as media from './media'
 
 const boot = function () {
   return shttp({
@@ -65,4 +66,5 @@ export default {
   ...component,
   ...feedback,
   ...videoChapter,
+  ...media,
 }
