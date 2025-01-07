@@ -623,16 +623,11 @@ export default function ResourceEdit() {
                           <Icon type={item.loading && item.status === store.constant.MEDIA_STATUS.loading ? 'loading' : 'download'} disabled={item.loading} onClick={async (e) => {
                             item.loading = true
                             try {
-                              const type = item.url.includes('.m3u8') ? 'm3u8' : (['youtube_short', 'youtube_video'].includes(local.data.spider_id) ? 'youtube' : 'mp4');
-                              const data = {
-                                _id: item._id,
-                                url: item.url,
-                                filepath: item.path,
-                                type,
-                                params: { total: _.get(item, 'more.size', 0), finished: 0, format: type === 'youtube' ? item.more.format : undefined },
-                                transcode: type === 'm3u8' ? 1 : 0,
-                              }
-                              const resp = await Axios.post(`https://192.168.0.124/gw/download/tasks?auto=1`, data)
+                              const type = item.url.includes('.m3u8') ? 'm3u8' : (['youtube_short', 'youtube_video', 'bilibili_video'].includes(local.data.spider_id) ? 'dlp' : 'video');
+                              const resp = await Axios.post(`https://192.168.0.124/gw/download/download/${type}/${item._id}?force=1&autofill=1`, {
+                                data: { format: _.get(item, 'more.format', undefined), transcode: type === 'm3u8' ? 1 : 0, },
+                                opts: {},
+                              })
                               if (resp.status === 200 && resp.data.code === 0) {
                                 item.status = store.constant.MEDIA_STATUS.loading
                               } else {
@@ -902,13 +897,17 @@ export default function ResourceEdit() {
                           item.status = store.constant.MEDIA_STATUS.loading
                           item.loading = true
                           try {
-                            await api.downloadResourceImage(local._id, item._id)
-                            item.status = store.constant.MEDIA_STATUS.finished
+                            const type = local.data.spider_id === 'pixiv_image' ? 'pixiv' : 'image';
+                            const resp = await Axios.post(`https://192.168.0.124/gw/download/download/${type}/${item._id}?force=1&autofill=1`, {})
+                            if (resp.status === 200 && resp.data.code === 0) {
+                              item.status = store.constant.MEDIA_STATUS.loading
+                            } else {
+                              message.error('失败：' + resp.body.message)
+                            }
                           } finally {
                             item.loading = false
                           }
                         }} />
-
                       </FullWidth>
                     )}</Observer>}
                   />
