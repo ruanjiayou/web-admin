@@ -867,7 +867,36 @@ export default function ResourceEdit() {
                       }
                     }} />}
                     addonAfter={<Observer>{() => (<FullWidth>
-                      <Icon type="upload" disabled={item.loading} />
+                      <Upload
+                        showUploadList={false}
+                        name="file"
+                        disabled={item.loading && item.status === 'upload'}
+                        onChange={async (e) => {
+                          item.loading = true
+                          const segs = item.path.split('/');
+                          const name = segs.pop()
+                          const dirs = segs.join('/')
+                          try {
+                            const res = await apis.createFile(dirs, {
+                              name: name,
+                              upfile: e.file
+                            })
+                            if (res.code === 0) {
+                              message.info('上传成功')
+                              await api.updateResourceImage(local._id, { _id: item._id, status: store.constant.RESOURCE_STATUS.finished })
+                              item.status = store.constant.RESOURCE_STATUS.finished
+                            } else {
+                              message.info(res.message || '上传失败')
+                            }
+                          } catch (e) {
+                            message.error(e.message)
+                          } finally {
+                            item.loading = false
+                          }
+                        }}
+                        beforeUpload={() => false}>
+                        <UploadOutlined />
+                      </Upload>
                       <div style={{ width: 12 }}></div>
                       <Popover trigger={'click'} content={<img style={{ width: 120, height: 120 }} src={store.app.imageLine + item.path} />}>
                         <Icon type={'page-search'} />
