@@ -9,8 +9,8 @@ import { events } from '../../../utils/events';
 import { AlignAside } from '../../../component//style'
 import shortid from 'shortid';
 import { formatNumber } from '../../../utils/helper';
+import store from '../../../store';
 
-const download_api_url = 'https://192.168.0.124/gw/download';
 const { Column } = Table;
 const Item = Form.Item;
 
@@ -72,7 +72,7 @@ export default function Page() {
   const onSearch = useCallback(async () => {
     try {
       local.loading = true;
-      const resp = await axios.get(`${download_api_url}/tasks?page=${local.page}&page_size=${local.page_size}&status=${local.status}&type=${local.type}&search=${local.search}&search_type=${local.search_type}`);
+      const resp = await axios.get(`${store.constant.GW_DOWNLOAD}/tasks?page=${local.page}&page_size=${local.page_size}&status=${local.status}&type=${local.type}&search=${local.search}&search_type=${local.search_type}`);
       if (resp.status === 200) {
         const result = resp.data;
         if (result.code === 0) {
@@ -214,7 +214,7 @@ export default function Page() {
             return <div>已解析&nbsp;<PlayCircleOutlined onClick={async () => {
               try {
                 local.loading = true;
-                await axios.post(`${download_api_url}/excute/start`, { _id: task._id });
+                await axios.post(`${store.constant.GW_DOWNLOAD}/excute/start`, { _id: task._id });
                 local.setById(task._id, { status: 2 })
               } catch (e) {
                 message.error('启动下载失败')
@@ -226,7 +226,7 @@ export default function Page() {
             return <div>下载中&nbsp;<PoweroffOutlined onClick={async () => {
               try {
                 local.loading = true;
-                await axios.post(`${download_api_url}/excute/stop`, { id: task._id });
+                await axios.post(`${store.constant.GW_DOWNLOAD}/excute/stop`, { id: task._id });
                 local.setById(task._id, { status: 1 })
               } catch (e) {
                 message.error('停止下载失败')
@@ -238,7 +238,7 @@ export default function Page() {
             return <div>{task.transcode === 3 ? <Button type='primary' onClick={async () => {
               try {
                 local.loading = true;
-                await axios.post(`${download_api_url}/excute/move`, { id: task._id });
+                await axios.post(`${store.constant.GW_DOWNLOAD}/excute/move`, { id: task._id });
                 local.setById(task._id, { status: 5 })
               } catch (e) {
                 message.error('转移失败')
@@ -259,7 +259,7 @@ export default function Page() {
             {task.transcode === 1 && (task.status === 3 ? <Button disabled={local.loading} type='link' onClick={async () => {
               try {
                 local.loading = true;
-                axios.post(`${download_api_url}/excute/transcode`, { id: task._id });
+                axios.post(`${store.constant.GW_DOWNLOAD}/excute/transcode`, { id: task._id });
                 local.setById(task._id, { transcode: 2 })
                 local.loading = false;
               } finally {
@@ -282,7 +282,7 @@ export default function Page() {
               onConfirm={async () => {
                 try {
                   local.loading = true;
-                  await axios.delete(`${download_api_url}/tasks/${id}`);
+                  await axios.delete(`${store.constant.GW_DOWNLOAD}/tasks/${id}`);
                   await onSearch();
                 } catch (e) {
                   message.error('删除失败')
@@ -303,7 +303,7 @@ export default function Page() {
             <CheckOutlined onClick={async () => {
               try {
                 local.loading = true
-                const res = await axios.post(`${download_api_url}/excute/check`, { id: task._id });
+                const res = await axios.post(`${store.constant.GW_DOWNLOAD}/excute/check`, { id: task._id });
                 if (res.status === 200) {
                   res.data.code === 0 ? message.success('检查完毕') : message.error(res.data.message || '失败');
                 }
@@ -324,7 +324,7 @@ export default function Page() {
           local.loading = true
           try {
             local.loading = true;
-            const resp = local.edit_id ? await axios.put('https://192.168.0.124/gw/download/tasks/' + local.edit_id, local.data) : await axios.post('https://192.168.0.124/gw/download/tasks', local.data);
+            const resp = local.edit_id ? await axios.put(store.constant.GW_DOWNLOAD + '/tasks/' + local.edit_id, local.data) : await axios.post(store.constant.GW_DOWNLOAD + '/tasks', local.data);
             if (resp.status === 200 && resp.data.code === 0) {
               local.showDialog = false;
               message.success('成功')

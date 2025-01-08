@@ -149,6 +149,7 @@ export default function MediaList({ ...props }) {
               <Select value={record.status} onChange={async (v) => {
                 try {
                   local.isLoading = true
+                  await apis.updateMedia(local.type, record._id, { status: v });
                   record.status = v
                   notification.info({ message: '修改成功' })
                 } catch (e) {

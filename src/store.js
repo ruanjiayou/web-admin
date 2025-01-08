@@ -54,6 +54,7 @@ const store = {
   rules: [],
   spiders: [],
   constant: {
+    GW_DOWNLOAD: 'https://192.168.0.124/gw/download',
     RESOURCE_STATUS: {
       init: 1,
       loading: 2,

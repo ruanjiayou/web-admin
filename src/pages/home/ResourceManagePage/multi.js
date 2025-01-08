@@ -525,7 +525,7 @@ export default function ResourceEdit() {
                         <Select style={{ width: 90 }} value={item.status} onChange={async (status) => {
                           item.loading = true
                           try {
-                            await api.updateResourceChapter(local._id, { _id: item._id, status })
+                            await api.updateMedia('chapter', item._id, { status })
                             item.status = status
                           } finally {
                             item.loading = false
@@ -586,7 +586,7 @@ export default function ResourceEdit() {
                           <Select style={{ width: 90 }} value={item.status} onChange={async (status) => {
                             item.loading = true
                             try {
-                              const result = await api.updateResourceVideo(local._id, { _id: item._id, status })
+                              const result = await api.updateMedia('video', item._id, { status })
                               if (result.code === 0) {
                                 item.status = status
                               } else {
@@ -596,16 +596,16 @@ export default function ResourceEdit() {
                               item.loading = false
                             }
                           }}>
-                            <Option value={store.constant.RESOURCE_STATUS.init}>初始化</Option>
-                            <Option value={store.constant.RESOURCE_STATUS.loading}>下载中</Option>
-                            <Option value={store.constant.RESOURCE_STATUS.finished}>已下载</Option>
-                            <Option value={store.constant.RESOURCE_STATUS.fail}>失败</Option>
+                            <Option value={store.constant.MEDIA_STATUS.init}>初始化</Option>
+                            <Option value={store.constant.MEDIA_STATUS.loading}>下载中</Option>
+                            <Option value={store.constant.MEDIA_STATUS.finished}>已下载</Option>
+                            <Option value={store.constant.MEDIA_STATUS.fail}>失败</Option>
                           </Select>
                           <Divider type="vertical" />
                           <Select style={{ width: 80 }} value={item.type} onChange={async (type) => {
                             item.loading = true
                             try {
-                              await api.updateResourceVideo(local._id, { _id: item._id, type })
+                              await api.updateMedia('video', item._id, { type })
                               item.type = type
                             } finally {
                               item.loading = false
@@ -624,7 +624,7 @@ export default function ResourceEdit() {
                             item.loading = true
                             try {
                               const type = item.url.includes('.m3u8') ? 'm3u8' : (['youtube_short', 'youtube_video', 'bilibili_video'].includes(local.data.spider_id) ? 'dlp' : 'video');
-                              const resp = await Axios.post(`https://192.168.0.124/gw/download/download/${type}/${item._id}?force=1&autofill=1`, {
+                              const resp = await Axios.post(`${store.constant.GW_DOWNLOAD}/download/${type}/${item._id}?force=1&autofill=1`, {
                                 data: { format: _.get(item, 'more.format', undefined), transcode: type === 'm3u8' ? 1 : 0, },
                                 opts: {},
                               })
@@ -663,15 +663,13 @@ export default function ResourceEdit() {
                         const name = segs.pop()
                         const dirs = segs.join('/')
                         try {
-                          const res = await apis.createFile({
-                            isDir: 0,
-                            param: dirs,
+                          const res = await apis.createFile(dirs, {
                             name: name,
                             upfile: e.file
                           })
                           if (res.code === 0) {
                             message.info('上传成功')
-                            await api.updateResourceVideo(local._id, { _id: item._id, status: store.constant.RESOURCE_STATUS.finished })
+                            await api.updateMedia('video', item._id, { status: store.constant.RESOURCE_STATUS.finished })
                             item.status = store.constant.RESOURCE_STATUS.finished
                           } else {
                             message.info(res.message || '上传失败')
@@ -694,7 +692,7 @@ export default function ResourceEdit() {
                         <CloseOutlined disabled={item.loading || item.status === store.constant.MEDIA_STATUS.loading} onClick={async () => {
                           item.loading = true
                           try {
-                            await api.removeResourceVideo({ _id: item._id, mid: local._id })
+                            await api.removeMedia('video', item._id);
                             local.data.videos = local.data.videos.filter(t => t.url !== item.url)
                           } finally {
                             item.loading = false
@@ -709,8 +707,10 @@ export default function ResourceEdit() {
                       const ourl = container.querySelectorAll('.url input')[2];
                       item.loading = true
                       try {
-                        await api.updateResourceVideo(local._id, { _id: item._id, url: ourl.value, path: opath.value, title: otitle.value });
+                        await api.updateMedia('video', item._id, { url: ourl.value, path: opath.value, title: otitle.value });
                         item.path = opath.value;
+                        item.url = ourl.value;
+                        item.title = otitle.value;
                         message.success('修改成功')
                       } finally {
                         item.loading = false
@@ -828,7 +828,7 @@ export default function ResourceEdit() {
                         <Select style={{ width: 90 }} value={item.status} onChange={async (status) => {
                           item.loading = true
                           try {
-                            await api.updateResourceImage(local._id, { _id: item._id, status })
+                            await api.updateMedia('image', item._id, { status })
                             item.status = status
                           } finally {
                             item.loading = false
@@ -843,7 +843,7 @@ export default function ResourceEdit() {
                         <Select style={{ width: 80 }} value={item.type} onChange={async (type) => {
                           item.loading = true
                           try {
-                            await api.updateResourceImage(local._id, { _id: item._id, type })
+                            await api.updateMedia('image', item._id, { type })
                             item.type = type
                           } finally {
                             item.loading = false
@@ -859,7 +859,7 @@ export default function ResourceEdit() {
                     suffix={<CloseOutlined disabled={item.loading || item.status === store.constant.MEDIA_STATUS.loading} onClick={async () => {
                       item.loading = true
                       try {
-                        await api.removeResourceImage({ _id: item._id, mid: local._id })
+                        await api.removeMedia('image', item._id);
                         await Axios.delete(`https://192.168.0.124/gw/download/tasks/${item._id}`)
                         local.data.images = local.data.images.filter(t => t.url !== item.url)
                       } finally {
@@ -883,7 +883,7 @@ export default function ResourceEdit() {
                             })
                             if (res.code === 0) {
                               message.info('上传成功')
-                              await api.updateResourceImage(local._id, { _id: item._id, status: store.constant.RESOURCE_STATUS.finished })
+                              await api.updateMedia('image', item._id, { status: store.constant.RESOURCE_STATUS.finished })
                               item.status = store.constant.RESOURCE_STATUS.finished
                             } else {
                               message.info(res.message || '上传失败')
@@ -913,7 +913,7 @@ export default function ResourceEdit() {
                         <Icon type="check" onClick={async () => {
                           item.loading = true
                           try {
-                            await api.updateResourceImage(local._id, { _id: item._id, url: item.url })
+                            await api.updateMedia(local.data.spider_id === 'pixiv_image' ? 'pixiv' : 'image', item._id, { url: item.url })
                           } finally {
                             item.loading = false
                           }
@@ -927,7 +927,7 @@ export default function ResourceEdit() {
                           item.loading = true
                           try {
                             const type = local.data.spider_id === 'pixiv_image' ? 'pixiv' : 'image';
-                            const resp = await Axios.post(`https://192.168.0.124/gw/download/download/${type}/${item._id}?force=1&autofill=1`, {})
+                            const resp = await Axios.post(`${store.constant.GW_DOWNLOAD}/download/${type}/${item._id}?force=1&autofill=1`, {})
                             if (resp.status === 200 && resp.data.code === 0) {
                               item.status = store.constant.MEDIA_STATUS.loading
                             } else {
@@ -1070,7 +1070,7 @@ export default function ResourceEdit() {
                           <Select style={{ width: 90 }} value={item.status} onChange={async (status) => {
                             item.loading = true
                             try {
-                              await api.updateResourceAudio(local._id, { _id: item._id, status, source_name: local.data.source_name })
+                              await api.updateMedia('audio', item._id, { status, })
                               item.status = status
                             } finally {
                               item.loading = false
@@ -1088,7 +1088,7 @@ export default function ResourceEdit() {
                           <Icon type="check" onClick={async () => {
                             item.loading = true
                             try {
-                              await api.updateResourceAudio(local._id, { _id: item._id, status: item.status, url: item.url })
+                              await api.updateMedia('audio', item._id, { status: item.status, url: item.url })
                             } finally {
                               item.loading = false
                             }
@@ -1096,7 +1096,7 @@ export default function ResourceEdit() {
                           <Divider type='vertical' /><CloseOutlined disabled={item.loading || item.status === store.constant.MEDIA_STATUS.loading} onClick={async () => {
                             item.loading = true
                             try {
-                              await api.removeResourceAudio({ _id: item._id, mid: local._id })
+                              await api.removeMedia('audio', item._id);
                               local.data.audios = local.data.audios.filter(t => t.url !== item.url)
                             } finally {
                               item.loading = false
@@ -1113,35 +1113,12 @@ export default function ResourceEdit() {
                       addonBefore='url'
                       addonAfter={<Observer>{() => (
                         <FullWidth>
-                          <label htmlFor={`audio_${index}`}>
-                            <input id={`audio_${index}`} type='file' style={{ display: 'none' }} onChange={async (e) => {
-                              item.music = e.target.files[0];
-                              item.status = store.constant.MEDIA_STATUS.loading
-                              item.loading = true
-                              try {
-                                await api.updateResourceAudio(local._id, { _id: item._id, music: item.music, status: store.constant.MEDIA_STATUS.finished })
-                                item.status = store.constant.MEDIA_STATUS.finished
-                              } finally {
-                                item.music = null;
-                                item.loading = false;
-                              }
-                            }} />
+                          <label>
                             <Icon type={item.loading || item.status === store.constant.MEDIA_STATUS.loading ? 'loading' : 'upload'} disabled={item.loading} />
                           </label>
                           <Divider type='vertical' />
                           <Icon type={item.loading || item.status === store.constant.RESOURCE_STATUS.loading ? 'loading' : 'download'} disabled={item.loading} onClick={async () => {
                             return notification.error({ message: '功能未开放' })
-                            if (item.status === store.constant.MEDIA_STATUS.finished) {
-                              return notification.error({ message: '已下载' })
-                            }
-                            item.status = store.constant.MEDIA_STATUS.loading
-                            item.loading = true
-                            try {
-                              await api.downloadResourceAudio(local._id, item._id, { source_name: local.data.source_name })
-                              item.status = store.constant.MEDIA_STATUS.finished
-                            } finally {
-                              item.loading = false
-                            }
                           }} />
                         </FullWidth>
                       )}</Observer>}

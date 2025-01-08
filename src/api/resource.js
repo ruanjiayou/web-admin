@@ -1,4 +1,5 @@
 import shttp from '../utils/shttp'
+import store from '../store'
 
 export function getResources(query) {
   let search = ''
@@ -76,14 +77,6 @@ export function destroyResource(params) {
   })
 }
 
-export function updateResourceChapter(_id, data) {
-  return shttp({
-    url: `/v1/admin/resource/${_id}/chapter/${data._id}`,
-    method: 'PUT',
-    data,
-  })
-}
-
 export function updateResourceActor(_id, data) {
   return shttp({
     url: `/v1/admin/resource/${_id}/actors`,
@@ -100,41 +93,6 @@ export function addResourceVideo({ _id, ...data }) {
   })
 }
 
-export function updateResourceVideo(_id, data) {
-  return shttp({
-    url: `/v1/admin/resource/${_id}/video/${data._id}`,
-    method: 'PUT',
-    data,
-  })
-}
-
-export function downloadResourceVideo(mid, _id) {
-  return shttp({
-    url: `/v1/admin/resource/${mid}/video/${_id}`,
-    method: 'PATCH',
-  })
-}
-
-export function downloadVideoSubtitles({ _id, mid, subtitles }) {
-  return shttp({
-    url: `/v1/admin/resource/${mid}/video/${_id}/subtitles`,
-    data: { subtitles },
-    method: 'PATCH',
-  })
-}
-
-export function downloadResourceCover({ _id }) {
-  return shttp({
-    url: `/v1/admin/resource/${_id}/cover`,
-    method: 'PATCH',
-  })
-}
-export function removeResourceVideo({ _id, mid }) {
-  return shttp({
-    url: `/v1/admin/resource/${mid}/video/${_id}`,
-    method: 'DELETE',
-  })
-}
 
 export function sortSubResource(_id, type, batch) {
   return shttp({
@@ -144,49 +102,10 @@ export function sortSubResource(_id, type, batch) {
   });
 }
 
-export function sortResourceVideo({ _id, data }) {
-  return shttp({
-    url: `/v1/admin/resource/${_id}/video`,
-    method: 'PUT',
-    data,
-  })
-}
-
-
 export function addResourceImage({ _id, ...data }) {
   return shttp({
     url: `/v1/admin/resource/${_id}/image`,
     method: 'POST',
-    data,
-  })
-}
-
-export function updateResourceImage(_id, data) {
-  return shttp({
-    url: `/v1/admin/resource/${_id}/image/${data._id}`,
-    method: 'PUT',
-    data,
-  })
-}
-
-export function downloadResourceImage(mid, _id) {
-  return shttp({
-    url: `/v1/admin/resource/${mid}/image/${_id}`,
-    method: 'PATCH',
-  })
-}
-
-export function removeResourceImage({ _id, mid }) {
-  return shttp({
-    url: `/v1/admin/resource/${mid}/image/${_id}`,
-    method: 'DELETE',
-  })
-}
-
-export function sortResourceImage({ _id, data }) {
-  return shttp({
-    url: `/v1/admin/resource/${_id}/image`,
-    method: 'PUT',
     data,
   })
 }
@@ -209,34 +128,17 @@ export function addResourceAudio(_id, data) {
   })
 }
 
-export function updateResourceAudio(_id, data) {
-  const form = new FormData()
-  for (let k in data) {
-    if (data[k] instanceof Array) {
-      for (let i = 0; i < data[k].length; i++) {
-        form.append(k, data[k][i])
-      }
-    } else {
-      form.append(k, data[k])
-    }
-  }
-  return shttp({
-    url: `/v1/admin/resource/${_id}/audio/${data._id}`,
-    method: 'PUT',
-    data: form,
-  })
-}
-
-export function removeResourceAudio({ _id, mid }) {
-  return shttp({
-    url: `/v1/admin/resource/${mid}/audio/${_id}`,
-    method: 'DELETE',
-  })
-}
-
 export function grabImages(params) {
   return shttp({
     url: `/v1/admin/resource-grab-images/${params._id}`,
     method: 'GET',
+  })
+}
+
+export function downloadMedia(type, _id, data = {}) {
+  return shttp({
+    url: `${store.constant.GW_DOWNLOAD}/download/${type}/${_id}?autofill=1`,
+    method: 'POST',
+    data,
   })
 }

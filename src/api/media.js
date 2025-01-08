@@ -12,3 +12,18 @@ export function getMedias(type, query) {
     method: 'GET'
   })
 }
+
+export function updateMedia(type, _id, data) {
+  return shttp({
+    url: `/v1/admin/media/${type}/${_id}`,
+    method: 'PUT',
+    data,
+  })
+}
+
+export function removeMedia(type, _id) {
+  return shttp({
+    url: `/v1/admin/media/${type}/${_id}`,
+    method: 'DELETE',
+  })
+}

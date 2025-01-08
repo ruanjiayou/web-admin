@@ -19,6 +19,7 @@ import * as component from './component'
 import * as feedback from './feedback'
 import * as videoChapter from './video-chapter'
 import * as media from './media'
+import store from '../store'
 
 const boot = function () {
   return shttp({
@@ -29,7 +30,7 @@ const boot = function () {
 
 const excuteTemplate = async (id, data) => {
   return shttp({
-    url: 'https://192.168.0.124/gw/download/ffmpeg/' + id,
+    url: store.constant.GW_DOWNLOAD + '/ffmpeg/' + id,
     data,
     method: 'POST'
   })
@@ -37,7 +38,7 @@ const excuteTemplate = async (id, data) => {
 
 const loadingInfo = async (filepath) => {
   return shttp({
-    url: 'https://192.168.0.124/gw/download/ffmpeg/video-info-full',
+    url: store.constant.GW_DOWNLOAD + '/ffmpeg/video-info-full',
     method: 'POST',
     data: { filepath }
   })
