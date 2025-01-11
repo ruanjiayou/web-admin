@@ -1,14 +1,16 @@
 import React, { Fragment, useCallback } from 'react'
 import { Observer, useLocalStore, } from 'mobx-react-lite'
 import apis from '../../../api';
-import { Table, notification, Select, Tag, Divider, Button, Input } from 'antd';
+import { Table, notification, Select, Tag, Divider, Button, Input, Spin } from 'antd';
 import { FieldTimeOutlined, CopyOutlined, } from '@ant-design/icons'
-import { FullHeight, FullHeightAuto, FullWidthFix } from '../../../component/style'
+import { FullHeight, FullHeightAuto, FullWidth, FullWidthFix } from '../../../component/style'
 import store from '../../../store'
 import Clipboard from 'react-clipboard.js';
 import styled from 'styled-components';
 import moment from 'moment';
+import Icon from '../../../component/Icon'
 import { useEffectOnce } from 'react-use';
+import { events } from '../../../utils/events';
 
 const { Column } = Table;
 const Label = styled.span`
@@ -30,8 +32,16 @@ export default function MediaList({ ...props }) {
     search_key: 'mid',
     search_value: '',
     search_page: 1,
-    search_status: '',
-    type: window.location.pathname.split('/').pop()
+    search_status: store.constant.MEDIA_STATUS.fail,
+    type: window.location.pathname.split('/').pop(),
+    changeResource: (data) => {
+      const resource_id = data.resource_id;
+      local.items.forEach(t => {
+        if (t._id === resource_id) {
+          t.status = data.status;
+        }
+      })
+    }
   }));
   const onSearch = useCallback(() => {
     apis.getMedias(local.type, { page: local.search_page, status: local.search_status, [local.search_key]: local.search_value }).then(result => {
@@ -43,6 +53,10 @@ export default function MediaList({ ...props }) {
   })
   useEffectOnce(() => {
     onSearch();
+    events.on('event', local.changeResource);
+    return () => {
+      events && local.changeResource && events.off(local.changeResource);
+    }
   })
   return <Observer>{() => (
     <FullHeight>
@@ -90,10 +104,20 @@ export default function MediaList({ ...props }) {
           local.search_page = page.current
           onSearch()
         }}>
-          <Column title="_id" dataIndex={'_id'} key='_id' render={text => (
-            <Clipboard data-clipboard-text={text} component={'a'}>
-              <CopyOutlined />
-            </Clipboard>
+          <Column title="_id" dataIndex={'_id'} key='_id' render={(text, record) => (
+            <Observer>{() => (
+              <FullWidth>
+                <Clipboard data-clipboard-text={text} component={'a'}>
+                  <CopyOutlined />
+                </Clipboard>
+                <Divider type='vertical' />
+                {record.status === store.constant.MEDIA_STATUS.loading && <Spin />}
+                {record.status === store.constant.MEDIA_STATUS.fail && <Icon type={'download'} onClick={() => {
+                  record.status = store.constant.MEDIA_STATUS.loading
+                  apis.downloadMedia(local.type, record._id);
+                }} />}
+              </FullWidth>
+            )}</Observer>
           )} />
           <Column title="标题" width={200} dataIndex="title" key="title" render={(text, record) => {
             let isDev = window.origin.includes('localhost') ? true : false;
@@ -146,6 +170,9 @@ export default function MediaList({ ...props }) {
                 <Select.Option value={store.constant.VIDEO_TYPE.normal}>正片</Select.Option>
                 <Select.Option value={store.constant.VIDEO_TYPE.tidbits}>预告</Select.Option>
                 <Select.Option value={store.constant.VIDEO_TYPE.trailer}>花絮</Select.Option>
+              </Fragment>) : null}
+              {local.type === 'gallery' ? (<Fragment>
+                <Select.Option value={store.constant.IMAGE_TYPE.gallery}>集合</Select.Option>
               </Fragment>) : null}
             </Select>
           )} />
