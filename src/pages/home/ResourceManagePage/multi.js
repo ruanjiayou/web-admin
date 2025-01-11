@@ -159,7 +159,7 @@ export default function ResourceEdit() {
     const resource_id = data.resource_id;
     if (data.resource_type === 'resource' && resource_id === local._id) {
       local.data.status = data.status;
-    } else if (data.resource_type === 'chapters') {
+    } else if (data.resource_type === 'chapter') {
       local.setSubStatus('chapters', resource_id, data.status)
     } else if (data.resource_type === 'video') {
       local.setSubStatus('videos', resource_id, data.status)
