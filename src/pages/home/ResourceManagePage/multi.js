@@ -159,12 +159,12 @@ export default function ResourceEdit() {
     const resource_id = data.resource_id;
     if (data.resource_type === 'resource' && resource_id === local._id) {
       local.data.status = data.status;
+    } else if (data.resource_type === 'chapters') {
+      local.setSubStatus('chapters', resource_id, data.status)
     } else if (data.resource_type === 'video') {
       local.setSubStatus('videos', resource_id, data.status)
     } else if (data.resource_type === 'image') {
       local.setSubStatus('images', resource_id, data.status);
-    } else if (data.resource_type === 'caption') {
-      local.setSubStatus('captions', resource_id, data.status);
     }
   };
   useEffectOnce(() => {

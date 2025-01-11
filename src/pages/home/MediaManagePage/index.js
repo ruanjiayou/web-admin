@@ -1,11 +1,9 @@
 import React, { Fragment, useCallback } from 'react'
 import { Observer, useLocalStore, } from 'mobx-react-lite'
-import { Link } from 'react-router-dom'
 import apis from '../../../api';
-import { Table, Popconfirm, notification, Select, Tag, Divider, Button, Input } from 'antd';
-import { FormOutlined, DeleteOutlined, WarningOutlined, CloudServerOutlined, SyncOutlined, FieldTimeOutlined, CloudSyncOutlined, LinkOutlined, SwitcherOutlined, DownloadOutlined, LoadingOutlined, } from '@ant-design/icons'
-import { Icon, VisualBox, EditTag } from '../../../component'
-import { CenterXY, FullHeight, FullHeightAuto, FullWidth, FullWidthAuto, FullWidthFix } from '../../../component/style'
+import { Table, notification, Select, Tag, Divider, Button, Input } from 'antd';
+import { FieldTimeOutlined, CopyOutlined, } from '@ant-design/icons'
+import { FullHeight, FullHeightAuto, FullWidthFix } from '../../../component/style'
 import store from '../../../store'
 import Clipboard from 'react-clipboard.js';
 import styled from 'styled-components';
@@ -92,6 +90,11 @@ export default function MediaList({ ...props }) {
           local.search_page = page.current
           onSearch()
         }}>
+          <Column title="_id" dataIndex={'_id'} key='_id' render={text => (
+            <Clipboard data-clipboard-text={text} component={'a'}>
+              <CopyOutlined />
+            </Clipboard>
+          )} />
           <Column title="标题" width={200} dataIndex="title" key="title" render={(text, record) => {
             let isDev = window.origin.includes('localhost') ? true : false;
             let url = isDev ? 'https://192.168.0.124' : window.origin;
