@@ -5,7 +5,7 @@ import apis from '../../../api';
 import { Table, Popconfirm, notification, Select, Tag, Divider, Button, Input } from 'antd';
 import { FormOutlined, DeleteOutlined, WarningOutlined, CloudServerOutlined, SyncOutlined, FieldTimeOutlined, CloudSyncOutlined, LinkOutlined, SwitcherOutlined, DownloadOutlined, LoadingOutlined, } from '@ant-design/icons'
 import { Icon, VisualBox, EditTag } from '../../../component'
-import { CenterXY, FullHeight, FullWidth, FullWidthAuto, FullWidthFix } from '../../../component/style'
+import { CenterXY, FullHeight, FullHeightAuto, FullWidth, FullWidthAuto, FullWidthFix } from '../../../component/style'
 import store from '../../../store'
 import Clipboard from 'react-clipboard.js';
 import styled from 'styled-components';
@@ -39,6 +39,7 @@ export default function MediaList({ ...props }) {
     apis.getMedias(local.type, { page: local.search_page, status: local.search_status, [local.search_key]: local.search_value }).then(result => {
       if (result.code === 0) {
         local.items = result.data;
+        local.count = result.total;
       }
     })
   })
@@ -81,11 +82,12 @@ export default function MediaList({ ...props }) {
           onSearch()
         }}>查询</Button>
       </FullWidthFix>
-      <FullWidthAuto>
+      <FullHeightAuto>
         <Table dataSource={local.items} rowKey="_id" loading={local.isLoading} pagination={{
           pageSize: 20,
           current: local.search_page,
           total: local.count,
+          position: ['topRight', 'bottomRight'],
         }} onChange={(page) => {
           local.search_page = page.current
           onSearch()
@@ -167,7 +169,7 @@ export default function MediaList({ ...props }) {
             </Observer>
           )} />
         </Table>
-      </FullWidthAuto>
+      </FullHeightAuto>
     </FullHeight>
   )}</Observer>
 }

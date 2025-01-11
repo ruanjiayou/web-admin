@@ -513,11 +513,11 @@ export default function ResourceEdit() {
             itemStyle={{ display: 'flex', alignItems: 'center', lineHeight: 1, marginBottom: 5, backgroundColor: 'transparent' }}
             renderItem={({ item, index }) => (
               <Observer>{() => (
-                <FullHeight style={{ flex: 1 }}>
+                <FullHeight style={{ flex: 1 }} className='container'>
                   <Input
                     key={index}
-                    value={item.title}
-                    disabled
+                    defaultValue={item.title}
+                    disabled={item.loading}
                     className="custom"
                     style={item.status === store.constant.RESOURCE_STATUS.finished ? { backgroundColor: '#00b578', color: 'white' } : { backgroundColor: '#ff8f1f' }}
                     addonBefore={<Observer>{() => (
@@ -537,7 +537,24 @@ export default function ResourceEdit() {
                           <Option value={store.constant.MEDIA_STATUS.fail}>失败</Option>
                         </Select>
                         <span style={{ padding: 5 }}>{item.nth}</span>
+                        <Clipboard data-clipboard-text={item._id} component={'a'}>
+                          <CopyOutlined />
+                        </Clipboard>
                       </Fragment>
+                    )}</Observer>}
+                    addonAfter={<Observer>{() => (
+                      <Icon type="check" onClick={async (e) => {
+                        const container = e.target.closest('.container');
+                        const otitle = container.querySelectorAll('input')[1];
+                        item.loading = true
+                        try {
+                          await api.updateMedia('chapter', item._id, { title: otitle.value });
+                          item.title = otitle.value;
+                          message.success('修改成功')
+                        } finally {
+                          item.loading = false
+                        }
+                      }} />
                     )}</Observer>}
                   />
                 </FullHeight>
