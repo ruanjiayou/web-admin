@@ -95,7 +95,11 @@ export default function ResourceManagePage() {
     });
     events.on('event', local.changeResource);
     return () => {
-      events.off('event', local.changeResource)
+      try {
+        events.off('event', local.changeResource)
+      } catch(e){
+
+      }      
     }
   }, [])
   return (<Observer>{() => {

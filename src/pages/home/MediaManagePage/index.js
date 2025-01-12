@@ -55,7 +55,11 @@ export default function MediaList({ ...props }) {
     onSearch();
     events.on('event', local.changeResource);
     return () => {
-      events && local.changeResource && events.off(local.changeResource);
+      try {
+        events && local.changeResource && events.off(local.changeResource);
+      } catch (e) {
+        console.log(e, 'off fail')
+      }
     }
   })
   return <Observer>{() => (

@@ -186,7 +186,11 @@ export default function ResourceEdit() {
       })
     }
     return () => {
-      events && changeResource && events.off(changeResource);
+      try {
+        events && changeResource && events.off(changeResource);
+      } catch (e) {
+
+      }
     }
   })
 
