@@ -3,7 +3,7 @@ import { Observer, useLocalStore } from 'mobx-react-lite'
 import { toJS } from 'mobx'
 import axios from 'axios'
 import { useEffectOnce } from 'react-use';
-import { Table, Popconfirm, notification, Select, Tag, Divider, message, Tooltip, Button, Form, Input, Radio, Modal, } from 'antd';
+import { Table, Popconfirm, notification, Select, Tag, Divider, message, Tooltip, Button, Form, Input, Radio, Modal, Popover } from 'antd';
 import { LinkOutlined, PoweroffOutlined, PlayCircleOutlined, PlusCircleOutlined, SyncOutlined, FormOutlined, DeleteOutlined, CheckOutlined, BarcodeOutlined, FileImageOutlined, VideoCameraOutlined } from '@ant-design/icons'
 import { events } from '../../../utils/events';
 import { AlignAside } from '../../../component//style'
@@ -146,11 +146,12 @@ export default function Page() {
               onSearch();
             }}>
               <Select.Option value="">全部</Select.Option>
+              <Select.Option value="0">已废弃</Select.Option>
               <Select.Option value="1,2,3">未完成</Select.Option>
               <Select.Option value="1">已解析</Select.Option>
               <Select.Option value="2">下载中</Select.Option>
               <Select.Option value="3">已下载</Select.Option>
-              <Select.Option value="4">失败</Select.Option>
+              <Select.Option value="4">已失败</Select.Option>
               <Select.Option value="5">已完成</Select.Option>
             </Select>
           </Button.Group>
@@ -187,7 +188,9 @@ export default function Page() {
               <LinkOutlined />
             </a>
             &nbsp;&nbsp;
-            {['image', 'gallery'].includes(task.type) ? <FileImageOutlined /> : <VideoCameraOutlined />}
+            {['image', 'gallery'].includes(task.type) ? <Popover trigger={'click'} content={<img style={{ width: 120, height: 120 }} src={store.app.imageLine + url} />}>
+              <FileImageOutlined />
+            </Popover> : <VideoCameraOutlined />}
           </Fragment>
         )} />
         <Column title="名称" width={200} dataIndex={'name'} render={(name, task) => (
@@ -246,6 +249,8 @@ export default function Page() {
                 local.loading = false;
               }
             }}>转移文件</Button> : '下载成功'}</div>
+          } else if (status === 0) {
+            return '已废弃'
           } else if (status === 4) {
             return '出错'
           } else if (status === 5) {
@@ -403,10 +408,11 @@ export default function Page() {
             <Radio.Group name="status" value={local.data.status} onChange={e => {
               local.data.status = e.target.value;
             }}>
+              <Radio value={0}>已废弃</Radio>
               <Radio value={1}>已创建</Radio>
               <Radio value={2}>下载中</Radio>
               <Radio value={3}>已下载</Radio>
-              <Radio value={4}>失败</Radio>
+              <Radio value={4}>已失败</Radio>
               <Radio value={5}>已完成</Radio>
             </Radio.Group>
           </Item>
